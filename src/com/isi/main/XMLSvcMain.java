@@ -104,7 +104,7 @@ public class XMLSvcMain {
 					}
 				}
 				
-			} else {
+			} else { // git test
 				System.out.println("Stand Alone Mode");
 				duplexMgr.setDuplexMode(false);
 				duplexMgr.setActiveMode();
