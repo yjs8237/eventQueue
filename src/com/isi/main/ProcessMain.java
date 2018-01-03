@@ -27,20 +27,21 @@ public class ProcessMain {
 		
 		System.out.println("Start ISPS Mode!! Active Mode[" + DuplexMgr.getInstance().getActiveMode() +"]");
 		
-		IQueue queue = new JQueue(); // ISPS 로 부터 받는 UDP 패킷 처리 큐
+		IQueue queue = new JQueue(); // ISPS 濡� 遺��꽣 諛쏅뒗 UDP �뙣�궥 泥섎━ �걧
 		
 //		System.out.println(DeviceMgr.getInstance().getAllDeviceInfo());
 		 
 		System.out.println("Start receiving UDP Packet from ISPS !!");
 		
-		// ISPS 로 부터 UDP 받는 소켓 스레드 시작
+		// ISPS 濡� 遺��꽣 UDP 諛쏅뒗 �냼耳� �뒪�젅�뱶 �떆�옉
 		UDPThread thread = new UDPThread(queue);
 		thread.startService();
-		
+		  
+		//asd sadf
 		/*
 		 * ///////////////////////////////////////////////
 		 * 
-		 * 3. UDP 패킷 처리
+		 * 3. UDP �뙣�궥 泥섎━
 		 */// ////////////////////////////////////////////
 		
 		UDPService udpService = new UDPService(queue);
@@ -55,12 +56,12 @@ public class ProcessMain {
 		
 			/*
 			 * ///////////////////////////////////////////////
-			 * 1. CM AXL Device 정보 가져오기 , Jtapi 연동
+			 * 1. CM AXL Device �젙蹂� 媛��졇�삤湲� , Jtapi �뿰�룞
 			 */// ////////////////////////////////////////////
 			
-			IQueue queue = new JQueue(); // 이벤트 데이터 처리 큐
+			IQueue queue = new JQueue(); // �씠踰ㅽ듃 �뜲�씠�꽣 泥섎━ �걧
 			
-			/* CM Jtapi 연동 (Device 정보 가져오기, Device 정보 DB Insert 하기) */
+			/* CM Jtapi �뿰�룞 (Device �젙蹂� 媛��졇�삤湲�, Device �젙蹂� DB Insert �븯湲�) */
 			JtapiService service = JtapiService.getInstance();
 			service.startService(queue);
 			
@@ -80,10 +81,10 @@ public class ProcessMain {
 			
 			/*
 			 * ///////////////////////////////////////////////
-			 * 3. Jtapi 이벤트 처리
+			 * 3. Jtapi �씠踰ㅽ듃 泥섎━
 			 */// ////////////////////////////////////////////
 			
-			/* 70개의 스레드를 관리하는 스레드 풀 에서 CM 으로부터 받은 Jtapi 이벤트를 처리한다. */
+			/* 70媛쒖쓽 �뒪�젅�뱶瑜� 愿�由ы븯�뒗 �뒪�젅�뱶 �� �뿉�꽌 CM �쑝濡쒕��꽣 諛쏆� Jtapi �씠踰ㅽ듃瑜� 泥섎━�븳�떎. */
 			XMLService xmlservice = new XMLService(queue);
 			xmlservice.startService();
 			
@@ -96,11 +97,11 @@ public class ProcessMain {
 		System.out.println("Start Test Mode!!  Active Mode[" + DuplexMgr.getInstance().getActiveMode() +"]");
 		/*
 		 * ///////////////////////////////////////////////
-		 * 1. CM AXL Device 정보 가져오기 , Jtapi 연동
+		 * 1. CM AXL Device �젙蹂� 媛��졇�삤湲� , Jtapi �뿰�룞
 		 */// ////////////////////////////////////////////
 		
-		IQueue queue = new JQueue(); // 이벤트 데이터 처리 큐
-		/* CM Jtapi 연동 (Device 정보 가져오기, Device 정보 DB Insert 하기) */
+		IQueue queue = new JQueue(); // �씠踰ㅽ듃 �뜲�씠�꽣 泥섎━ �걧
+		/* CM Jtapi �뿰�룞 (Device �젙蹂� 媛��졇�삤湲�, Device �젙蹂� DB Insert �븯湲�) */
 		
 		JtapiService service = JtapiService.getInstance();
 		service.startService(queue);
@@ -109,10 +110,10 @@ public class ProcessMain {
 		
 		/*
 		 * ///////////////////////////////////////////////
-		 * 3. Jtapi 이벤트 처리
+		 * 3. Jtapi �씠踰ㅽ듃 泥섎━
 		 */// ////////////////////////////////////////////
 		
-		/* 70개의 스레드를 관리하는 스레드 풀 에서 CM 으로부터 받은 Jtapi 이벤트를 처리한다. */
+		/* 70媛쒖쓽 �뒪�젅�뱶瑜� 愿�由ы븯�뒗 �뒪�젅�뱶 �� �뿉�꽌 CM �쑝濡쒕��꽣 諛쏆� Jtapi �씠踰ㅽ듃瑜� 泥섎━�븳�떎. */
 		TestService testService = new TestService(queue );
 		testService.startService();
 		

@@ -97,7 +97,7 @@ public class XMLSvcMain {
 				int result = alive.startAliveProc(); 
 				if(result == RESULT.RTN_SUCCESS){
 					duplexMgr.setStandByMode();
-				} else {
+				} else { //test
 					if(result == RESULT.TCP_CONN_FAIL){
 						System.out.println("TCP Connection FAIL!!");
 						duplexMgr.setActiveMode();
