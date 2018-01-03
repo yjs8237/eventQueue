@@ -1,0 +1,116 @@
+package com.isi.service;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import com.isi.axl.CiscoPhoneInfo;
+import com.isi.constans.LOGLEVEL;
+import com.isi.constans.LOGTYPE;
+import com.isi.constans.PROPERTIES;
+import com.isi.constans.RESULT;
+import com.isi.constans.SVCTYPE;
+import com.isi.exception.ExceptionUtil;
+import com.isi.file.GLogWriter;
+import com.isi.file.ILog;
+import com.isi.file.PropertyRead;
+import com.isi.jtapi.IJTAPI;
+import com.isi.jtapi.JTAPI2;
+import com.isi.process.IQueue;
+import com.isi.process.JQueue;
+/**
+*
+* @author greatyun
+*/
+public class JtapiService {
+	
+	private PropertyRead proRead;
+	private ILog logWriter;
+	
+	private String cmIP;
+	private String cmUser;
+	private String cmPassword;
+	private boolean isJtapiRun;
+	
+	private int cmCnt;
+	
+	private IJTAPI[] m_jtapi;
+	private JQueue m_EvtQue;
+	 
+	private static JtapiService jtapiService = new JtapiService();
+	
+	private JtapiService(){}
+	public synchronized static JtapiService getInstance(){
+		if(jtapiService == null){
+			jtapiService = new JtapiService();
+		}
+		return jtapiService;
+	}
+	
+	
+	public int startService(IQueue queue){
+		
+		try {
+			
+			proRead = PropertyRead.getInstance();
+			logWriter = new GLogWriter();
+			m_EvtQue = (JQueue) queue;
+			
+			cmCnt = Integer.parseInt(proRead.getValue(PROPERTIES.CM_CNT));
+			
+			m_jtapi = new IJTAPI[cmCnt];
+			
+			 for (int i = 0; i < m_jtapi.length; i++) {
+				 
+				 if( i == 0 ){
+					 cmIP = proRead.getValue(PROPERTIES.CM1_IP);
+					 cmUser = proRead.getValue(PROPERTIES.CM1_USER);
+					 cmPassword = proRead.getValue(PROPERTIES.CM1_PASSWORD);
+				 } else if(i == 1){
+					 cmIP = proRead.getValue(PROPERTIES.CM2_IP);
+					 cmUser = proRead.getValue(PROPERTIES.CM2_USER);
+					 cmPassword = proRead.getValue(PROPERTIES.CM2_PASSWORD);
+				 }
+				 
+	                m_jtapi[i] = new JTAPI2(i, m_EvtQue);
+	                
+	                if(m_jtapi[i].serviceStart(cmIP, cmUser, cmPassword) != RESULT.RTN_SUCCESS) {
+	                	isJtapiRun = false;
+	                	logWriter.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.JTAPI, "startService", "Cannot start JTAPI Service!");
+	                } else {
+	                	isJtapiRun = true;
+	                	logWriter.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.JTAPI, "startService", "Start JTAPI Service!");
+	                	
+	                	CiscoPhoneInfo phoneinfo = new CiscoPhoneInfo();
+	                	CiscoPhoneInfo.GetAllPhoneInfo(cmIP, 8443, cmUser, cmPassword, phoneinfo);
+	                	// ## 주석
+//	                	JCtiData.getData().updateDeviceIP(phoneinfo);
+	                	
+	                	m_jtapi[i].MonitorAllStart(phoneinfo);
+	                }
+			 }
+			 
+			 if(!isJtapiRun) {
+				 System.exit(0);
+			 }
+			 
+			
+		} catch( Exception e){
+			e.printStackTrace(ExceptionUtil.getPrintWriter());
+			logWriter.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, SVCTYPE.JTAPI, "startService", ExceptionUtil.getStringWriter().toString());
+		}
+		
+		
+		return RESULT.RTN_SUCCESS;
+	}
+	
+	
+	public int addDevice(String aDn , String aIP, String aModel){
+		
+		for (int i = 0; i < m_jtapi.length; i++) {
+			m_jtapi[i].MonitorStart(aDn, aIP, aModel);
+		}
+		
+		return RESULT.RTN_SUCCESS;
+	}
+	
+}
