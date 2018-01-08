@@ -50,7 +50,8 @@ public class XMLHandler {
 		xmlData = new XMLData();
 //		this.dataBase = dataBase;
 		this.threadID = threadID;
-		custInfoPopupYN = pr.getValue(PROPERTIES.CUSTINFO_POPUP);
+//		custInfoPopupYN = pr.getValue(PROPERTIES.CUSTINFO_POPUP);
+		custInfoPopupYN = XmlInfoMgr.getInstance().getCustinfoPopupYN();
 	}
 	
 	public void pushToPhone(){
@@ -124,9 +125,24 @@ public class XMLHandler {
 				returnCode = pushImage(person, xmlInfo , callID);
 //				returnCode = pushText(person, xmlInfo , callID);
 				break;
+				
+			case IPPhone.PHONE_7941:
+				returnCode = pushImage(person, xmlInfo , callID);
+//				returnCode = pushText(person, xmlInfo , callID);
+				break;
+				
+			case IPPhone.PHONE_7971:
+				returnCode = pushImage(person, xmlInfo , callID);
+//				returnCode = pushText(person, xmlInfo , callID);
+				break;
+				
+			case IPPhone.PHONE_7970:
+				returnCode = pushImage(person, xmlInfo , callID);
+//				returnCode = pushText(person, xmlInfo , callID);
+				break;
 		
 			default:
-				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID, "evtRing", "## THIS Phone Model is not supported !! ##");
+				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID, "evtRing", "## THIS Phone Model is not supported !! ## [" + model + "]");
 				break;
 			}
 			

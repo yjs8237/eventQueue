@@ -21,8 +21,6 @@ import com.test.thread.TestThread;
 public class ProcessMain {
 
 	
-
-	
 	public void ispsMode(){
 		
 		System.out.println("Start ISPS Mode!! Active Mode[" + DuplexMgr.getInstance().getActiveMode() +"]");
@@ -34,7 +32,7 @@ public class ProcessMain {
 		System.out.println("Start receiving UDP Packet from ISPS !!");
 		
 		// ISPS 濡� 遺��꽣 UDP 諛쏅뒗 �냼耳� �뒪�젅�뱶 �떆�옉
-		UDPThread thread = new UDPThread(queue);
+		UDPThread thread = new UDPThread(queue); //asdasd
 		thread.startService();
 		  
 		//asd sadf

@@ -4,6 +4,7 @@ import java.net.Socket;
 
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
+import com.isi.data.XmlInfoMgr;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
@@ -32,8 +33,13 @@ public class AliveProc {
 	public int startAliveProc(){
 		
 		try{
-			ip = pr.getValue(PROPERTIES.REMOTE_IP);
-			port = Integer.parseInt(pr.getValue(PROPERTIES.REMOTE_PORT));
+			
+			if(pr.getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+				ip = XmlInfoMgr.getInstance().getSideBIP();
+			} else {
+				ip = XmlInfoMgr.getInstance().getSideAIP();
+			}
+			port = Integer.parseInt(XmlInfoMgr.getInstance().getRemotePort());
 			
 //			System.out.println("서버 접속 시도");
 			logwrite.duplexLog(DuplexMgr.getInstance().getActiveMode(), "AliveThread startAliveProc()", "서버 접속 시도 IP : " + ip + " , PORT : " + port);

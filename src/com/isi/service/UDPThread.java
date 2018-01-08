@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 import com.isi.constans.PROPERTIES;
+import com.isi.data.XmlInfoMgr;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.*;
 import com.isi.process.*;
@@ -39,8 +40,9 @@ public class UDPThread extends Thread{
 		
 		PropertyRead pr = PropertyRead.getInstance();
 		
-		this.recvPort = Integer.parseInt(pr.getValue(PROPERTIES.RECV_PORT));
-		this.sendPort = Integer.parseInt(pr.getValue(PROPERTIES.SEND_PORT));
+//		this.recvPort = Integer.parseInt(pr.getValue(PROPERTIES.RECV_PORT));
+		this.recvPort = 4567;
+		this.sendPort = 7654;
 		
 		try {
 			

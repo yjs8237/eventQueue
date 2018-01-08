@@ -114,7 +114,7 @@ public class Employees {
 		BufferedImage img = null;
 		
 		try{
-			
+			/*
 			imgHandler = new ImageHandler();
 			// 직원 증명사진 삭제
 			imgHandler.deleteFaceImageFile(updateEmployee);
@@ -124,7 +124,7 @@ public class Employees {
 			imgHandler.deleteEmpImage(updateEmployee);
 			// 신규 팝업이미지 생성
 			imgHandler.createAllImageFile(updateEmployee);
-			
+			*/
 			
 		} catch (Exception e) {
 			e.printStackTrace(ExceptionUtil.getPrintWriter());
@@ -526,16 +526,14 @@ public class Employees {
 			String key = (String) iter.next();
 			ArrayList list = (ArrayList) map.get(key);
 			
-			for (int i = 0; i < list.size(); i++) {
-				EmployeeVO employee = (EmployeeVO) list.get(i);
-				if(!imgHandler.createAllImageFile(employee)){
-					
-					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, ""
-							, "MakeLogFaile", "[creatEmployeeImg] Exception >> EMP:" + employee.toString());
-					System.out.println("[creatEmployeeImg] Exception >> EMP:" + employee.toString());
-					//return RESULT.RTN_EXCEPTION;
-				}
+			if(!imgHandler.createAllImageFile(list)){
+				
+//				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, ""
+//						, "MakeLogFaile", "[creatEmployeeImg] Exception >> EMP:" + employee.toString());
+//				System.out.println("[creatEmployeeImg] Exception >> EMP:" + employee.toString());
+				//return RESULT.RTN_EXCEPTION;
 			}
+			
 		}
 		return RESULT.RTN_SUCCESS;
 	}
@@ -635,7 +633,7 @@ public class Employees {
 			
 			if (retCode == RESULT.RTN_SUCCESS) {
 				
-				String strSelect = "select * from tb_emp_info_md order by comtel_no1_4 desc";
+				String strSelect = pr.getValue(PROPERTIES.QUERY_EMPINFO);
                 m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, "", "getMemberInfo", "[SELECT] " + strSelect);
                 
                 ResultSet rs = m_Conn.selectQuery(strSelect, false);
@@ -645,24 +643,19 @@ public class Employees {
                 	m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, "", "getMemberInfo" ,"[DB] Select Success");
                 	while(rs.next()){
                 		
-//                		String sql = "update itss_userinfo set dn = '"+ getDN(rs.getString("phone"))+"' where userid = '" +rs.getString("userid")+"'";
-//                		m_Conn.executeQuery(sql, false);
-                		
-                		if(rs.getString("comtel_no1_4") != null && rs.getString("comtel_no1_4").length() > 0){
+                		if(rs.getString("extension") != null && rs.getString("extension").length() > 0){
                 			
                 			employeeInfo = new EmployeeVO();
                 			
 //                			String cellNum = rs.getString("mobile_no_1") + "-" + rs.getString("mobile_no_2") + "-"+rs.getString("mobile_no_3");
-                			String extension = rs.getString("comtel_no1_4");
-                			String mac = rs.getString("mac");
+                			String extension = rs.getString("extension");
                 			employeeInfo.
-                			setEm_ID(rs.getString("emp_no")).
-                			setMacaddress(rs.getString("mac")).
-                			setDN(rs.getString("comtel_no1_4")).
+                			setEm_ID(rs.getString("emp_id")).
+                			setMacaddress(rs.getString("mac_address")).
+                			setDN(rs.getString("extension")).
                 			setOrgNm(rs.getString("org_nm")).
-                			setGroupNm(rs.getString("dup_org_nm")).
-                			setEm_position(rs.getString("duty_nm")).
-                			setEm_name(rs.getString("emp_nm")).
+                			setEm_position(rs.getString("pos_nm")).
+                			setEm_name(rs.getString("emp_nm_kor")).
                 			setPopupYN(rs.getString("popup_svc_yn")).
                 			setCmIP(rs.getString("cm_ip")).
                 			setDeviceType(rs.getString("device_type")).

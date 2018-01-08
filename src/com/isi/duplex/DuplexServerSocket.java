@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.*;
 
 import com.isi.constans.PROPERTIES;
+import com.isi.data.XmlInfoMgr;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.PropertyRead;
 /**
@@ -36,7 +37,7 @@ public class DuplexServerSocket extends ServerSocketEx{
 				ip = sock.getInetAddress().getHostAddress();
 				port = sock.getLocalPort();
 				
-				if(ip.equals(pr.getValue(PROPERTIES.REMOTE_IP))){
+				if(ip.equals(XmlInfoMgr.getInstance().getRemoteIP())){
 					logwrite.duplexLog(duplexMgr.getActiveMode(),"DuplexServerSocket run()", "REMOTE SERVER CONNECTED !! IP["+ip+"]PORT["+port+"]");
 					ServerSockThread senderSocket = new ServerSockThread(sock);
 					senderSocket.startService();

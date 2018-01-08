@@ -17,8 +17,10 @@ import java.util.List;
 
 import com.isi.constans.*;
 import com.isi.data.ImageMgr;
+import com.isi.data.XmlInfoMgr;
 import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
+import com.isi.file.PropertyRead;
 import com.isi.utils.Utils;
 import com.isi.vo.*;
 import com.test.vo.TestCallVO;
@@ -261,18 +263,93 @@ public class JDatabase  {
         }
     } 
     
+  public int selectXMLInfo(String query){
+    	
+    	System.out.println("************** DB Select XML Info *****************");
+    	
+    	query = query.trim();
+    	
+    	XmlInfoMgr xmlInfoMgr = XmlInfoMgr.getInstance();
+    	
+    	System.out.println("QUERY -> " + query);
+    	
+    	try{
+    		ResultSet rs = selectQuery(query, false);
+    		
+        	if(rs != null){
+        		
+        		while(rs.next()) {
+        			xmlInfoMgr.setXmlMode(rs.getString("xml_mode"));
+        			xmlInfoMgr.setDuplexYN(rs.getString("duplex_yn"));
+        			if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+        				xmlInfoMgr.setRemoteIP(rs.getString("side_b_ip"));
+        			} else {
+        				xmlInfoMgr.setRemoteIP(rs.getString("side_a_ip"));
+        			}
+        			xmlInfoMgr.setSideAIP(rs.getString("side_a_ip"));
+        			xmlInfoMgr.setSideBIP(rs.getString("side_b_ip"));
+        			xmlInfoMgr.setRemotePort(rs.getString("remote_port"));
+        			xmlInfoMgr.setCustinfoPopupYN(rs.getString("custinfo_popup"));
+        			xmlInfoMgr.setCmCnt(rs.getInt("cm_cnt"));
+        			xmlInfoMgr.setCm1User(rs.getString("cm1_user"));
+        			xmlInfoMgr.setCm1Pwd(rs.getString("cm1_pwd"));
+        			xmlInfoMgr.setCm2User(rs.getString("cm2_user"));
+        			xmlInfoMgr.setCm2Pwd(rs.getString("cm2_pwd"));
+        			xmlInfoMgr.setCm1IpAddr(rs.getString("cm1_ip"));
+        			xmlInfoMgr.setCm2IpAddr(rs.getString("cm2_ip"));
+        			xmlInfoMgr.setConnectTimeout(rs.getInt("conn_timeout"));
+        			xmlInfoMgr.setReadTimeout(rs.getInt("read_timeout"));
+        			xmlInfoMgr.setXmlPushUrl(rs.getString("xml_push_url"));
+        			xmlInfoMgr.setHttpPort(rs.getInt("http_port"));
+        			xmlInfoMgr.setConsoleDebugYN(rs.getString("console_debug"));
+        			xmlInfoMgr.setLogLevel(rs.getInt("log_level"));
+        			xmlInfoMgr.setLogPath(rs.getString("log_path"));
+        			xmlInfoMgr.setBaseImgPath(rs.getString("base_img_path"));
+        			xmlInfoMgr.setFaceImgPath(rs.getString("face_img_path"));
+        			xmlInfoMgr.setEmpImgPath(rs.getString("emp_img_path"));
+        			xmlInfoMgr.setLogDelDays(rs.getInt("log_del_days"));
+            	}
+        	}
+    	}catch(Exception e){
+    		
+    	}
+    	
+    	System.out.println(xmlInfoMgr.toString());
+    	return RESULT.RTN_SUCCESS;
+    }
     
-    public int selectImageInfoByModel(){
+    
+    public int selectImageInfoByModel(String query){
     	
     	System.out.println("************** DB Select ImageInfo *****************");
-    	CustomerVO customer = null;
-    	String sql = "select * from tb_xmlservice_info";
+    	
+    	query = query.trim();
+    	
+    	System.out.println("SQL : " + query);
+    	
     	try{
-    		ResultSet rs = selectQuery(sql, true);
+    		ResultSet rs = selectQuery(query, false);
         	if(rs != null){
         		while(rs.next()) {
-        			ImageMgr.getInstance().addImage(rs.getString("device_type"), rs.getString("image_size"));
+        			ImageVO imageVO = new ImageVO();
+        			imageVO.setModel(rs.getString("device_type"));
+        			imageVO.setImageSize(rs.getString("display_size"));
+        			imageVO.setPicture_x1(rs.getInt("pic_x"));
+        			imageVO.setPicture_y1(rs.getInt("pic_y"));
+        			imageVO.setPicture_width(rs.getInt("pic_width"));
+        			imageVO.setPicture_height(rs.getInt("pic_height"));
+        			imageVO.setName_x1(rs.getInt("pic_nm_x"));
+        			imageVO.setName_y1(rs.getInt("pic_nm_y"));
+        			imageVO.setOrg_x1(rs.getInt("pic_org_x"));
+        			imageVO.setOrg_y1(rs.getInt("pic_org_y"));
+        			imageVO.setDivision_x1(rs.getInt("pic_div_x"));
+        			imageVO.setDivision_y1(rs.getInt("pic_div_y"));
+        			imageVO.setExtension_x1(rs.getInt("pic_ext_x"));
+        			imageVO.setExtension_y1(rs.getInt("pic_ext_y"));
+        			ImageMgr.getInstance().addImage(rs.getString("device_type"), imageVO);
             	}
+        	} else {
+        		System.out.println("NO DB DATA");
         	}
     	}catch(Exception e){
     		

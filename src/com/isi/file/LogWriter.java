@@ -13,6 +13,7 @@ import org.apache.commons.io.output.FileWriterWithEncoding;
 import com.isi.constans.LOGLEVEL;
 import com.isi.constans.LOGTYPE;
 import com.isi.constans.PROPERTIES;
+import com.isi.data.XmlInfoMgr;
 import com.isi.utils.Utils;
 
 
@@ -35,7 +36,7 @@ public class LogWriter implements ILog {
     public LogWriter( ) {
 //    	pr = new PropertyRead();
     	pr = PropertyRead.getInstance();
-    	logDirectory = pr.getValue(PROPERTIES.LOG_PATH);
+    	logDirectory = XmlInfoMgr.getInstance().getLogPath();
     }
     
     
@@ -52,7 +53,7 @@ public class LogWriter implements ILog {
     
 	public synchronized void write(String level, String type, String callkey, String methodName,String msg) {
 		
-		String isConsoleDebug = pr.getValue(PROPERTIES.CONSOLE_DEBUG_MODE);
+		String isConsoleDebug = XmlInfoMgr.getInstance().getConsoleDebugYN();
 			
 		try {
 			util = new Utils();
@@ -83,7 +84,7 @@ public class LogWriter implements ILog {
 			
 			// PropertyRead pr = PropertyRead.getInstance();
 			if (pr.isRead()) {
-				if (Integer.parseInt(level) > Integer.parseInt(pr.getValue(PROPERTIES.LOG_LEVEL))) {
+				if (Integer.parseInt(level) > XmlInfoMgr.getInstance().getLogLevel()) {
 					return;
 				}
 			}

@@ -25,6 +25,9 @@ public class SoapXML {
     private ILog            m_Log = new GLogWriter();
     private PrintWriter 	pw;
     private StringWriter	sw;
+    protected static final String dbVer = "8.5";
+    
+    
     
     public SoapXML(String ip, int port, String id, String pwd, SSLContext ctx) {
 

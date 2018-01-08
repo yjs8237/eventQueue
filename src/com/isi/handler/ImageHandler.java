@@ -12,18 +12,18 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.AttributedString;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 
+import com.cisco.cti.util.ArrayList;
 import com.isi.constans.IMAGESIZE;
 import com.isi.constans.LOGLEVEL;
 import com.isi.constans.LOGTYPE;
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.PersonType;
 import com.isi.data.ImageMgr;
+import com.isi.data.XmlInfoMgr;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
@@ -61,7 +61,9 @@ public class ImageHandler {
 		
 		if(objEmployee.getPic_path()==null || objEmployee.getPic_path().isEmpty() || objEmployee.getPic_path().equalsIgnoreCase("null")){
 			// DB 정보에 증명사진 경로가 없을 경우
-			strUrl = pr.getValue(PROPERTIES.FACE_IMAGE_URL) + objEmployee.getEm_ID() + ".jpg";
+//			strUrl = pr.getValue(PROPERTIES.FACE_IMAGE_URL) + objEmployee.getEm_ID() + ".jpg";
+//			strUrl = XmlInfoMgr.getInstance().getEmpImgPath() + objEmployee.getEm_ID() + ".jpg";
+			strUrl = XmlInfoMgr.getInstance().getFaceImgPath() + objEmployee.getEm_ID() + ".jpg";
 			g_Log.imageLog("", "createAllFaceImage", "[" +objEmployee.getEm_ID() + "] Property Read 증명사진 URL 경로 [" +strUrl+ "]");
 		} else {
 			strUrl = objEmployee.getPic_path();
@@ -76,14 +78,15 @@ public class ImageHandler {
 			url = new URL(strUrl);
 			img = ImageIO.read(url);
 			
-			File directory = new File(pr.getValue(PROPERTIES.FACE_IMAGE));
+//			File directory = new File(pr.getValue(PROPERTIES.FACE_IMAGE));
+			File directory = new File(XmlInfoMgr.getInstance().getFaceImgPath());
 			// 폴더가 없을 경우 생성
 			if(!directory.exists()){
 				directory.mkdirs();
 			}
 			
-			File file = new File(pr.getValue(PROPERTIES.FACE_IMAGE) + "\\" + objEmployee.getEm_ID() + ".jpg");
-			
+//			File file = new File(pr.getValue(PROPERTIES.FACE_IMAGE) + "\\" + objEmployee.getEm_ID() + ".jpg");
+			File file = new File(XmlInfoMgr.getInstance().getFaceImgPath() + "\\" + objEmployee.getEm_ID() + ".jpg");
 			
 			if(img != null) {
 				ImageIO.write(img, "jpg", file);
@@ -110,7 +113,7 @@ public class ImageHandler {
 		boolean bResult = true;
 		// 팝업 이미지 내선.png
 		try{
-			String dirPath = pr.getValue(PROPERTIES.EMPLOYEE_IMAGE);
+			String dirPath = XmlInfoMgr.getInstance().getEmpImgPath();
 			File files = new File(dirPath);
 			bResult = deleteDirectory(files);
 			
@@ -130,7 +133,8 @@ public class ImageHandler {
 			if(employee.getEm_ID()==null || employee.getEm_ID().equals("null") || employee.getEm_ID().isEmpty()){
 				return false;
 			}
-			String dirPath = pr.getValue(PROPERTIES.FACE_IMAGE) + employee.getEm_ID() + ".jpg";
+//			String dirPath = pr.getValue(PROPERTIES.FACE_IMAGE) + employee.getEm_ID() + ".jpg";
+			String dirPath = XmlInfoMgr.getInstance().getFaceImgPath() + employee.getEm_ID() + ".jpg";
 			File files = new File(dirPath);
 			bResult = deleteDirectory(files);
 			
@@ -148,7 +152,8 @@ public class ImageHandler {
 		boolean bResult = true;
 		// 팝업 이미지 내선.png
 		try{
-			String dirPath = pr.getValue(PROPERTIES.FACE_IMAGE);
+//			String dirPath = pr.getValue(PROPERTIES.FACE_IMAGE);
+			String dirPath = XmlInfoMgr.getInstance().getFaceImgPath();
 			File files = new File(dirPath);
 			bResult = deleteDirectory(files);
 			
@@ -197,7 +202,8 @@ public class ImageHandler {
 		boolean bResult = true;
 		// 팝업 이미지 내선.png
 		try{
-			String dirPath = pr.getValue(PROPERTIES.EMPLOYEE_IMAGE);
+//			String dirPath = pr.getValue(PROPERTIES.EMPLOYEE_IMAGE);
+			String dirPath = XmlInfoMgr.getInstance().getEmpImgPath();
 			File path = new File(dirPath);
 			File[] files = path.listFiles();
 			
@@ -251,16 +257,20 @@ public class ImageHandler {
 			
 		}
 		
-		// 직원 사진 사번.jpg
-		String strCallerPicture = pr.getValue(PROPERTIES.FACE_IMAGE) + ID + ".jpg";
 		
-		String imageSize = imageMgr.getImageInfo(model);
+		ImageVO imageVO = ImageMgr.getInstance().getImageInfo(model);
+		
+		// 직원 사진 사번.jpg
+//		String strCallerPicture = pr.getValue(PROPERTIES.FACE_IMAGE) + ID + ".jpg";
+		String strCallerPicture = XmlInfoMgr.getInstance().getFaceImgPath() + ID + ".jpg";
+		String imageSize = imageVO.getImageSize();
 		if(imageSize == null){
-			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID , "CreateImageFile", model + " 모델 이미지 사이즈 정보 없음 !! ");
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID , "CreateImageFile", imageSize + " 모델 이미지 사이즈 정보 없음 !! ");
 			return false;
 		}
 		
-		String strDest = pr.getValue(PROPERTIES.EMPLOYEE_IMAGE) + imageSize + "\\"+ aniNum + ".png";
+//		String strDest = pr.getValue(PROPERTIES.EMPLOYEE_IMAGE) + imageSize + "\\"+ aniNum + ".png";
+		String strDest = XmlInfoMgr.getInstance().getEmpImgPath() + imageSize + "\\"+ aniNum + ".png";
         // 고로 이미지
 //		String logoImagePath = pr.getValue(PROPERTIES.BASE_IMAGE) + "logo.jpg";
 		
@@ -279,40 +289,13 @@ public class ImageHandler {
             logdir = new File(strCallerPicture);
             if(!logdir.exists()){
             	// 직원 사진이 없다면 default 이미지로 대체한다.
-            	strCallerPicture = pr.getValue(PROPERTIES.BASE_IMAGE) + "default.jpg";
+//            	strCallerPicture = pr.getValue(PROPERTIES.BASE_IMAGE) + "default.jpg";
+            	strCallerPicture = XmlInfoMgr.getInstance().getBaseImgPath() + "default.jpg";
             }
-            String basic_img_path = pr.getValue(PROPERTIES.BASE_IMAGE) + imageSize + "_basic.png";
+            String basic_img_path = XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png";
             BufferedImage basic_img = ImageIO.read(new File(basic_img_path)); // 배경이미지
             
             
-            /*
-            // 얼굴 이미지
-            BufferedImage faceImage = null;
-            try {
-                faceImage = ImageIO.read(new File(strCallerPicture)); // 띄우고자 하는 사진 
-            } catch (IOException ex) {
-            	ex.printStackTrace(ExceptionUtil.getPrintWriter());
-            	m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID , "CreateImageFile", ExceptionUtil.getStringWriter().toString());
-            }
-            */
-            
-            /*
-            // 로고 이미지
-            BufferedImage logoImage = null;
-            try {
-            	logoImage = ImageIO.read(new File(logoImagePath)); // 띄우고자 하는 사진 
-            } catch (IOException ex) {
-            	ex.printStackTrace(ExceptionUtil.getPrintWriter());
-            	m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID , "CreateImageFile", ExceptionUtil.getStringWriter().toString());
-            }
-            // 로고 이미지는 안띄울꺼니.. null 
-            logoImage = null;
-            */
-            ImageVO imageVO = IMAGESIZE.imageSizeMap.get(imageSize);
-            
-            
-//            System.out.println("imageSize : " + imageSize);
-//            System.out.println("imageVO.getImageSize() : " + imageVO.getImageSize());
             
             int width = Integer.parseInt(imageVO.getImageSize().substring(0, 3));
             int height = Integer.parseInt(imageVO.getImageSize().substring(3));
@@ -322,7 +305,7 @@ public class ImageHandler {
 			int picture_y = imageVO.getPicture_y1();
 			int pictureWidth = imageVO.getPicture_width();
 			int pictureHeight = imageVO.getPicture_height();
-			int fontsize = (int) (height / 8.5);
+			int fontsize = (int) (height / 10);
 			
 			BufferedImage mergedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 			Graphics2D graphics = (Graphics2D) mergedImage.getGraphics();
@@ -330,7 +313,16 @@ public class ImageHandler {
 			graphics.setBackground(Color.WHITE);
 			graphics.drawImage(basic_img, 0, 0, null);
 			
-			/*
+			  // 얼굴 이미지
+            BufferedImage faceImage = null;
+            try {
+                faceImage = ImageIO.read(new File(strCallerPicture)); // 띄우고자 하는 사진 
+            } catch (IOException ex) {
+            	ex.printStackTrace(ExceptionUtil.getPrintWriter());
+            	m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID , "CreateImageFile", ExceptionUtil.getStringWriter().toString());
+            }
+            
+			
 			if (faceImage != null) {
 				Image imgTarget = faceImage.getScaledInstance(pictureWidth, pictureHeight, Image.SCALE_SMOOTH);
 				int pixels[] = new int[pictureWidth * pictureHeight];
@@ -344,7 +336,7 @@ public class ImageHandler {
 				// Remote 원본 이미지를 가져오는 기능 추가 여부 판단 후 적용 예정
 				// System.out.println("[CreateImageFile] Picture is NOT exist > " + objEmployee.getEMP_ID() );
 			}
-			*/
+			
 			
 			/*
 			if (logoImage != null) {
@@ -362,7 +354,7 @@ public class ImageHandler {
 			graphics.setFont(font);
 			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			
-			if(!displayName.isEmpty()){
+			if(displayName != null && !displayName.isEmpty()){
 				// 직책 + 이름
 				AttributedString attName = new AttributedString( displayName );
 				attName.addAttribute(TextAttribute.FONT, font);
@@ -371,7 +363,7 @@ public class ImageHandler {
 				
 			}
 			
-			if(!orgNm.isEmpty()) {
+			if(orgNm != null && !orgNm.isEmpty()) {
 				if(orgNm.length() > 9) {
 					Font newfont = new Font("맑은고딕", Font.BOLD, fontsize - 2);
 					graphics.setFont(newfont);
@@ -391,7 +383,7 @@ public class ImageHandler {
 				
 			}
 			
-			if(!division.isEmpty()) {
+			if(division != null && !division.isEmpty()) {
 				// 부서
 				AttributedString attPhone1 = new AttributedString(division);
 				attPhone1.addAttribute(TextAttribute.FONT, font);
@@ -400,7 +392,7 @@ public class ImageHandler {
 				
 			}
 			
-			if(!contactNum.isEmpty()){
+			if(contactNum != null && !contactNum.isEmpty()){
 				// 내선번호
 				AttributedString attExtension = new AttributedString(contactNum);
 				attExtension.addAttribute(TextAttribute.FONT, font);
@@ -420,88 +412,49 @@ public class ImageHandler {
     }
 	
 
-	public boolean createAllImageFile(EmployeeVO objEmployee) {
+	public boolean createAllImageFile(java.util.ArrayList<EmployeeVO> employeeList) {
 
 		boolean bResult = true;
-		// 배경 이미지
-//		String basic_img_path = pr.getValue(PROPERTIES.BASE_IMAGE) + "basic.jpg";
-		// 직원 사진 사번.jpg
-//		String strCallerPicture = pr.getValue(PROPERTIES.FACE_IMAGE) + objEmployee.getEm_ID() + ".jpg";
-//		String strCallerPicture = pr.getValue(PROPERTIES.FACE_IMAGE) + getEmailID(objEmployee.getEmail()) + ".jpg";	// 사번 말고 이메일로 변경
-        
-//		String logoImagePath = pr.getValue(PROPERTIES.BASE_IMAGE) + "logo.jpg";
 		
-//		// 팝업 이미지 내선.png
-//		String strDest = pr.getValue(PROPERTIES.EMPLOYEE_IMAGE) + objEmployee.getEm_extension() + ".png";
-        
+		EmployeeVO objEmployee = null;
+		
         try {
         	
-        	File dirPath = new File(pr.getValue(PROPERTIES.EMPLOYEE_IMAGE));
+//        	File dirPath = new File(pr.getValue(PROPERTIES.EMPLOYEE_IMAGE));
+        	File dirPath = new File(XmlInfoMgr.getInstance().getEmpImgPath());
         	File [] dirFiles = dirPath.listFiles();
-        		
-        		Map imageMap = IMAGESIZE.imageSizeMap;
-        		
-        		Set keySet = imageMap.keySet();
-        		Iterator iter = keySet.iterator();
-        		while(iter.hasNext()){
-        			String key = (String)iter.next();
-        			ImageVO imageVO = (ImageVO)imageMap.get(key);
-        			File directory = new File(pr.getValue(PROPERTIES.EMPLOYEE_IMAGE) + "\\" + imageVO.getImageSize());
-        			if(!directory.exists()){
-        				directory.mkdirs();
-        			}
-	        		
-        		}
         	
-        		
+			Map imageMap = ImageMgr.getInstance().getImageInfo();
+			
+			Set keySet = imageMap.keySet();
+			Iterator iter = keySet.iterator();
+			while (iter.hasNext()) {
+				String key = (String) iter.next();
+				ImageVO imageVO = (ImageVO) imageMap.get(key);
+				File directory = new File(XmlInfoMgr.getInstance().getEmpImgPath() + "\\" + imageVO.getImageSize());
+				if (!directory.exists()) {
+					directory.mkdirs();
+				}
+				
+				for (int i = 0; i < employeeList.size(); i++) {
+					objEmployee = employeeList.get(i);
+					createImageFile(objEmployee, imageVO.getModel(), "createAllImage");
+					
+					Thread.sleep(100);	// 이미지 처리 속도 텀을 0.3 초로 설정
+				}
+				
+			}
+        	
         	for (File file : dirFiles) {
         		
 				directtoryNm = file.getName();
-				String basic_img_path = pr.getValue(PROPERTIES.BASE_IMAGE) +  directtoryNm + "_basic.png";
-				String strDest = dirPath + "\\" + directtoryNm + "\\" + objEmployee.getDN() + ".png";
+			
 				
-				File logdir = new File(strDest);
-				if (logdir.exists()) {
-					// 이미 팝업 이미지가 있다면 이미지를 생성하지 않는다.
-					g_Log.imageLog( "" , "createAllImageFile", objEmployee.getEm_ID() + " / " +objEmployee.getDN() + " 이미지 존재");
-					return true;
-				}
 				/*
-				logdir = new File(strCallerPicture);
-				if(!logdir.exists()){
-					// 직원 사진이 없다면 default 이미지로 대체한다.
-					strCallerPicture = pr.getValue(PROPERTIES.BASE_IMAGE) + "default.jpg";
-				}
-				*/
+			
 				BufferedImage basic_img = ImageIO.read(new File(basic_img_path)); // 배경이미지
 				
-				/*
-				// 얼굴사진
-				BufferedImage faceImage = null;
-				try {
-					faceImage = ImageIO.read(new File(strCallerPicture)); // 띄우고자 하는 사진 
-					
-				} catch (IOException ex) {
-					ex.printStackTrace(ExceptionUtil.getPrintWriter());
-					g_Log.imageLog( "" , "createAllImageFile", "There is no face image file !!");
-					g_Log.imageLog( "" , "createAllImageFile", ExceptionUtil.getStringWriter().toString());
-					return false;
-				}
-				*/
-				/*
-				// 회사 로고 사진
-				BufferedImage logoImage = null;
-				try {
-					logoImage = ImageIO.read(new File(logoImagePath)); // 띄우고자 하는 사진 
-				} catch (IOException ex) {
-					ex.printStackTrace(ExceptionUtil.getPrintWriter());
-					g_Log.imageLog( "" , "createAllImageFile", "There is no logo image file !!");
-					g_Log.imageLog( "" , "createAllImageFile", ExceptionUtil.getStringWriter().toString());
-					return false;
-				}
-				// 로고안띄울꺼니가.. null
-				logoImage = null;
-				*/
+			
 				ImageVO imageVO = IMAGESIZE.imageSizeMap.get(directtoryNm);
 				
 				int width = Integer.parseInt(directtoryNm.substring(0, 3));
@@ -523,31 +476,7 @@ public class ImageHandler {
 				graphics.setBackground(Color.WHITE);
 				graphics.drawImage(basic_img, 0, 0, null);
 				
-				/*
-				if (faceImage != null) {
-					Image imgTarget = faceImage.getScaledInstance(pictureWidth, pictureHeight, Image.SCALE_SMOOTH);
-					int pixels[] = new int[pictureWidth * pictureHeight];
-					PixelGrabber pg = new PixelGrabber(imgTarget, 0, 0, pictureWidth, pictureHeight, pixels,0 ,pictureWidth);
-					pg.grabPixels();
-					graphics.drawImage(imgTarget, picture_x, picture_y, pictureWidth, pictureHeight, null);
-//					graphics.drawImage(faceImage, picture_x, picture_y, pictureWidth, pictureHeight, null);
-					//System.out.println("[CreateImageFile] Picture is exist > " + strCallerPicture );
-				} else {
-					// Remote 원본 이미지를 가져오는 기능 추가 여부 판단 후 적용 예정
-					// System.out.println("[CreateImageFile] Picture is NOT exist > " + objEmployee.getEMP_ID() );
-				}
-				*/
-				/*
-				if (logoImage != null) {
-					//graphics.drawImage(image2, 20, 60, null);
-					// 127 x 150 Pixel Pictuer
-//					graphics.drawImage(logoImage, ((width / 20) * 17)  , (height / 10), (width / 8), (height / 8), null);
-					//System.out.println("[CreateImageFile] Picture is exist > " + strCallerPicture );
-				} else {
-					// Remote 원본 이미지를 가져오는 기능 추가 여부 판단 후 적용 예정
-					// System.out.println("[CreateImageFile] Picture is NOT exist > " + objEmployee.getEMP_ID() );
-				}
-				*/
+		
 				
 				Font font = new Font("맑은고딕", Font.BOLD, fontsize);
 				graphics.setFont(font);
@@ -619,9 +548,10 @@ public class ImageHandler {
 				
 				g_Log.imageLog( "" , "createAllImageFile", "CREATE SUCCESS : " + strDest);
 				
-//				System.out.println("CREATE SUCCESS : " + strDest);
 				
-				Thread.sleep(100);	// 이미지 처리 속도 텀을 0.3 초로 설정
+				*/
+				
+				
 				
 			}
         	
@@ -630,7 +560,6 @@ public class ImageHandler {
         } catch (Exception ioe) {
             bResult = false;
             ioe.printStackTrace(ExceptionUtil.getPrintWriter());
-            
             g_Log.imageLog( "" , "createAllImageFile", "directtoryNm -> " + directtoryNm + " , objEmployee -> " + objEmployee.toString());
             g_Log.imageLog( "" , "createAllImageFile", ExceptionUtil.getStringWriter().toString());
             return false;

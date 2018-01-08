@@ -41,8 +41,9 @@ public class PushHandler {
 		pr = PropertyRead.getInstance();
 		m_Log = LogMgr.getInstance();
 		this.threadID = threadID;
-		connTimeout = Integer.parseInt(pr.getValue(PROPERTIES.CONNECT_TIMEOUT));
-		readTimeout = Integer.parseInt(pr.getValue(PROPERTIES.READ_TIMEOUT));
+//		connTimeout = Integer.parseInt(pr.getValue(PROPERTIES.CONNECT_TIMEOUT));
+		connTimeout = XmlInfoMgr.getInstance().getConnectTimeout();
+		readTimeout = XmlInfoMgr.getInstance().getReadTimeout();
 	}
 	
 	 public int push(String xml, XmlVO xmlInfo, boolean getResult) {

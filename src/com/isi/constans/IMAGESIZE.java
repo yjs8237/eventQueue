@@ -14,13 +14,19 @@ public abstract class IMAGESIZE {
 	
 	static {
 		
+		// 7941 모델
 		ImageVO imageVO = new ImageVO();
-		imageVO.setImageSize("559265").setPicture_x1(37).setPicture_y1(29).setPicture_width(200).setPicture_height(209)
-		.setName_x1(100).setName_y1(45).
-		setOrg_x1(100).setOrg_y1(110).
-		setDivision_x1(100).setDivision_y1(175)
-		.setExtension_x1(100).setExtension_y1(240);
-		imageSizeMap.put("559265", imageVO);
+		imageVO.setImageSize("298144").setPicture_x1(19).setPicture_y1(15).setPicture_width(200).setPicture_height(114)
+				.setName_x1(158).setName_y1(22).setOrg_x1(158).setOrg_y1(52).setDivision_x1(158).setDivision_y1(175)
+				.setExtension_x1(158).setExtension_y1(108);
+		imageSizeMap.put("298144", imageVO);
+
+		// 7970 모델
+		imageVO = new ImageVO();
+		imageVO.setImageSize("298168").setPicture_x1(19).setPicture_y1(15).setPicture_width(200).setPicture_height(114)
+				.setName_x1(158).setName_y1(22).setOrg_x1(158).setOrg_y1(52).setDivision_x1(158).setDivision_y1(175)
+				.setExtension_x1(158).setExtension_y1(108);
+		imageSizeMap.put("298168", imageVO);
 		
 	}
 	

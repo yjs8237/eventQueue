@@ -27,7 +27,8 @@ public class XMLData {
         
         // 폰 모델별 이미지 사이즈가 다르기 때문에 각기 다른 사이즈의 이미지 폴더  URL 을 구한다.
 //        String path =     getPathByModel(model);
-        String path = pr.getValue(PROPERTIES.ISXMLWEB_URL) + ImageMgr.getInstance().getImageInfo(model) + "/"; 
+//        String path = pr.getValue(PROPERTIES.ISXMLWEB_URL) + ImageMgr.getInstance().getImageInfo(model) + "/"; 
+        String path = XmlInfoMgr.getInstance().getXmlPushUrl() + ImageMgr.getInstance().getImageInfo(model).getImageSize() + "/";
         
         String aniNum = "";
         if(person instanceof EmployeeVO){
@@ -46,8 +47,8 @@ public class XMLData {
             xmlBuffer.append("<Prompt>");
             xmlBuffer.append("" + aniNum);
             xmlBuffer.append("</Prompt>");
-            xmlBuffer.append("<LocationX>0</LocationX>");
-            xmlBuffer.append("<LocationY>0</LocationY>");
+            xmlBuffer.append("<LocationX>-1</LocationX>");
+            xmlBuffer.append("<LocationY>-1</LocationY>");
             xmlBuffer.append("<URL>");
             xmlBuffer.append( path + aniNum + ".png");
             xmlBuffer.append("</URL>");

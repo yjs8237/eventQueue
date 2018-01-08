@@ -48,7 +48,7 @@ public class CallEvtHandler {
 		
 		TermConnEvt event = (TermConnEvt) evt;
 		
-		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "########################## " + event.toString());
+//		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "########################## " + event.toString());
 		
 		if(event.getDevice().equals(event.getCalledDn())) { // 전화를 받는 사람 측 이벤트만 push 한다
 			
@@ -68,6 +68,8 @@ public class CallEvtHandler {
 							
 							return RESULT.ERROR;
 						}
+						
+						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "########### 2 ##########");
 						
 						xmlHandler.evtRing(makeAlertingXmlVO(event , employeeVO , callID) , callID);
 					}
@@ -146,11 +148,17 @@ public class CallEvtHandler {
 		
 
 		case CALLSTATE.CONFERENCE:					// 전화회의 콜 
+			
 			int metaCode = event.getMetaCode();		// MetaCode
-			if(metaCode == CALLSTATE.META_CALL_MERGING){
+			
+			if(metaCode == CALLSTATE.META_CALL_MERGING) {
 				
 				if(redirectDN.equals(callingDN) && callingDN.equals(DN) && !DN.equals(deviceDN)){
 					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvt", ">>>>>>>>>>>>>>>>>>>>>>>> " + event.toString());
+					
+					/* 전화기 현재 상태 업데이트 */
+					CallStateMgr.getInstance().addDeviceState(deviceDN , CALLSTATE.ESTABLISHED_ING);
+					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.ESTABLISHED_ING);
 					
 					EmployeeVO emp = employeeMgr.getEmployee(DN , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(DN);
@@ -160,6 +168,11 @@ public class CallEvtHandler {
 					isEastblish = true;
 				} else if(!deviceDN.equals(DN) && deviceDN.equals(redirectDN)){
 					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvt", ">>>>>>>>>>>>>>>>>>>>>>>> " + event.toString());
+					
+					/* 전화기 현재 상태 업데이트 */
+					CallStateMgr.getInstance().addDeviceState(deviceDN , CALLSTATE.ESTABLISHED_ING);
+					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.ESTABLISHED_ING);
+					
 					EmployeeVO emp = employeeMgr.getEmployee(DN , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(DN);
 					if(emp != null){
@@ -176,9 +189,10 @@ public class CallEvtHandler {
 				if(event.getDevice().equals(event.getDn())){	// 이벤트 정보내에 Device 번호와 DN 번호가 같을 경우 push 처리
 					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvt", ">>>>>>>>>>> UN HOLD >>>>>>>>>>>>> " + event.toString());
 					
-					callMgr = CallStateMgr.getInstance();
-					callMgr.addDeviceState(callingDN, CALLSTATE.ESTABLISHED_ING);
-					callMgr.addDeviceState(calledDN, CALLSTATE.ESTABLISHED_ING);
+					/* 전화기 현재 상태 업데이트 */
+					CallStateMgr.getInstance().addDeviceState(callingDN , CALLSTATE.ESTABLISHED_ING);
+					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.ESTABLISHED_ING);
+					
 					EmployeeVO emp = employeeMgr.getEmployee(deviceDN , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(deviceDN);
 					if(emp != null) {
@@ -196,6 +210,11 @@ public class CallEvtHandler {
 			if(!terminal.equals(employee.getMacaddress())){ 
 				if(event.getDevice().equals(event.getDn())){	// 이벤트 정보내에 Device 번호와 DN 번호가 같을 경우 push 처리
 					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvt", ">>>>>>>>>>>>>>>>>>>>>>>> " + event.toString());
+					
+					/* 전화기 현재 상태 업데이트 */
+					CallStateMgr.getInstance().addDeviceState(callingDN , CALLSTATE.ESTABLISHED_ING);
+					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.ESTABLISHED_ING);
+					
 					EmployeeVO emp = employeeMgr.getEmployee(deviceDN , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(deviceDN);
 					if(emp != null){
@@ -214,9 +233,9 @@ public class CallEvtHandler {
 			if(ctlCause != CALLSTATE.CONFERENCE){ // 전화회의 경우, 통화이력 정보를 새로 추가할 필요가 없다.
 				
 //				System.out.println("############ Established ############ calling["+callingDN+"] called["+calledDN+"]");
-				callMgr = CallStateMgr.getInstance(); 
-				callMgr.addDeviceState(callingDN, CALLSTATE.ESTABLISHED_ING);
-				callMgr.addDeviceState(calledDN, CALLSTATE.ESTABLISHED_ING);
+//				callMgr = CallStateMgr.getInstance(); 
+//				callMgr.addDeviceState(callingDN, CALLSTATE.ESTABLISHED_ING);
+//				callMgr.addDeviceState(calledDN, CALLSTATE.ESTABLISHED_ING);
 				
 //				dataBase.insertCalledHistory(event.get_GCallID(),callingDN, calledDN);	// XML 통화 이력을 위한 DB INSERT
 			}
@@ -260,6 +279,11 @@ public class CallEvtHandler {
 					
 					disconType = DISCONNECTTYPE.TRANSFER_DISCONNECT;
 					
+					/* 전화기 현재 상태 업데이트 */
+					CallStateMgr.getInstance().addDeviceState(callingDn , CALLSTATE.IDLE);
+					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.IDLE);
+					
+					
 					List employeeList = employees.getAllEmployee(callingDn, callID);
 					if(employeeList != null && employeeList.size() > 0){
 						
@@ -301,6 +325,9 @@ public class CallEvtHandler {
 					
 					disconType = DISCONNECTTYPE.PICKUP_DISCONNECT;
 					
+					/* 전화기 현재 상태 업데이트 */
+					CallStateMgr.getInstance().addDeviceState(deviceDN , CALLSTATE.IDLE);
+					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.IDLE);
 					
 					List employeeList = employees.getAllEmployee(deviceDN, callID);
 					if(employeeList != null && employeeList.size() > 0){
@@ -346,6 +373,11 @@ public class CallEvtHandler {
 
 					disconType = DISCONNECTTYPE.NORMAL_DISCONNECT;
 					
+					/* 전화기 현재 상태 업데이트 */
+					CallStateMgr.getInstance().addDeviceState(calledDn , CALLSTATE.IDLE);
+					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.IDLE);
+					
+					
 					List employeeList = employees.getAllEmployee(calledDn, callID);
 					if(employeeList != null && employeeList.size() > 0){
 						
@@ -378,30 +410,17 @@ public class CallEvtHandler {
 						}
 						
 					}
-					
-					/*
-					EmployeeVO emp = employees.getEmployee(calledDn , callID);
-//					
-					if(emp != null) {
-						xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp, callID) , callID);
-						// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
-						Thread.sleep(500);
-						xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , emp, callID) , callID);
-					} else {
-						EmployeeVO tempEmp = employees.getEmployee(dn , callID);
-						if(tempEmp != null) {
-							xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , tempEmp, callID) , callID);
-							// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
-							Thread.sleep(500);
-							xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , tempEmp, callID) , callID);
-						}
-					}
-					*/
+				
 					isDisconnect = true;
 				} else if(metaCode == CALLSTATE.META_CALL_REMOVING_PARTY && !Utils.isNumber(calledDn)){	// 전화회의 종료
 					disconType = DISCONNECTTYPE.CONFERENCE_DISCONNECT;
 					
 					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", ">>>>>>>>>> CONFERENCE >>>>>>>>>>>>>> " + event.toString());
+					
+					/* 전화기 현재 상태 업데이트 */
+					CallStateMgr.getInstance().addDeviceState(dn , CALLSTATE.IDLE);
+					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.IDLE);
+					
 					EmployeeVO emp = employees.getEmployee(dn , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(dn);
 					if(emp != null){
@@ -421,6 +440,11 @@ public class CallEvtHandler {
 					disconType = DISCONNECTTYPE.CONFERENCEFINAL_DISCONNECT;
 					
 					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", ">>>>>>>>>> CONFERENCE FINAL >>>>>>>>>>>>>> " + calledDn);
+					
+					/* 전화기 현재 상태 업데이트 */
+					CallStateMgr.getInstance().addDeviceState(calledDn , CALLSTATE.IDLE);
+					CallStateMgr.getInstance().addDeviceState(callingDn , CALLSTATE.IDLE);
+					
 					EmployeeVO emp = employees.getEmployee(calledDn , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(calledDn);
 					if(emp != null){
@@ -457,6 +481,8 @@ public class CallEvtHandler {
 			
 		} 
 		
+		
+		/*
 		if(isDisconnect) {	// 통화이력저장 ( 전화기 XML 서비스 )
 //			System.out.println("#### Call History Data #### -> " + event.get_GCallID());
 //			m_Log.standLog(event.get_GCallID(), "callDisconnectEvt", "######## Disconnect ######### callID["+event.get_GCallID()+"]callingDN["+callingDn+"]calledDN["+calledDn+"]");
@@ -504,6 +530,7 @@ public class CallEvtHandler {
 				}
 			}
 		}
+		*/
 		return RESULT.RTN_SUCCESS;
 	}
 	
@@ -517,7 +544,7 @@ public class CallEvtHandler {
 		.setCallingDn(event.getCallingDn()).setTargetdn(event.getDn()).setTerminal(event.getTerminal())
 		.setTargetIP(employee.getIpAddr()).setTargetModel(employee.getDeviceType()).setCalledDn(event.getCalledDn()).setCallidByString(event.getCallID().getGCallID())
 //		.setCmUser(employee.getCmUser()).setCmPassword(employee.getCmPass());
-		.setCmUser(CMInfo.getInstance().getCmUser()).setCmPassword(CMInfo.getInstance().getCmPassword());
+		.setCmUser(employee.getCmUser()).setCmPassword(employee.getCmPass());
 		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "makeDisconnectXmlVO", xmlVO.toString());
 		
 		return xmlVO;
@@ -545,7 +572,7 @@ public class CallEvtHandler {
 		.setCallingDn(event.getCallingDn()).setTargetdn(event.getDn()).setTerminal(event.getTerminal())
 		.setTargetIP(employee.getIpAddr()).setTargetModel(employee.getDeviceType()).setCalledDn(event.getCalledDn()).setCallidByString(event.getCallID().getGCallID())
 //		.setCmUser(employee.getCmUser()).setCmPassword(employee.getCmPass());
-		.setCmUser(CMInfo.getInstance().getCmUser()).setCmPassword(CMInfo.getInstance().getCmPassword());
+		.setCmUser(employee.getCmUser()).setCmPassword(employee.getCmPass());
 		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "makeAlertingXmlVO", xmlVO.toString());
 		
 		return xmlVO;

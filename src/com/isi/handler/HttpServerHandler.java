@@ -18,6 +18,7 @@ import com.isi.constans.LOGTYPE;
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
 import com.isi.data.Employees;
+import com.isi.data.XmlInfoMgr;
 import com.isi.db.JDatabase;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.*;
@@ -52,7 +53,7 @@ public class HttpServerHandler {
 		
 		try {
 			
-			port = Integer.parseInt(pr.getValue(PROPERTIES.HTTP_PORT));
+			port = XmlInfoMgr.getInstance().getHttpPort();
 			
 			InetSocketAddress addr = new InetSocketAddress(port);
 			HttpServer server = HttpServer.create(addr, 0);
@@ -143,6 +144,10 @@ public class HttpServerHandler {
 				logwrite.httpLog(requestID,"procGet()", "REQUEST URL[" + url + "] PARAM["+parameter+"]");
 				
 				switch (url) {
+				
+				
+				
+				
 				
 				// 인사정보 전체 일괄 업데이트
 				case "/updateAll" :

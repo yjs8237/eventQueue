@@ -13,6 +13,7 @@ import com.isi.constans.LOGLEVEL;
 import com.isi.constans.LOGTYPE;
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.SVCTYPE;
+import com.isi.data.XmlInfoMgr;
 import com.isi.utils.Utils;
 
 
@@ -35,13 +36,13 @@ public class GLogWriter implements ILog{
     public GLogWriter( ) {
 //    	pr = new PropertyRead();
     	pr = PropertyRead.getInstance();
-    	logDirectory = pr.getValue(PROPERTIES.LOG_PATH);
+    	logDirectory = XmlInfoMgr.getInstance().getLogPath();
     }
     
     
 	public synchronized void write(String level, String type, String svcType, String callkey, String methodName, String msg) {
 		
-		String isConsoleDebug = pr.getValue(PROPERTIES.CONSOLE_DEBUG_MODE);
+		String isConsoleDebug = XmlInfoMgr.getInstance().getConsoleDebugYN();
 		
 		try {
 			util = new Utils();
@@ -80,7 +81,7 @@ public class GLogWriter implements ILog{
 			
 			// PropertyRead pr = PropertyRead.getInstance();
 			if (pr.isRead()) {
-				if (Integer.parseInt(level) > Integer.parseInt(pr.getValue(PROPERTIES.LOG_LEVEL))) {
+				if (Integer.parseInt(level) > XmlInfoMgr.getInstance().getLogLevel()) {
 					return;
 				}
 			}

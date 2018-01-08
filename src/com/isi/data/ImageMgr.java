@@ -13,12 +13,12 @@ import com.isi.vo.ImageVO;
 */
 public class ImageMgr {
 	
-	final private Map <String, String> imageMap;
+	final private Map <String, ImageVO> imageMap;
 	private static ImageMgr imageMgr = new ImageMgr();
 	
 	
 	private ImageMgr(){
-		imageMap = Collections.synchronizedMap(new HashMap<String, String>());
+		imageMap = Collections.synchronizedMap(new HashMap<String, ImageVO>());
 	}
 	
 	public synchronized static ImageMgr getInstance(){
@@ -29,13 +29,26 @@ public class ImageMgr {
 	}
 	
 	
-	public void addImage(String modelID, String size){
+	public void addImage(String modelID, ImageVO imageVo){
 		synchronized (imageMap) {
-			imageMap.put(modelID, size);
+			imageMap.put(modelID, imageVo);
 		}
 	}
 	
-	public String getImageInfo(String modelID){
+	public Map getImageInfo() {
+		return this.imageMap;
+	}
+	
+	public void checkAllImageSize() {
+		Set keySet = imageMap.keySet();
+		Iterator iter = keySet.iterator();
+		while(iter.hasNext()) {
+			String key = (String)iter.next();
+			System.out.println(key + " : " + imageMap.get(key));
+		}
+	}
+	
+	public ImageVO getImageInfo(String modelID){
 		return imageMap.get(modelID);
 	}
 	

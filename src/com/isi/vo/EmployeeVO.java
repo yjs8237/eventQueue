@@ -17,8 +17,6 @@ public class EmployeeVO  implements IPerson{
 	private String em_position;			// 직급
 	private String em_orgNm;			// 사업부
 	
-
-
 	private String em_groupNm;			// 부서
 	private String dev_macaddress;		// 전화기 Macaddress
 	private String dev_dn;				// 내선번호

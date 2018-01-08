@@ -39,8 +39,8 @@ public class TestPushHandler {
 		pr = PropertyRead.getInstance();
 		m_Log = LogMgr.getInstance();
 		
-		cmUser = pr.getValue(PROPERTIES.CM1_USER);
-		cmPassword = pr.getValue(PROPERTIES.CM1_PASSWORD);
+		cmUser = XmlInfoMgr.getInstance().getCm1User();
+		cmPassword = XmlInfoMgr.getInstance().getCm1Pwd();
 	}
 	
 	 public int push(String xml, XmlVO xmlInfo, boolean getResult) {

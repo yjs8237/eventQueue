@@ -28,7 +28,7 @@ public class AdministrativeXML extends SoapXML{
         strSoapReqeust +="xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ";
         strSoapReqeust +="xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> ";
         strSoapReqeust +="<SOAP-ENV:Body> ";
-        strSoapReqeust +="<axlapi:executeSQLQuery xmlns:axlapi=\"http://www.cisco.com/AXL/API/9.0\" sequence=\"1234\"> ";
+        strSoapReqeust +="<axlapi:executeSQLQuery xmlns:axlapi=\"http://www.cisco.com/AXL/API/"+dbVer+"\" sequence=\"1234\"> ";
         strSoapReqeust +="<sql> SELECT name, tkClass FROM device WHERE name LIKE \'" + aLike + "%\' </sql> ";
         strSoapReqeust +="</axlapi:executeSQLQuery> ";
         strSoapReqeust +="</SOAP-ENV:Body> ";
@@ -36,7 +36,7 @@ public class AdministrativeXML extends SoapXML{
 
         strReqHttpHeader = "POST /axl/ HTTP/1.0\r\n";
         strReqHttpHeader +="Content-type: text/xml\r\n";
-        strReqHttpHeader +="SOAPAction: \"CUCM:DB ver=9.0\"\r\n";
+        strReqHttpHeader +="SOAPAction: \"CUCM:DB ver="+dbVer+"\"\r\n";
         strReqHttpHeader +="Accept: text/*\r\n";
         strReqHttpHeader +="Content-Length: " + Integer.toString(strSoapReqeust.length()) + "\r\n";
         strReqHttpHeader +="Authorization: Basic " + getAuth() + "\r\n";
@@ -105,7 +105,7 @@ public class AdministrativeXML extends SoapXML{
         
         strReqHttpHeader = "POST /axl/ HTTP/1.0\r\n";
         strReqHttpHeader += "Content-type: text/xml\r\n";
-        strReqHttpHeader += "SOAPAction: \"CUCM:DB ver=9.0\"\r\n";
+        strReqHttpHeader += "SOAPAction: \"CUCM:DB ver="+dbVer+"\"\r\n";
         strReqHttpHeader += "Accept: text/*\r\n";
         strReqHttpHeader += "Content-Length: " + Integer.toString(strSoapReqeust.length()) + "\r\n";
         strReqHttpHeader += "Authorization: Basic " + getAuth() + "\r\n";
@@ -133,7 +133,7 @@ public class AdministrativeXML extends SoapXML{
         strSoapReqeust += "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ";
         strSoapReqeust += "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> ";
         strSoapReqeust += "<SOAP-ENV:Body> ";
-        strSoapReqeust += "<axlapi:executeSQLQuery xmlns:axlapi=\"http://www.cisco.com/AXL/API/9.0\" sequence=\"1234\"> ";
+        strSoapReqeust += "<axlapi:executeSQLQuery xmlns:axlapi=\"http://www.cisco.com/AXL/API/"+dbVer+"\" sequence=\"1234\"> ";
         strSoapReqeust += "<sql> select hlog from devicehlogdynamic where fkdevice = ";
         strSoapReqeust += "(select fkdevice from devicenumplanmap where fknumplan = ";
         strSoapReqeust += "(select pkid from numplan where dnorpattern = \'" + dnorpattern + "\'))</sql> ";
@@ -143,7 +143,7 @@ public class AdministrativeXML extends SoapXML{
 
         strReqHttpHeader = "POST /axl/ HTTP/1.0\r\n";
         strReqHttpHeader += "Content-type: text/xml\r\n";
-        strReqHttpHeader += "SOAPAction: \"CUCM:DB ver=9.0\"\r\n";
+        strReqHttpHeader += "SOAPAction: \"CUCM:DB ver="+dbVer+"\"\r\n";
         strReqHttpHeader += "Accept: text/*\r\n";
         strReqHttpHeader += "Content-Length: " + Integer.toString(strSoapReqeust.length()) + "\r\n";
         strReqHttpHeader += "Authorization: Basic " + getAuth() + "\r\n";
@@ -183,9 +183,9 @@ public class AdministrativeXML extends SoapXML{
         strSoapReqeust += "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"> ";
         strSoapReqeust += "<SOAP-ENV:Body> ";
         strSoapReqeust += "<axlapi:executeSQLUpdate sequence=\"1\" ";
-        strSoapReqeust += "xmlns:axlapi=\"http://www.cisco.com/AXL/API/9.0\" xmlns:axl=\"http://www.cisco.com/AXL/9.0\" ";
+        strSoapReqeust += "xmlns:axlapi=\"http://www.cisco.com/AXL/API/"+dbVer+"\" xmlns:axl=\"http://www.cisco.com/AXL/"+dbVer+"\" ";
         strSoapReqeust += "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ";
-        strSoapReqeust += "xsi:schemaLocation=\"http://www.cisco.com/AXL/API/9.0 axlsoap.xsd\"> ";
+        strSoapReqeust += "xsi:schemaLocation=\"http://www.cisco.com/AXL/API/"+dbVer+" axlsoap.xsd\"> ";
         strSoapReqeust += "<sql>update devicehlogdynamic set hlog = \'" + hlog + "\' where fkdevice = ";
         strSoapReqeust += "(select fkdevice from devicenumplanmap where fknumplan = ";
         strSoapReqeust += "(select pkid from numplan where dnorpattern = \'" + dnorpattern + "\'))</sql> ";
@@ -195,7 +195,7 @@ public class AdministrativeXML extends SoapXML{
 
         strReqHttpHeader = "POST /axl/ HTTP/1.0\r\n";
         strReqHttpHeader += "Content-type: text/xml\r\n";
-        strReqHttpHeader += "SOAPAction: \"CUCM:DB ver=9.0\"\r\n";
+        strReqHttpHeader += "SOAPAction: \"CUCM:DB ver="+dbVer+"\"\r\n";
         strReqHttpHeader += "Accept: text/*\r\n";
         strReqHttpHeader += "Content-Length: " + Integer.toString(strSoapReqeust.length()) + "\r\n";
         strReqHttpHeader += "Authorization: Basic " + getAuth() + "\r\n";

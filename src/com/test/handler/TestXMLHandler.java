@@ -35,7 +35,7 @@ public class TestXMLHandler {
 		pr = PropertyRead.getInstance();
 		xmlData = new XMLData();
 		this.dataBase = dataBase;
-		custInfoPopupYN = pr.getValue(PROPERTIES.CUSTINFO_POPUP);
+		custInfoPopupYN = XmlInfoMgr.getInstance().getCustinfoPopupYN();
 	}
 	
 	public void pushToPhone(){

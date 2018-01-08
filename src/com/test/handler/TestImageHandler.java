@@ -45,7 +45,7 @@ public class TestImageHandler {
 		boolean bResult = true;
 		// 팝업 이미지 내선.png
 		try{
-			String dirPath = pr.getValue(PROPERTIES.EMPLOYEE_IMAGE);
+			String dirPath = "";
 			File files = new File(dirPath);
 			bResult = deleteDirectory(files);
 			
@@ -140,9 +140,9 @@ public class TestImageHandler {
 		
 		
 		// 배경 이미지
-		String basic_img_path = pr.getValue(PROPERTIES.BASE_IMAGE) + "basic.jpg";
+		String basic_img_path = XmlInfoMgr.getInstance().getBaseImgPath() + "basic.jpg";
 		// 직원 사진 사번.jpg
-		String strCallerPicture = pr.getValue(PROPERTIES.BASE_IMAGE) + ID + ".jpg";
+		String strCallerPicture = XmlInfoMgr.getInstance().getBaseImgPath() + ID + ".jpg";
         // 팝업 이미지 내선.png
 //		String strDest = getPathByModel(model) + aniNum + ".png";
 		
@@ -152,9 +152,9 @@ public class TestImageHandler {
 			return false;
 		}
 		
-		String strDest = pr.getValue(PROPERTIES.EMPLOYEE_IMAGE) + modelSize + "\\"+ aniNum + ".png";
+		String strDest = XmlInfoMgr.getInstance().getEmpImgPath() + modelSize + "\\"+ aniNum + ".png";
         // 고로 이미지
-		String logoImagePath = pr.getValue(PROPERTIES.BASE_IMAGE) + "logo.jpg";
+		String logoImagePath = XmlInfoMgr.getInstance().getBaseImgPath() + "logo.jpg";
 		
         try {
         	
@@ -172,7 +172,7 @@ public class TestImageHandler {
             logdir = new File(strCallerPicture);
             if(!logdir.exists()){
             	// 직원 사진이 없다면 default 이미지로 대체한다.
-            	strCallerPicture = pr.getValue(PROPERTIES.BASE_IMAGE) + "default.jpg";
+            	strCallerPicture = XmlInfoMgr.getInstance().getBaseImgPath() + "default.jpg";
             }
             
             
@@ -349,19 +349,19 @@ public class TestImageHandler {
 
 		boolean bResult = true;
 		// 배경 이미지
-		String basic_img_path = pr.getValue(PROPERTIES.BASE_IMAGE) + "basic.jpg";
+		String basic_img_path = XmlInfoMgr.getInstance().getBaseImgPath() + "basic.jpg";
 		// 직원 사진 사번.jpg
 //		String strCallerPicture = pr.getValue(PROPERTIES.BASE_IMAGE) + objEmployee.getEm_ID() + ".jpg";
-		String strCallerPicture = pr.getValue(PROPERTIES.BASE_IMAGE) + getEmailID(objEmployee.getCmIP()) + ".jpg";	// 사번 말고 이메일로 변경
+		String strCallerPicture = XmlInfoMgr.getInstance().getBaseImgPath() + getEmailID(objEmployee.getCmIP()) + ".jpg";	// 사번 말고 이메일로 변경
         
-		String logoImagePath = pr.getValue(PROPERTIES.BASE_IMAGE) + "logo.jpg";
+		String logoImagePath = XmlInfoMgr.getInstance().getBaseImgPath() + "logo.jpg";
 		
 //		// 팝업 이미지 내선.png
 //		String strDest = pr.getValue(PROPERTIES.EMPLOYEE_IMAGE) + objEmployee.getDN() + ".png";
         
         try {
         	
-        	File dirPath = new File(pr.getValue(PROPERTIES.EMPLOYEE_IMAGE));
+        	File dirPath = new File(XmlInfoMgr.getInstance().getEmpImgPath());
         	File [] dirFiles = dirPath.listFiles();
         	
         		
@@ -372,7 +372,7 @@ public class TestImageHandler {
     		while(iter.hasNext()){
     			String key = (String)iter.next();
     			ImageVO imageVO = (ImageVO)imageMap.get(key);
-    			File directory = new File(pr.getValue(PROPERTIES.EMPLOYEE_IMAGE) + "\\" + imageVO.getImageSize());
+    			File directory = new File(XmlInfoMgr.getInstance().getEmpImgPath() + "\\" + imageVO.getImageSize());
     			if(!directory.exists()){
     				directory.mkdirs();
     			}
@@ -395,7 +395,7 @@ public class TestImageHandler {
 				logdir = new File(strCallerPicture);
 				if(!logdir.exists()){
 					// 직원 사진이 없다면 default 이미지로 대체한다.
-					strCallerPicture = pr.getValue(PROPERTIES.BASE_IMAGE) + "default.jpg";
+					strCallerPicture = XmlInfoMgr.getInstance().getBaseImgPath() + "default.jpg";
 				}
 				
 				

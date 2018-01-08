@@ -86,22 +86,22 @@ public class JsonHandler {
 		String str = "";
 		
 		switch (retCode) {
+		
 		case RESULT.RTN_SUCCESS:
-			str = "SUCCESS";
+			str = "success";
 			break;
 			
 		case RESULT.HTTP_SUCCESS:
-			str = "SUCCESS";
+			str = "success";
 			break;
 			
 		case RESULT.HTTP_URL_ERROR:
-			str = "잘못된 URL 요청";
+			str = "page not found";
 			break;
 			
 		case RESULT.HTTP_PARAM_ERROR:
-			str = "Parameter 데이터 확인해주세요";
+			str = "bad parameter data";
 			break;
-		
 		
 		default:
 			break;

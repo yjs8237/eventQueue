@@ -10,6 +10,8 @@ import java.util.Scanner;
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
 import com.isi.data.Employees;
+import com.isi.data.ImageMgr;
+import com.isi.data.XmlInfoMgr;
 import com.isi.db.JDatabase;
 import com.isi.duplex.*;
 import com.isi.file.GLogWriter;
@@ -39,58 +41,70 @@ public class XMLSvcMain {
 		
 		PropertyRead pr = PropertyRead.getInstance();
 		DuplexMgr duplexMgr = DuplexMgr.getInstance();
-
+		
+		JDatabase database = new JDatabase("XMLSvcMain");
+		database.connectDB(pr.getValue(PROPERTIES.DB_CLASS), pr.getValue(PROPERTIES.DB_URL), pr.getValue(PROPERTIES.DB_USER), pr.getValue(PROPERTIES.DB_PASSWORD));
+		// 전화기정보 SELECT
+		database.selectImageInfoByModel(pr.getValue(PROPERTIES.QUERY_DEVICEINFO));
+		// XML 환경설정  SELECT
+		database.selectXMLInfo(pr.getValue(PROPERTIES.QUERY_XMLINFO));
+		
 		// 오래된 로그파일 삭제
 		XMLSvcMain svcMain = new XMLSvcMain();
 		svcMain.delOldLogFiles();
+		
+		database.disconnectDB();
+		
+		/*
 		
 		CMInfo cmInfo = CMInfo.getInstance();
 		cmInfo.setCmUser(pr.getValue(PROPERTIES.CM1_USER));
 		cmInfo.setCmPassword(pr.getValue(PROPERTIES.CM1_PASSWORD));
 		
-		/*
-		JDatabase database = new JDatabase("XMLSvcMain");
-		database.connectDB(pr.getValue(PROPERTIES.DB_CLASS), pr.getValue(PROPERTIES.DB_URL), pr.getValue(PROPERTIES.DB_USER), pr.getValue(PROPERTIES.DB_PASSWORD));
-		database.selectImageInfoByModel();
-		database.disconnectDB();
 		*/
+		
 		/*
 		 * ///////////////////////////////////////////////
 		 * 
 		 * 2. DB 직원정보 가져오기
 		 * 메인 스레드에서 실행하지 않고 스레드를 새로 생성하여 실행한다.
 		 */// ////////////////////////////////////////////
-		/*
+		
 		Employees employees = Employees.getInstance();
 		// 최초 직원정보 메모리 업로드
 		if (employees.getEmployeeList() != RESULT.RTN_SUCCESS) {
 			System.out.println("!! ERROR !! [getEmployeeList]");
 //			System.exit(0);
 		}
+		
+		/*
 		// 최초 고객정보 메모리 업로드
 		if (employees.getCustomerList() != RESULT.RTN_SUCCESS) {
 			System.out.println("!! ERROR !! [getEmployeeList]");
 //			System.exit(0);
 		}
+		*/
+		
 		
 		ImageService imgSvrThread = new ImageService();
 		imgSvrThread.start();
-		*/
+		
 		
 		
 		ProcessMain main = new ProcessMain();
 		
-		if(!PropertyRead.getInstance().getValue(PROPERTIES.SINGLE_MODE).equalsIgnoreCase("Y")){
+		
+		if(!XmlInfoMgr.getInstance().getXmlMode().equalsIgnoreCase("Y")){
 			
 			main.ispsMode(); // ISPS 에게 UDP 패킷을 받는 모드
 		
 		} else {
 			
-			if(PropertyRead.getInstance().getValue(PROPERTIES.DUPLEX_YN).equals("Y")){
+			if(XmlInfoMgr.getInstance().getDuplexYN().equalsIgnoreCase("Y")){
 				
 				duplexMgr.setDuplexMode(true);
 				
-				ServerSocketEx server = new DuplexServerSocket(Integer.parseInt(pr.getValue(PROPERTIES.REMOTE_PORT)));
+				ServerSocketEx server = new DuplexServerSocket(Integer.parseInt(XmlInfoMgr.getInstance().getRemotePort()));
 				server.startServer();
 				
 				AliveProc alive = new AliveProc();
@@ -140,10 +154,10 @@ public class XMLSvcMain {
 	
 	private void delOldLogFiles() {
 		// TODO Auto-generated method stub
-		PropertyRead pr = PropertyRead.getInstance();
-		String logPath = pr.getValue(PROPERTIES.LOG_PATH);
-//		String middleLogPath = pr.getValue(PROPERTIES.MIDDLE_LOG_PATH);
-		int days = Integer.parseInt(pr.getValue(PROPERTIES.LOG_DEL_DAYS));
+		
+		String logPath = XmlInfoMgr.getInstance().getLogPath();
+		
+		int days = XmlInfoMgr.getInstance().getLogDelDays();
 		
 		try{
 			

@@ -9,6 +9,7 @@ import java.net.URLConnection;
 
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
+import com.isi.data.XmlInfoMgr;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.LogMgr;
 import com.isi.file.PropertyRead;
@@ -32,8 +33,8 @@ public class HttpUrlHandler {
 	public HttpUrlHandler (){
 		pr = PropertyRead.getInstance();
 		m_Log = LogMgr.getInstance();
-		connTimeout = Integer.parseInt(pr.getValue(PROPERTIES.CONNECT_TIMEOUT));
-		readTimeout = Integer.parseInt(pr.getValue(PROPERTIES.READ_TIMEOUT));
+		connTimeout = XmlInfoMgr.getInstance().getConnectTimeout();
+		readTimeout = XmlInfoMgr.getInstance().getReadTimeout();
 	}
 	
 	

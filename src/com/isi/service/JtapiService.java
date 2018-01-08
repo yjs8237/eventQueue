@@ -9,6 +9,7 @@ import com.isi.constans.LOGTYPE;
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
 import com.isi.constans.SVCTYPE;
+import com.isi.data.XmlInfoMgr;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
@@ -55,20 +56,21 @@ public class JtapiService {
 			logWriter = new GLogWriter();
 			m_EvtQue = (JQueue) queue;
 			
-			cmCnt = Integer.parseInt(proRead.getValue(PROPERTIES.CM_CNT));
+//			cmCnt = Integer.parseInt(proRead.getValue(PROPERTIES.CM_CNT));
+			cmCnt = XmlInfoMgr.getInstance().getCmCnt();
 			
 			m_jtapi = new IJTAPI[cmCnt];
 			
 			 for (int i = 0; i < m_jtapi.length; i++) {
 				 
 				 if( i == 0 ){
-					 cmIP = proRead.getValue(PROPERTIES.CM1_IP);
-					 cmUser = proRead.getValue(PROPERTIES.CM1_USER);
-					 cmPassword = proRead.getValue(PROPERTIES.CM1_PASSWORD);
+					 cmIP = XmlInfoMgr.getInstance().getCm1IpAddr();
+					 cmUser = XmlInfoMgr.getInstance().getCm1User();
+					 cmPassword = XmlInfoMgr.getInstance().getCm1Pwd();
 				 } else if(i == 1){
-					 cmIP = proRead.getValue(PROPERTIES.CM2_IP);
-					 cmUser = proRead.getValue(PROPERTIES.CM2_USER);
-					 cmPassword = proRead.getValue(PROPERTIES.CM2_PASSWORD);
+					 cmIP = XmlInfoMgr.getInstance().getCm2IpAddr();
+					 cmUser = XmlInfoMgr.getInstance().getCm2User();
+					 cmPassword = XmlInfoMgr.getInstance().getCm2Pwd();
 				 }
 				 
 	                m_jtapi[i] = new JTAPI2(i, m_EvtQue);

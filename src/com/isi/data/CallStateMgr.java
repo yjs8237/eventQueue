@@ -38,7 +38,12 @@ public class CallStateMgr {
 	}
 	
 	public synchronized Integer getDeviceState(String DN){
-		return (Integer)deviceMap.get(DN) == null ? CALLSTATE.IDLE : (Integer)deviceMap.get(DN);
+		
+		return (Integer) deviceMap.get(DN);
+//		if(deviceMap.get(DN) == null) {
+//			return null;
+//		} else 
+//		return (Integer)deviceMap.get(DN) == null ? CALLSTATE.IDLE : (Integer)deviceMap.get(DN);
 	}
 	
 	private String getCallStateString(int state){
