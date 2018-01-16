@@ -36,7 +36,6 @@ public class XMLData {
         } else if(person instanceof CustomerVO) {
         	aniNum = ((CustomerVO) person).getPhoneNum();
         }
-      
         
         {
             xmlBuffer.append("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
@@ -47,8 +46,8 @@ public class XMLData {
             xmlBuffer.append("<Prompt>");
             xmlBuffer.append("" + aniNum);
             xmlBuffer.append("</Prompt>");
-            xmlBuffer.append("<LocationX>-1</LocationX>");
-            xmlBuffer.append("<LocationY>-1</LocationY>");
+            xmlBuffer.append("<LocationX>0</LocationX>");
+            xmlBuffer.append("<LocationY>0</LocationY>");
             xmlBuffer.append("<URL>");
             xmlBuffer.append( path + aniNum + ".png");
             xmlBuffer.append("</URL>");

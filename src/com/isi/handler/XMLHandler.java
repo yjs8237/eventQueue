@@ -140,6 +140,11 @@ public class XMLHandler {
 				returnCode = pushImage(person, xmlInfo , callID);
 //				returnCode = pushText(person, xmlInfo , callID);
 				break;
+				
+			case IPPhone.PHONE_9971:
+				returnCode = pushImage(person, xmlInfo , callID);
+//				returnCode = pushText(person, xmlInfo , callID);
+				break;
 		
 			default:
 				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID, "evtRing", "## THIS Phone Model is not supported !! ## [" + model + "]");

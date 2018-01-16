@@ -90,6 +90,7 @@ public class XMLSvcMain {
 		imgSvrThread.start();
 		
 		
+		ILog logwrite = new GLogWriter();
 		
 		ProcessMain main = new ProcessMain();
 		
@@ -110,9 +111,12 @@ public class XMLSvcMain {
 				AliveProc alive = new AliveProc();
 				int result = alive.startAliveProc(); 
 				if(result == RESULT.RTN_SUCCESS){
+					logwrite.duplexLog(duplexMgr.getActiveMode(), "XMLSvcMain main()",  "START STANDBY MODE !!");
 					duplexMgr.setStandByMode();
 				} else { //
 					if(result == RESULT.TCP_CONN_FAIL){
+						logwrite.duplexLog(duplexMgr.getActiveMode(), "XMLSvcMain main()",  "REMOTE Server Connection Fail..");
+						logwrite.duplexLog(duplexMgr.getActiveMode(), "XMLSvcMain main()",  "START ACTIVE MODE !!");
 						System.out.println("TCP Connection FAIL!!");
 						duplexMgr.setActiveMode();
 					}
@@ -138,13 +142,13 @@ public class XMLSvcMain {
 					
 					System.out.println("Active Mode 시작!!!!");
 					
-					ILog logwrite = new GLogWriter();
 					logwrite.duplexLog(duplexMgr.getActiveMode(), "XMLSvcMain main()",  "Start Active Mode !! ");
 //					main.testMode();	// 부하테스트 모드
 					main.singleMode(); // ISPS 없는 싱글모드
 					break;
 				} else {
-//				System.out.println("Standby Mode 시작!!!!");
+//					System.out.println("Standby Mode 시작!!!!");
+					
 				}
 			}	// end while
 			

@@ -146,7 +146,7 @@ public class TestImageHandler {
         // 팝업 이미지 내선.png
 //		String strDest = getPathByModel(model) + aniNum + ".png";
 		
-		String modelSize = ImageMgr.getInstance().getImageInfo(model);
+		String modelSize = ((ImageVO)ImageMgr.getInstance().getImageInfo(model)).getImageSize();
 		if(modelSize == null){
 			LogMgr.getInstance().write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID , "CreateImageFile", model + " 모델 이미지 사이즈 정보 없음 !! ");
 			return false;
@@ -198,7 +198,7 @@ public class TestImageHandler {
             
             
 //            String imageSize = getImageSizeByModel(model);
-            String imageSize = ImageMgr.getInstance().getImageInfo(model);
+            String imageSize = ((ImageVO)ImageMgr.getInstance().getImageInfo(model)).getImageSize();
             
             /*
             int width = basic_img.getWidth();
