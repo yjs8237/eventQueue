@@ -1,35 +1,81 @@
 package com.isi.test;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Vector;
 
-import com.test.main.CmAxlInfoModel;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import com.isi.axl.AdministrativeXML;
+import com.isi.axl.CiscoPhoneInfo;
+import com.isi.axl.SoapTrustManager;
+import com.isi.constans.LOGLEVEL;
+import com.isi.constans.LOGTYPE;
+import com.isi.constans.SVCTYPE;
+import com.isi.handler.PushHandler;
+import com.isi.vo.EmployeeVO;
+import com.isi.vo.XmlVO;
 import com.test.soap.AxlHandler;
+import com.test.soap.Utils;
+import com.test.vo.CmAxlInfoModel;
 
 public class TestMain {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		/*
+		
 		EmployeeVO employeeVO = new EmployeeVO();
-		employeeVO.setCmUser("xmluser");
-		employeeVO.setCmPass("!Insung2018#");
-		employeeVO.setCmIP("192.168.230.120");
-		employeeVO.setDeviceType("119");
-		employeeVO.setDN("1001");
-		employeeVO.setEm_ID("s001");
-		employeeVO.setEm_name("윤지상");
-		employeeVO.setEm_position("대리");
-		employeeVO.setGroupNm("인성");
-		employeeVO.setIpAddr("192.168.20.242");
 		
+		employeeVO.setEmp_id("jisang");
+		
+		try {
+			
+			Class targetClass = Class.forName("com.isi.vo.EmployeeVO");
+			Method methods[] = targetClass.getDeclaredMethods();
+			
+			for (int i = 0; i < methods.length; i++) {
+				String name = methods[i].getName();
+				if(name.startsWith("get")) {
+					methods[i].invoke(employeeVO, "");
+				}
+			}
+			
+		} catch (Exception e) {
+			
+		}
+		
+		
+		
+		
+		
+		/*
 		PushHandler push = new PushHandler("1");
-		
+		String backgroundurl = "http://192.168.20.17:8080/static/images/em/298144/1001.png";
 		StringBuffer sb = new StringBuffer();
-		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\" ?><CiscoIPPhoneImageFile><Title>Ringing</Title><Prompt>1002</Prompt><LocationX>0</LocationX><LocationY>0</LocationY><URL>http://192.168.20.248:8080/static/images/em/298168/1002.png</URL></CiscoIPPhoneImageFile>");
+//		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\" ?><CiscoIPPhoneImageFile><Title>Ringing</Title><Prompt>1002</Prompt><LocationX>0</LocationX><LocationY>0</LocationY><URL>http://192.168.20.248:8080/static/images/em/298168/1002.png</URL></CiscoIPPhoneImageFile>");
+		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\" ?>").append("<setBackground>").append("<background><image>").append(backgroundurl).append("</image> </background></setBackground>");
 //		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\" ?><CiscoIPPhoneImageFile><Title>Ringing</Title><Prompt>1002</Prompt><LocationX>0</LocationX><LocationY>0</LocationY><URL>http://192.168.0.23:8080/static/images/back.png</URL></CiscoIPPhoneImageFile>");
 		
+
 		XmlVO xmlInfo = new XmlVO();
 		xmlInfo.setAlertingdn("1001");
 		xmlInfo.setCalledDn("1002");
@@ -48,16 +94,164 @@ public class TestMain {
 //			
 //		}
 		
+		
+		/*
 		CmAxlInfoModel model = new CmAxlInfoModel();
 		model.setCmID("xmluser");
 		model.setCmIP("192.168.230.120");
 		model.setCmPwd("!Insung2018#");
+		model.setCmPort(8443);
+		TestMain main = new TestMain();
+//		main.gogotest();
 		
-		AxlHandler.testSoap(model);
+		ArrayList list = new ArrayList<>();
+		CmAxlInfoModel mo1 = new CmAxlInfoModel();
+		mo1.setCmID("1");
+		list.add(mo1);
+		mo1 = new CmAxlInfoModel();
+		mo1.setCmID("2");
+		list.add(mo1);
+		
+		
+		for (int i = 0; i < list.size(); i++) {
+			CmAxlInfoModel mo = (CmAxlInfoModel) list.get(i);
+			System.out.println(mo.getCmID());
+			mo.setCmID("1-1");
+		}
+		
+		for (int i = 0; i < list.size(); i++) {
+			CmAxlInfoModel mo = (CmAxlInfoModel) list.get(i);
+			System.out.println(mo.getCmID());
+		}
+		
+		*/
+		
+//		fkroutepartition , description
+
+		
+		String query = "SELECT \r\n" + 
+				"			PICK.pkid AS pick_pkid, PICK.name AS pickup_grp_name, NUM.dnorpattern AS pickup_grp_num , NUM.pkid AS fknumplan_pickup , ROUTE.description    \r\n" + 
+				"		FROM\r\n" + 
+				"		(\r\n" + 
+				"				SELECT * \r\n" + 
+				"				FROM pickupgroup \r\n" + 
+				"		) PICK LEFT OUTER JOIN (\r\n" + 
+				"				SELECT pkid, fkroutepartition ,dnorpattern FROM numplan\r\n" + 
+				"		) NUM ON PICK.fknumplan_pickup = NUM.pkid "
+				+ "		LEFT OUTER JOIN ("
+				+ "		SELECT pkid , description FROM routepartition"
+				+ ") ROUTE ON NUM.fkroutepartition = ROUTE.pkid"
+				+ ""
+				+ "";
+//		 query = "SELECT * FROM routepartition";
+//		 query = "SELECT * FROM numplan";
+//		axl.testSoap(model, query);
+		//AxlHandler.testSoap(model);
 		
 	}
 	
+	public static void gogotest() {
+		
+		CmAxlInfoModel model = new CmAxlInfoModel();
+		model.setCmID("xmluser");
+		model.setCmIP("192.168.230.120");
+		model.setCmPwd("!Insung2018#");
+		model.setCmPort(8443);
+		
+
+        try {
+            String ver  = "8.5";
+        	
+        	StringBuffer queryBuffer = new StringBuffer();
+    		queryBuffer.append("SELECT").append("\n");
+    		queryBuffer.append("PICK.pkid AS pick_pkid, PICK.name AS pickup_grp_name, NUM.dnorpattern AS pickup_grp_num , NUM.pkid AS fknumplan_pickup , ROUTE.description").append("\n");
+    		queryBuffer.append("FROM (").append("\n");
+    		queryBuffer.append(" SELECT * FROM pickupgroup ").append("\n");
+    		queryBuffer.append(" ) PICK LEFT OUTER JOIN ( ").append("\n");
+    		queryBuffer.append(" SELECT pkid, fkroutepartition ,dnorpattern FROM numplan ").append("\n");
+    		queryBuffer.append(" ) NUM ON PICK.fknumplan_pickup = NUM.pkid ").append("\n");
+    		queryBuffer.append(" LEFT OUTER JOIN ( ").append("\n");
+    		queryBuffer.append(" SELECT pkid , description FROM routepartition ").append("\n");
+    		queryBuffer.append(" ) ROUTE ON NUM.fkroutepartition = ROUTE.pkid ").append("\n");
+        	
+        	
+        	StringBuffer soapHeader = new StringBuffer();
+    		soapHeader.append("POST https://").append(model.getCmIP()).append(":").append(model.getCmPort()).append("/axl/ HTTP/1.1").append("\n");
+    		soapHeader.append("Accept-Encoding: gzip,deflate").append("\n");
+    		soapHeader.append("Content-Type: text/xml;charset=UTF-8").append("\n");
+    		soapHeader.append("SOAPAction: \"CUCM:DB ver=").append(ver).append(" executeSQLQuery\"").append("\n");
+    		soapHeader.append("Content-Length: ").append(queryBuffer.toString().length()).append("\n");	
+    		soapHeader.append("Host: ").append(model.getCmIP()).append(":").append(model.getCmPort()).append("\n");
+    		soapHeader.append("Connection: Keep-Alive").append("\n");
+    		soapHeader.append("User-Agent: Apache-HttpClient/4.1.1 (java 1.5)").append("\n");
+    		soapHeader.append("Authorization: Basic ").append(Utils.getBase64(model.getCmID()+":"+model.getCmPwd())).append("\n").append("\n");
+    		soapHeader.append(queryBuffer.toString());
+    		
+    		
+    		sendSoap(soapHeader.toString() , model);
+        } catch (Exception e) {
+        	
+        }
 	
+	}
+	
+	public static void sendSoap(String aReqMsg , CmAxlInfoModel model ) {
+
+        Socket socket = null;
+        
+        try {
+        	
+        	X509TrustManager xtm = new SoapTrustManager();
+            TrustManager[] mytm = { xtm };
+
+                SSLContext ctx = SSLContext.getInstance("SSL");
+                ctx.init(null, mytm, null);
+        	
+            String rcvMsg;
+            SSLSocketFactory sslFact = (SSLSocketFactory) ctx.getSocketFactory();
+            socket = (SSLSocket) sslFact.createSocket(model.getCmIP(), model.getCmPort());
+
+            InputStream in = socket.getInputStream();
+            OutputStream out = socket.getOutputStream();
+            
+            System.out.println("SEND SOAP MESSAGE");
+            System.out.println(aReqMsg);
+            
+            StringBuffer sb = new StringBuffer(8192);
+            byte[] bArray  = new byte[8192];
+            int ch = 0;
+            out.write(aReqMsg.getBytes("UTF-8"));
+            
+//            m_Log.fine(aReqMsg);
+            while ((ch = in.read(bArray)) != -1) {
+                String temp = new String(bArray, 0, ch);
+                sb.append(temp);
+              // 종료시점에 바로 소켓을 종료함.
+                if (sb.lastIndexOf("</soapenv:Envelope>") != -1 || sb.lastIndexOf("</SOAP-ENV:Envelope>") != -1) {
+                    break;
+                }
+            }
+            
+            System.out.println("RECV SOAP MSG : " + sb.toString());
+            
+//            RemoveSizeInfo(sb);
+//            m_Log.fine(sb.toString());
+            in.close();
+            out.close();
+            /*
+            if (sb.indexOf("<") < sb.length()) {
+                rcvMsg = sb.substring(sb.indexOf("<"));
+            } else {
+                return -1;
+            }
+*/
+        } catch (UnknownHostException e) {
+//            m_Log.warning("UnknownHostException", e);
+        } catch (IOException ioe) {
+        } catch (Exception ea) {
+        } finally{
+        }
+	}
 	
 	public static void test1() {
 		

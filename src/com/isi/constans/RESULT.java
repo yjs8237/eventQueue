@@ -107,4 +107,7 @@ public interface RESULT {
     final static int RTN_TIMEOUT                    = RTN_EXCEPTION - 3;// 제한된 시간이 초과되었습니다.
     
     final static int HTTP_SUCCESS					= 200;
+    
+   
+    
 }

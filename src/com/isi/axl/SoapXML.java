@@ -92,7 +92,7 @@ public class SoapXML {
         Socket socket = null;
         
         try {
-
+        	
             String rcvMsg;
             aResDom[0] = null;
             SSLSocketFactory sslFact = (SSLSocketFactory) m_ctx.getSocketFactory();
@@ -100,13 +100,16 @@ public class SoapXML {
 
             InputStream in = socket.getInputStream();
             OutputStream out = socket.getOutputStream();
-
+            
+            System.out.println("SEND SOAP MESSAGE");
+            System.out.println(aReqMsg);
+            
             StringBuffer sb = new StringBuffer(8192);
             byte[] bArray  = new byte[8192];
             int ch = 0;
             out.write(aReqMsg.getBytes("UTF-8"));
             
-            m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.GLOBAL, "SendSoapMessage", aReqMsg);
+            m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.GLOBAL, "SendSoapMessage", "SEND SOAP -> " + aReqMsg);
 //            m_Log.fine(aReqMsg);
             while ((ch = in.read(bArray)) != -1) {
                 String temp = new String(bArray, 0, ch);
@@ -116,6 +119,8 @@ public class SoapXML {
                     break;
                 }
             }
+            
+            System.out.println("RECV SOAP MSG : " + sb.toString());
             
             RemoveSizeInfo(sb);
             m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.GLOBAL, "SendSoapMessage", "RECV SOAP -> " + sb.toString());

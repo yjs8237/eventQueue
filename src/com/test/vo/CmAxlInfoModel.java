@@ -1,4 +1,4 @@
-package com.test.main;
+package com.test.vo;
 
 public class CmAxlInfoModel {
 	

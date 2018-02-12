@@ -1,10 +1,25 @@
 package com.isi.axl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Vector;
 
 import javax.net.ssl.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.*;
+import org.xml.sax.InputSource;
+
+import com.isi.constans.LOGLEVEL;
+import com.isi.constans.LOGTYPE;
+import com.isi.constans.SVCTYPE;
+import com.test.soap.Utils;
+import com.test.vo.CmAxlInfoModel;
 
 
 
@@ -16,6 +31,40 @@ public class AdministrativeXML extends SoapXML{
 
     public AdministrativeXML(String ip, int port, String id, String pwd, SSLContext ctx) {
         super(ip, port, id, pwd, ctx);
+    }
+    
+    public int SoapTest(CmAxlInfoModel model) {
+    	String ver  = "8.5";
+    	
+    	StringBuffer queryBuffer = new StringBuffer();
+		queryBuffer.append("SELECT").append("\n");
+		queryBuffer.append("PICK.pkid AS pick_pkid, PICK.name AS pickup_grp_name, NUM.dnorpattern AS pickup_grp_num , NUM.pkid AS fknumplan_pickup , ROUTE.description").append("\n");
+		queryBuffer.append("FROM (").append("\n");
+		queryBuffer.append(" SELECT * FROM pickupgroup ").append("\n");
+		queryBuffer.append(" ) PICK LEFT OUTER JOIN ( ").append("\n");
+		queryBuffer.append(" SELECT pkid, fkroutepartition ,dnorpattern FROM numplan ").append("\n");
+		queryBuffer.append(" ) NUM ON PICK.fknumplan_pickup = NUM.pkid ").append("\n");
+		queryBuffer.append(" LEFT OUTER JOIN ( ").append("\n");
+		queryBuffer.append(" SELECT pkid , description FROM routepartition ").append("\n");
+		queryBuffer.append(" ) ROUTE ON NUM.fkroutepartition = ROUTE.pkid ").append("\n");
+    	
+    	
+    	StringBuffer soapHeader = new StringBuffer();
+		soapHeader.append("POST https://").append(model.getCmIP()).append(":").append(model.getCmPort()).append("/axl/ HTTP/1.1").append("\n");
+		soapHeader.append("Accept-Encoding: gzip,deflate").append("\n");
+		soapHeader.append("Content-Type: text/xml;charset=UTF-8").append("\n");
+		soapHeader.append("SOAPAction: \"CUCM:DB ver=").append(ver).append(" executeSQLQuery\"").append("\n");
+		soapHeader.append("Content-Length: ").append(queryBuffer.toString().length()).append("\n");	
+		soapHeader.append("Host: ").append(model.getCmIP()).append(":").append(model.getCmPort()).append("\n");
+		soapHeader.append("Connection: Keep-Alive").append("\n");
+		soapHeader.append("User-Agent: Apache-HttpClient/4.1.1 (java 1.5)").append("\n");
+		soapHeader.append("Authorization: Basic ").append(Utils.getBase64(model.getCmID()+":"+model.getCmPwd())).append("\n").append("\n");
+    	
+		soapHeader.append(queryBuffer.toString());
+		Document [] xmldom      =  new Document [1];
+		SendSoapMessage(soapHeader.toString() , xmldom);
+		
+    	return 0;
     }
 
     public int GetDeviceNameList(String aLike, Vector DeviceNames) {

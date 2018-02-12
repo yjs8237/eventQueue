@@ -279,35 +279,93 @@ public class JDatabase  {
         	if(rs != null){
         		
         		while(rs.next()) {
-        			xmlInfoMgr.setXmlMode(rs.getString("xml_mode"));
-        			xmlInfoMgr.setDuplexYN(rs.getString("duplex_yn"));
-        			if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
-        				xmlInfoMgr.setRemoteIP(rs.getString("side_b_ip"));
-        			} else {
-        				xmlInfoMgr.setRemoteIP(rs.getString("side_a_ip"));
+        			
+        			if(rs.getString("config_name").equals("xml_mode") ) {
+        				
+        				xmlInfoMgr.setXmlMode(rs.getString("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("duplex_yn") ) {
+        				
+        				xmlInfoMgr.setDuplexYN(rs.getString("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("side_a_ip")) {
+        				if(!PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+        					xmlInfoMgr.setRemoteIP(rs.getString("config_value"));
+        				}
+        			} else if(rs.getString("config_name").equals("side_b_ip")) {
+        				if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+        					xmlInfoMgr.setRemoteIP(rs.getString("config_value"));
+        				}
+        			} else if(rs.getString("config_name").equals("remote_port") ) {
+        				
+        				xmlInfoMgr.setRemotePort(rs.getString("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("custinfo_popup") ) {
+        				
+        				xmlInfoMgr.setCustinfoPopupYN(rs.getString("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("cm_cnt") ) {
+        				
+        				xmlInfoMgr.setCmCnt(Integer.parseInt(rs.getString("config_value")));
+        				
+        			} else if(rs.getString("config_name").equals("cm_ip01") ) {
+        				
+        				xmlInfoMgr.setCm1IpAddr(rs.getString("config_value"));
+        				xmlInfoMgr.setCm1User(rs.getString("config_desc1"));
+        				xmlInfoMgr.setCm1Pwd(rs.getString("config_desc2"));
+        				
+        			} else if(rs.getString("config_name").equals("cm_ip03") ) {
+        				
+        				xmlInfoMgr.setCm2IpAddr(rs.getString("config_value"));
+        				xmlInfoMgr.setCm2User(rs.getString("config_desc1"));
+        				xmlInfoMgr.setCm2Pwd(rs.getString("config_desc2"));
+        				
+        			} else if(rs.getString("config_name").equals("conn_timeout") ) {
+        				
+        				xmlInfoMgr.setConnectTimeout(rs.getInt("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("read_timeout") ) {
+        				
+        				xmlInfoMgr.setReadTimeout(rs.getInt("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("xml_push_url") ) {
+        				
+        				xmlInfoMgr.setXmlPushUrl(rs.getString("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("http_port") ) {
+        				
+        				xmlInfoMgr.setHttpPort(rs.getInt("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("console_debug") ) {
+        				
+        				xmlInfoMgr.setConsoleDebugYN(rs.getString("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("log_level") ) {
+        				
+        				xmlInfoMgr.setLogLevel(rs.getInt("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("log_path") ) {
+        				
+        				xmlInfoMgr.setLogPath(rs.getString("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("base_img_path") ) {
+        				
+        				xmlInfoMgr.setBaseImgPath(rs.getString("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("face_img_path") ) {
+        				
+        				xmlInfoMgr.setFaceImgPath(rs.getString("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("emp_img_path") ) {
+        				
+        				xmlInfoMgr.setEmpImgPath(rs.getString("config_value"));
+        				
+        			} else if(rs.getString("config_name").equals("log_del_days") ) {
+        				
+        				xmlInfoMgr.setLogDelDays(rs.getInt("config_value"));
+        				
         			}
-        			xmlInfoMgr.setSideAIP(rs.getString("side_a_ip"));
-        			xmlInfoMgr.setSideBIP(rs.getString("side_b_ip"));
-        			xmlInfoMgr.setRemotePort(rs.getString("remote_port"));
-        			xmlInfoMgr.setCustinfoPopupYN(rs.getString("custinfo_popup"));
-        			xmlInfoMgr.setCmCnt(rs.getInt("cm_cnt"));
-        			xmlInfoMgr.setCm1User(rs.getString("cm1_user"));
-        			xmlInfoMgr.setCm1Pwd(rs.getString("cm1_pwd"));
-        			xmlInfoMgr.setCm2User(rs.getString("cm2_user"));
-        			xmlInfoMgr.setCm2Pwd(rs.getString("cm2_pwd"));
-        			xmlInfoMgr.setCm1IpAddr(rs.getString("cm1_ip"));
-        			xmlInfoMgr.setCm2IpAddr(rs.getString("cm2_ip"));
-        			xmlInfoMgr.setConnectTimeout(rs.getInt("conn_timeout"));
-        			xmlInfoMgr.setReadTimeout(rs.getInt("read_timeout"));
-        			xmlInfoMgr.setXmlPushUrl(rs.getString("xml_push_url"));
-        			xmlInfoMgr.setHttpPort(rs.getInt("http_port"));
-        			xmlInfoMgr.setConsoleDebugYN(rs.getString("console_debug"));
-        			xmlInfoMgr.setLogLevel(rs.getInt("log_level"));
-        			xmlInfoMgr.setLogPath(rs.getString("log_path"));
-        			xmlInfoMgr.setBaseImgPath(rs.getString("base_img_path"));
-        			xmlInfoMgr.setFaceImgPath(rs.getString("face_img_path"));
-        			xmlInfoMgr.setEmpImgPath(rs.getString("emp_img_path"));
-        			xmlInfoMgr.setLogDelDays(rs.getInt("log_del_days"));
+        			
             	}
         	}
     	}catch(Exception e){
@@ -338,14 +396,16 @@ public class JDatabase  {
         			imageVO.setPicture_y1(rs.getInt("pic_y"));
         			imageVO.setPicture_width(rs.getInt("pic_width"));
         			imageVO.setPicture_height(rs.getInt("pic_height"));
-        			imageVO.setName_x1(rs.getInt("pic_nm_x"));
-        			imageVO.setName_y1(rs.getInt("pic_nm_y"));
-        			imageVO.setOrg_x1(rs.getInt("pic_org_x"));
-        			imageVO.setOrg_y1(rs.getInt("pic_org_y"));
-        			imageVO.setDivision_x1(rs.getInt("pic_div_x"));
-        			imageVO.setDivision_y1(rs.getInt("pic_div_y"));
-        			imageVO.setExtension_x1(rs.getInt("pic_ext_x"));
-        			imageVO.setExtension_y1(rs.getInt("pic_ext_y"));
+        			imageVO.setAninum_x(rs.getInt("aninum_x"));
+        			imageVO.setAninum_y(rs.getInt("aninum_y"));
+        			imageVO.setName_x(rs.getInt("name_x"));
+        			imageVO.setName_y(rs.getInt("name_y"));
+        			imageVO.setPosition_x(rs.getInt("position_x"));
+        			imageVO.setPosition_y(rs.getInt("position_y"));
+        			imageVO.setDivision_x(rs.getInt("division_x"));
+        			imageVO.setDivision_y(rs.getInt("division_y"));
+        			imageVO.setFloor_x(rs.getInt("floor_x"));
+        			imageVO.setFloor_y(rs.getInt("floor_y"));
         			ImageMgr.getInstance().addImage(rs.getString("device_type"), imageVO);
             	}
         	} else {

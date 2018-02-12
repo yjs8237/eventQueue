@@ -23,12 +23,13 @@ public class ImageService extends Thread {
 //			System.exit(0);
 		}
 
+		
+		/*
 		// 최초 직원 이미지 파일 생성
 		if (employees.creatEmployeeImg() != RESULT.RTN_SUCCESS) {
 			System.out.println("!! ERROR !! [creatEmployeeImg]");
-//			System.exit(0);
 		}
-		
+		*/
 	}
 	
 

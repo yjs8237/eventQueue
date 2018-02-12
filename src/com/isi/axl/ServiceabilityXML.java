@@ -220,10 +220,11 @@ public class ServiceabilityXML extends SoapXML{
         }
         return 0;
     }
-
+/*
 	private void updateEmployeeDeviceInfo(String number, String ipAddress) {
 		// TODO Auto-generated method stub
 		Employees employees = Employees.getInstance();
 		employees.updateDeviceIpaddrInfo(number , ipAddress);
 	}
+	*/
 }

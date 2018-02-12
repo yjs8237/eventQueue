@@ -17,6 +17,7 @@ import com.isi.constans.SVCTYPE;
 import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
 import com.isi.file.PropertyRead;
+import com.test.vo.CmAxlInfoModel;
 
 
 
@@ -131,6 +132,29 @@ public class CiscoPhoneInfo {
         return 0;
     }
 */
+    
+    
+    public static int axlTest (CmAxlInfoModel model ) {
+    	
+    	   X509TrustManager xtm = new SoapTrustManager();
+           TrustManager[] mytm = { xtm };
+
+           try {
+               Vector DeviceNames = new Vector();
+               SSLContext ctx = SSLContext.getInstance("SSL");
+               ctx.init(null, mytm, null);
+               
+               AdministrativeXML AXL = new AdministrativeXML(model.getCmIP(), model.getCmPort(), model.getCmID(), model.getCmPwd(), ctx);
+               AXL.SoapTest(model);
+           } catch (Exception e) {
+        	   
+           }
+    	
+    	
+    	
+    	return 0;
+    }
+    
     public static int GetAllPhoneInfo (String cmip, int cmport, String cmid, String cmpwd, CiscoPhoneInfo PhoneInfo) {
 
         String 	cmIp    = cmip;

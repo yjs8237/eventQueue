@@ -2,6 +2,7 @@ package com.isi.handler;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -82,12 +83,12 @@ public class HttpServerHandler {
 			// TODO Auto-generated method stub
 			
 			String requestID = String.valueOf(System.currentTimeMillis()) + "-" + String.valueOf(Thread.currentThread().getName()) + String.valueOf(Thread.currentThread().getId());
-			
+			String responseDATA = "";
 			requestMethod = exchange.getRequestMethod().toUpperCase().trim();
 			int retCode = RESULT.RTN_EXCEPTION;
 			switch (requestMethod) {
 			case "GET":
-				retCode = procGet(exchange , requestID);
+				responseDATA = procGet(exchange , requestID);
 				break;
 				
 			case "POST":
@@ -97,18 +98,6 @@ public class HttpServerHandler {
 				break;
 			}
 			
-			String responseDATA = "";
-			JsonHandler jsonHandler = new JsonHandler();
-
-			URI uri = exchange.getRequestURI();
-			String url = uri.toString().trim();
-			url = getURL(url);
-			if(url.equals("/select")) {
-				//	
-			} else {
-				responseDATA = jsonHandler.getResponseJson(retCode).toString();
-//				logwrite.httpLog(requestID, "handle", "[" + url + "]");
-			}
 			
 			exchange.sendResponseHeaders(200, responseDATA.length());
 			
@@ -120,9 +109,11 @@ public class HttpServerHandler {
 			
 		}
 	
-		private int procGet(HttpExchange exchange, String requestID) {
+		private String procGet(HttpExchange exchange, String requestID) {
 			
 			int returnCode = RESULT.RTN_EXCEPTION;
+			
+			String resultJSONData = "";
 			
 			try {
 				
@@ -145,49 +136,15 @@ public class HttpServerHandler {
 				
 				switch (url) {
 				
-				
-				
-				
-				
-				// 인사정보 전체 일괄 업데이트
-				case "/updateAll" :
-					returnCode = procUpdateAll(parameter , requestID);
+					
+				case "/login":
+					resultJSONData = procLogin(parameter , requestID);
 					break;
 					
-				// 특정 직원 인사정보 업데이트
-				case "/update":
-					returnCode = procUpdate(parameter , requestID);
+				case "/logout":
+					resultJSONData = procLogout(parameter , requestID);
 					break;
 					
-				// 사용자 추가
-				case "/register":
-					returnCode = procRegister(parameter , requestID);
-					break;
-				
-				case "/delete":
-					returnCode = procDelete(parameter , requestID);
-					break;
-					
-				case "pickup":
-					returnCode = procPickup(parameter , requestID);
-					break;
-					
-				case "login":
-					returnCode = procLogin(parameter , requestID);
-					break;
-					
-				case "logout":
-					returnCode = procLogout(parameter , requestID);
-					break;
-					/*
-				case "/select":
-					returnCode = procSelect(parameter , requestID);
-					break;
-					
-				case "/updateImg":
-					returnCode = procUpdateImg(parameter , requestID);
-					break;
-				*/	
 				default:
 					returnCode = RESULT.HTTP_URL_ERROR;
 					break;
@@ -227,24 +184,41 @@ public class HttpServerHandler {
 			
 			return RESULT.RTN_SUCCESS;
 		}
-		private int procLogin  (String parameter, String requestID) {
+		private String procLogin  (String parameter, String requestID) {
 			
 			Map <String, String> map = new HashMap<String, String>();
 			map = queryToMap(parameter);
 			
-			if(map == null) {
-				return RESULT.HTTP_PARAM_ERROR;
-			}
+			JSONObject jsonObj = new JSONObject();
 			
-			if(map.isEmpty()) {
-				return RESULT.HTTP_PARAM_ERROR;
+			
+			if(map == null || map.isEmpty()) {
+				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", "all");
+				return jsonObj.toString();
 			}
 			
 			EmployeeVO employee = getEmployeeInfo(map);
-			if(employee.getEm_ID() == null || employee.getEm_ID().isEmpty() || employee.getEm_ID().equals("null")){
+			if(employee.getEmp_id() == null || employee.getEmp_id().isEmpty() || employee.getEmp_id().equals("null")){
 				logwrite.httpLog(requestID , "procLogin()", "getEm_ID 정보 없음 !!");
-				return RESULT.HTTP_PARAM_ERROR;
+				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", "emp_id");
+				return jsonObj.toString();
 			}
+			
+			
+			String vaildParam = checkParameter(employee);
+			if(!vaildParam.equals("OK")) {
+				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", vaildParam);
+				return jsonObj.toString();
+			}
+			
+			Employees.getInstance().getEmployeeByCellNum(employee.getCell_no(), callID)
+			
 			
 			/*
 			 * 로그인 구현 로직 개발
@@ -254,6 +228,33 @@ public class HttpServerHandler {
 			
 			return RESULT.RTN_SUCCESS;
 		}
+		
+		
+		private String checkParameter (EmployeeVO employee) {
+			String result = "OK";
+			String checkData = "";
+			try {
+				
+				Class targetClass = Class.forName("com.isi.vo.EmployeeVO");
+				Method methods[] = targetClass.getDeclaredMethods();
+				
+				for (int i = 0; i < methods.length; i++) {
+					String methodName = methods[i].getName();
+					if(methodName.startsWith("get")) {
+						Object obj = methods[i].invoke(employee);
+						if(obj == null || obj.toString().isEmpty()) {
+							return methodName.replaceAll("get", "").toLowerCase();
+						}
+					}
+				}
+				
+			} catch (Exception e) {
+			}
+			
+			return result;
+		}
+		
+		
 	
 		private int procPickup (String parameter, String requestID) {
 			
@@ -412,78 +413,82 @@ public class HttpServerHandler {
 			return employee;
 		}
 
-		private int procRegister(String parameter , String requestID) {
-			// TODO Auto-generated method stub
-			Map <String, String> map = new HashMap<String, String>();
-			map = queryToMap(parameter);
-			
-			if(map == null) {
-				return RESULT.HTTP_PARAM_ERROR;
-			}
-			
-			if(map.isEmpty()) {
-				return RESULT.HTTP_PARAM_ERROR;
-			}
-			
-			EmployeeVO employee = getEmployeeInfo(map);
-			
-			int retCode = Employees.getInstance().addEmployee(employee);
-			
-			if(retCode == RESULT.RTN_SUCCESS){
-				logwrite.httpLog(requestID , "procRegister()", "REGISTER SUCCESS !! " + employee.toString());
-			} else {
-				logwrite.httpLog(requestID , "procRegister()", "REGISTER FAIL !! " + employee.toString());
-			}
-			return retCode;
-		}
+		
 		
 		private EmployeeVO getEmployeeInfo(Map<String, String> map) {
 			// TODO Auto-generated method stub
 			EmployeeVO employee = new EmployeeVO();
 			Set keySet = map.keySet();
 			Iterator iter = keySet.iterator();
-			while(iter.hasNext()){
+			while (iter.hasNext()) {
 				String key = (String) iter.next();
-				switch(key){
-				case "empId" :
-					employee.setEm_ID(getEmployeeInfo(map,key));
+				switch (key) {
+				case "emp_id":
+					employee.setEmp_id(getEmployeeInfo(map, key));
 					break;
-				case "mac" :
-					employee.setMacaddress(getEmployeeInfo(map,key));
+				case "emp_nm_kor":
+					employee.setEmp_nm_kor(getEmployeeInfo(map, key));
 					break;
-				case "extension" :
-					employee.setDN(getEmployeeInfo(map,key));
+				case "emp_nm_eng":
+					employee.setEmp_nm_eng(getEmployeeInfo(map, key));
 					break;
-				case "orgNm" :
-					employee.setGroupNm(getEmployeeInfo(map,key));
+				case "org_nm":
+					employee.setOrg_nm(getEmployeeInfo(map, key));
 					break;
-				case "empNm" :
-					employee.setEm_name(getEmployeeInfo(map,key));
+				case "pos_nm":
+					employee.setPos_nm(getEmployeeInfo(map, key));
 					break;
-				case "empGradeNm" :
-					employee.setEm_position(getEmployeeInfo(map,key));
+				case "duty_nm":
+					employee.setDuty_nm(getEmployeeInfo(map, key));
 					break;
-				case "cmIp" :
-					employee.setCmIP(getEmployeeInfo(map,key));
+				case "extension":
+					employee.setExtension(getEmployeeInfo(map, key));
 					break;
-				case "deviceType" :
-					employee.setDeviceType(getEmployeeInfo(map,key));
+				case "email":
+					employee.setEmail(getEmployeeInfo(map, key));
 					break;
-				case "deviceIpaddr" :
-					employee.setIpAddr(getEmployeeInfo(map,key));
+				case "cell_no":
+					employee.setCell_no(getEmployeeInfo(map, key));
 					break;
-				case "cmUser" :
-					employee.setCmUser(getEmployeeInfo(map,key));
+				case "building":
+					employee.setBuilding(getEmployeeInfo(map, key));
 					break;
-				case "cmPwd" :
-					employee.setCmPass(getEmployeeInfo(map,key));
+				case "floor":
+					employee.setFloor(getEmployeeInfo(map, key));
 					break;
-				case "popupSvcYn" :
-					employee.setPopupYN(getEmployeeInfo(map,key));
+				case "emp_stat_nm":
+					employee.setEmp_stat_nm(getEmployeeInfo(map, key));
+					break;
+				case "emp_div_cd_nm":
+					employee.setEmp_div_cd_nm(getEmployeeInfo(map, key));
+					break;
+				case "popup_svc_yn":
+					employee.setPopup_svc_yn(getEmployeeInfo(map, key));
+					break;
+				case "mac_address":
+					employee.setMac_address(getEmployeeInfo(map, key));
+					break;
+				case "device_ipaddr":
+					employee.setDevice_ipaddr(getEmployeeInfo(map, key));
+					break;
+				case "device_type":
+					employee.setDevice_type(getEmployeeInfo(map, key));
+					break;
+				case "cm_ver":
+					employee.setCm_ver(getEmployeeInfo(map, key));
+					break;
+				case "cm_ip":
+					employee.setCm_ip(getEmployeeInfo(map, key));
+					break;
+				case "cm_user":
+					employee.setCm_user(getEmployeeInfo(map, key));
+					break;
+				case "cm_pwd":
+					employee.setCm_pwd(getEmployeeInfo(map, key));
 					break;
 				}
 			}
-			
+
 			return employee;
 		}
 		

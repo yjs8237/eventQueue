@@ -32,7 +32,7 @@ public class XMLData {
         
         String aniNum = "";
         if(person instanceof EmployeeVO){
-        	aniNum = ((EmployeeVO) person).getDN();
+        	aniNum = ((EmployeeVO) person).getExtension();
         } else if(person instanceof CustomerVO) {
         	aniNum = ((CustomerVO) person).getPhoneNum();
         }
@@ -97,11 +97,10 @@ public class XMLData {
         int type = 0;
         if(person instanceof EmployeeVO){
         	type = PersonType.EMPLOYEE;
-        	name = ((EmployeeVO) person).getEm_name();
-        	aniNum = ((EmployeeVO) person).getDN();
-        	position = ((EmployeeVO) person).getEm_position();
-        	division = ((EmployeeVO) person).getGroupNm();
-        	orgNm = ((EmployeeVO) person).getOrgNm();
+        	name = ((EmployeeVO) person).getEmp_nm_kor();
+        	aniNum = ((EmployeeVO) person).getExtension();
+        	position = ((EmployeeVO) person).getPos_nm();
+        	division = ((EmployeeVO) person).getOrg_nm();
         } else if (person instanceof CustomerVO){
         	type = PersonType.CUSTOMER;
         	name = ((CustomerVO) person).getName();
@@ -131,17 +130,10 @@ public class XMLData {
             xmlBuffer.append("</Prompt>");
             xmlBuffer.append("<Text>"); 
             if(type == PersonType.EMPLOYEE){
-//            	xmlBuffer.append(division + " " + name+ " " + position);
             	xmlBuffer.append(orgNm + " " + division + "\r\n"); // 직급 / 성명 / 부서 / 핸드폰번호
             	xmlBuffer.append(position + " " + name); // 직급 / 성명 / 부서 / 핸드폰번호
-//            	xmlBuffer.append(position + "\r\n"); // 직급 / 성명 / 부서 / 핸드폰번호
-//            	xmlBuffer.append(name + "\r\n"); // 직급 / 성명 / 부서 / 핸드폰번호
-//            	xmlBuffer.append(aniNum + "\r\n"); // 직급 / 성명 / 부서 / 핸드폰번호
-//                xmlBuffer.append(phoneNum);
             } else {
             	xmlBuffer.append(custLevel+" "+name);
-//            	xmlBuffer.append(custLevel+" "+name+"\r\n"); // 직급 / 성명 / 부서 / 핸드폰번호                 
-//                xmlBuffer.append(phoneNum);
             }
             
             xmlBuffer.append("</Text>");
@@ -150,13 +142,6 @@ public class XMLData {
             xmlBuffer.append("<URL>SoftKey:Exit</URL>");
             xmlBuffer.append("<Position>4</Position>");
             xmlBuffer.append("</SoftKeyItem>");
-            /*
-            xmlBuffer.append("<SoftKeyItem>");
-            xmlBuffer.append("<Name>Accept</Name>");
-            xmlBuffer.append("<URL>SoftKey:Select</URL>");
-            xmlBuffer.append("<Position>3</Position>");
-            xmlBuffer.append("</SoftKeyItem>");
-             */
             xmlBuffer.append("</CiscoIPPhoneText>");
             /////////////////////////////////////////////////
         }

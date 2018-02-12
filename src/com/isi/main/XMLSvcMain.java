@@ -56,11 +56,9 @@ public class XMLSvcMain {
 		database.disconnectDB();
 		
 		/*
-		
 		CMInfo cmInfo = CMInfo.getInstance();
 		cmInfo.setCmUser(pr.getValue(PROPERTIES.CM1_USER));
 		cmInfo.setCmPassword(pr.getValue(PROPERTIES.CM1_PASSWORD));
-		
 		*/
 		
 		/*
@@ -77,18 +75,8 @@ public class XMLSvcMain {
 //			System.exit(0);
 		}
 		
-		/*
-		// 최초 고객정보 메모리 업로드
-		if (employees.getCustomerList() != RESULT.RTN_SUCCESS) {
-			System.out.println("!! ERROR !! [getEmployeeList]");
-//			System.exit(0);
-		}
-		*/
-		
-		
 		ImageService imgSvrThread = new ImageService();
 		imgSvrThread.start();
-		
 		
 		ILog logwrite = new GLogWriter();
 		
@@ -148,7 +136,6 @@ public class XMLSvcMain {
 					break;
 				} else {
 //					System.out.println("Standby Mode 시작!!!!");
-					
 				}
 			}	// end while
 			

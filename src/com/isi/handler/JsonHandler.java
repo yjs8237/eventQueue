@@ -1,6 +1,8 @@
 package com.isi.handler;
 
 import java.util.List;
+import java.util.Map;
+import java.util.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -15,6 +17,9 @@ public class JsonHandler {
 	public JsonHandler() {
 		
 	}
+	
+	
+	
 	
 	public JSONObject getResponseJson(int returnCode) {
 		
@@ -71,6 +76,18 @@ public class JsonHandler {
 		setJsonReturnCode(RESULT.HTTP_SUCCESS);
 		return jsonData;
 		
+	}
+	
+	
+	public JSONObject convertMapToJSON(Map map) {
+		jsonData = new JSONObject();
+		Set keySet = map.keySet();
+		Iterator iter = keySet.iterator();
+		while(iter.hasNext()) {
+			String key = (String) iter.next();
+			jsonData.put(key, map.get(key));
+		}
+		return jsonData;
 	}
 	
 	

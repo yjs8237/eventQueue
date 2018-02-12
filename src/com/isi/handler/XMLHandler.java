@@ -63,7 +63,7 @@ public class XMLHandler {
 		
 		int returnCode = -1;	// Http Push 결과 리턴 코드
 		
-		IPerson person;
+		EmployeeVO employee;
 		
 		if(xmlInfo.getTargetModel() == null || xmlInfo.getTargetModel().isEmpty() || xmlInfo.getTargetModel().equalsIgnoreCase("null")){
 			// 팝업 띄우려는 타겟의 디바이스 타입이 없을 경우
@@ -72,77 +72,47 @@ public class XMLHandler {
 		}
 		
 		if(xmlInfo.getCallingDn().length() > 6) {
-			// 고객 콜 인입
-			person = employees.getCustomer(xmlInfo.getCallingDn() , callID);
+			// 휴대전화번호 
+			employee = employees.getEmployeeByCellNum(xmlInfo.getCallingDn() , callID);
 		} else {
-			// 직원간 내선전화
-			person = employees.getEmployee(xmlInfo.getCallingDn() , callID);
+			// 내선전화
+			employee = employees.getEmployeeByExtension(xmlInfo.getCallingDn() , callID);
 		}
 		
-		
-		/*
-		// 고객정보 팝업 여부 설정이 Y 인 경우에만 고객정보 테이블 Select 한다. 쓸데없는 트랜잭션 유발 금지
-		if(custInfoPopupYN.equals("Y")){
-			
-			person = employees.getEmployee(xmlInfo.getCallingDn() , callID);
-			
-			// 전기안전공사는  고객정보 팝업 서비스 없다.
-			/*
-			if(xmlInfo.getCallingDn().length() > 6) {
-				
-				person = getCustomerInfoV2(xmlInfo.getCallingDn() , callID);
-				
-				if(person == null) {
-					return RESULT.RTN_EXCEPTION;
-				}
-				
-				if(((CustomerVO)person).getName() == null || ((CustomerVO)person).getName().equalsIgnoreCase("null")){
-					return RESULT.RTN_EXCEPTION; 
-				}
-//				person = getCustomerInfo(xmlInfo.getCallingDn());
-//				person = dataBase.getCustInfo(xmlInfo.getCallingDn());
-			} else {
-				person = employees.getEmployee(xmlInfo.getCallingDn() , callID);
-			}
-			
-		} else {
-			person = employees.getEmployee(xmlInfo.getCallingDn(), callID);
-		}
-		*/
         
-		if(person != null){
+		if(employee != null){
 			
 			String model = xmlInfo.getTargetModel().trim();
 			
 			switch (model) {
 			
 			case IPPhone.PHONE_8841:
-				returnCode = pushImage(person, xmlInfo , callID);
+				returnCode = pushImage(employee, xmlInfo , callID);
 //				returnCode = pushText(person, xmlInfo , callID);
 				break;
 				
 			case IPPhone.PHONE_8851:
-				returnCode = pushImage(person, xmlInfo , callID);
+				returnCode = pushImage(employee, xmlInfo , callID);
 //				returnCode = pushText(person, xmlInfo , callID);
 				break;
 				
 			case IPPhone.PHONE_7941:
-				returnCode = pushImage(person, xmlInfo , callID);
+				returnCode = pushImage(employee, xmlInfo , callID);
 //				returnCode = pushText(person, xmlInfo , callID);
 				break;
 				
 			case IPPhone.PHONE_7971:
-				returnCode = pushImage(person, xmlInfo , callID);
+				returnCode = pushImage(employee, xmlInfo , callID);
 //				returnCode = pushText(person, xmlInfo , callID);
 				break;
 				
 			case IPPhone.PHONE_7970:
-				returnCode = pushImage(person, xmlInfo , callID);
+				returnCode = pushImage(employee, xmlInfo , callID);
 //				returnCode = pushText(person, xmlInfo , callID);
 				break;
 				
 			case IPPhone.PHONE_9971:
-				returnCode = pushImage(person, xmlInfo , callID);
+				returnCode = pushImage(employee, xmlInfo , callID);
 //				returnCode = pushText(person, xmlInfo , callID);
 				break;
 		
@@ -350,10 +320,10 @@ public class XMLHandler {
 //				person = dataBase.getCustInfo(callingDN);
 				person = null;
 			} else {
-				person = employees.getEmployee(callingDN , callID);
+				person = employees.getEmployeeByExtension(callingDN , callID);
 			}
 		} else {
-			person = employees.getEmployee(callingDN , callID);
+			person = employees.getEmployeeByExtension(callingDN , callID);
 		}
 				
 		
@@ -479,15 +449,15 @@ public class XMLHandler {
 		return returnCode;
 	}
 	
-	private int pushImage(IPerson person, XmlVO xmlInfo , String callID) { 
+	private int pushImage(EmployeeVO employee, XmlVO xmlInfo , String callID) { 
 		// TODO Auto-generated method stub
 		
 		int returnCode = -1;
 		ImageHandler imgHandler = new ImageHandler();
-		if(imgHandler.createImageFile(person , xmlInfo.getTargetModel() , callID)) {
+		if(imgHandler.createImageFile(employee ,xmlInfo.getCallingDn(), xmlInfo.getTargetModel() , callID)) {
 			// 이미지 생성
 			pushHandler = new PushHandler(callID);
-			returnCode = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing" , person , CALL_RING , xmlInfo.getTargetModel()), xmlInfo, false);
+			returnCode = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing" , employee , CALL_RING , xmlInfo.getTargetModel()), xmlInfo, false);
 			
 		} else {
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushRing", "Cannot make Image !!");

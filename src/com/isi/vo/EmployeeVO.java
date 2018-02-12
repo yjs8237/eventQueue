@@ -11,191 +11,407 @@ package com.isi.vo;
 */
 public class EmployeeVO  implements IPerson{
 	
-	
-	private String em_ID;				// 사번
-	private String em_name;				// 이름
-	private String em_position;			// 직급
-	private String em_orgNm;			// 사업부
-	
-	private String em_groupNm;			// 부서
-	private String dev_macaddress;		// 전화기 Macaddress
-	private String dev_dn;				// 내선번호
-	private String dev_CmIP;			// CM IP
-	private String dev_deviceType;		// 전화기 모델 코드
-	private String dev_ipAddr;			// 전화기 IP주소
-	private String dev_popupYN;			// pop 유무
-	private String dev_cmUser;			// CM Application User
-	private String dev_cmPass;			// CM Application Password
-	private String pic_path;			// 직원 사진 URL
-	
+	private int emp_seq;
+	private String emp_seq_str;
+	private String emp_id;
+	private String emp_nm_kor;
+	private String emp_nm_eng;
+	private String user_id;
+	private String org_nm;
+	private String pos_nm;
+	private String duty_nm;
+	private String email;
+	private String tel_no;
+	private String cell_no;
+	private String emp_stat_nm;
+	private String emp_div_cd_nm;
+	private String emp_pwd;
+	private String emp_lno;
+	private String building;
+	private String floor;
+	private String popup_svc_yn;
+	private String cm_ver;
+	private String cm_ip;
+	private String cm_user;
+	private String cm_pwd;
+	private String mac_address;
+	private String device_ipaddr;
+	private String extension;
+	private String device_type;
+	private String device_name;
 
 	public EmployeeVO (){
 		
 	}
 	
-	
-	
-	public String getPic_path() {
-		return pic_path;
+
+
+	public int getEmp_seq() {
+		return emp_seq;
 	}
 
 
 
-	public void setPic_path(String pic_path) {
-		this.pic_path = pic_path;
+	public void setEmp_seq(int emp_seq) {
+		this.emp_seq = emp_seq;
 	}
 
 
-	public String getOrgNm() {
-		return em_orgNm;
+
+	public String getEmp_seq_str() {
+		return emp_seq_str;
 	}
 
 
-	public EmployeeVO setOrgNm(String em_orgNm) {
-		this.em_orgNm = em_orgNm;
-		return this;
-	}
-	
 
-	public String getCmUser() {
-		return dev_cmUser;
-	}
-
-	public EmployeeVO setCmUser(String dev_cmUser) {
-		this.dev_cmUser = dev_cmUser;
-		return this;
-	}
-
-	public String getCmPass() {
-		return dev_cmPass;
-	}
-
-	public EmployeeVO setCmPass(String dev_cmPass) {
-		this.dev_cmPass = dev_cmPass;
-		return this;
-	}
-
-	public String getPopupYN() {
-		return dev_popupYN;
-	}
-
-	public EmployeeVO setPopupYN(String dev_popupYN) {
-		this.dev_popupYN = dev_popupYN;
-		return this;
-	}
-
-	public String getIpAddr() {
-		return dev_ipAddr;
+	public void setEmp_seq_str(String emp_seq_str) {
+		this.emp_seq_str = emp_seq_str;
 	}
 
 
-	public EmployeeVO setIpAddr(String dev_ipAddr) {
-		this.dev_ipAddr = dev_ipAddr;
-		return this;
+
+	public String getEmp_id() {
+		return emp_id;
 	}
 
 
-	public String getDeviceType() {
-		return dev_deviceType;
+
+	public void setEmp_id(String emp_id) {
+		this.emp_id = emp_id;
 	}
 
 
-	public EmployeeVO setDeviceType(String dev_deviceType) {
-		this.dev_deviceType = dev_deviceType;
-		return this;
+
+	public String getEmp_nm_kor() {
+		return emp_nm_kor;
 	}
 
-	public String getCmIP() {
-		return dev_CmIP;
+
+
+	public void setEmp_nm_kor(String emp_nm_kor) {
+		this.emp_nm_kor = emp_nm_kor;
 	}
 
-	public EmployeeVO setCmIP(String dev_CmIP) {
-		this.dev_CmIP = dev_CmIP;
-		return this;
+
+
+	public String getEmp_nm_eng() {
+		return emp_nm_eng;
 	}
 
-	public String getMacaddress() {
-		return dev_macaddress;
+
+
+	public void setEmp_nm_eng(String emp_nm_eng) {
+		this.emp_nm_eng = emp_nm_eng;
 	}
 
-	public EmployeeVO setMacaddress(String dev_macaddress) {
-		this.dev_macaddress = dev_macaddress;
-		return this;
+
+
+	public String getUser_id() {
+		return user_id;
 	}
 
-//	public String getEm_cellnum() {
-//		return em_cellnum;
-//	}
-
-//	public void setEm_cellnum(String em_cellnum) {
-//		this.em_cellnum = em_cellnum;
-//	}
 
 
-
-	public String getEm_ID() {
-		return em_ID;
+	public void setUser_id(String user_id) {
+		this.user_id = user_id;
 	}
 
-	public EmployeeVO setEm_ID(String em_ID) {
-		this.em_ID = em_ID;
-		return this;
+
+
+	public String getOrg_nm() {
+		return org_nm;
 	}
 
-	
-	public String getEm_name() {
-		return em_name;
+
+
+	public void setOrg_nm(String org_nm) {
+		this.org_nm = org_nm;
 	}
 
-	public EmployeeVO setEm_name(String em_name) {
-		this.em_name = em_name;
-		return this;
-	}
-	
 
-	public String getDN() {
-		return dev_dn;
+
+	public String getPos_nm() {
+		return pos_nm;
 	}
 
-	public EmployeeVO setDN(String dev_dn) {
-		this.dev_dn = dev_dn;
-		return this;
+
+
+	public void setPos_nm(String pos_nm) {
+		this.pos_nm = pos_nm;
 	}
 
-	public String getEm_position() {
-		return em_position;
+
+
+	public String getDuty_nm() {
+		return duty_nm;
 	}
 
-	public EmployeeVO setEm_position(String em_position) {
-		this.em_position = em_position;
-		return this;
+
+
+	public void setDuty_nm(String duty_nm) {
+		this.duty_nm = duty_nm;
 	}
 
-	public String getGroupNm() {
-		return em_groupNm;
+
+
+	public String getEmail() {
+		return email;
 	}
 
-	public EmployeeVO setGroupNm(String em_groupNm) {
-		this.em_groupNm = em_groupNm;
-		return this;
+
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
-	
-	
+
+
+	public String getTel_no() {
+		return tel_no;
+	}
+
+
+
+	public void setTel_no(String tel_no) {
+		this.tel_no = tel_no;
+	}
+
+
+
+	public String getCell_no() {
+		return cell_no;
+	}
+
+
+
+	public void setCell_no(String cell_no) {
+		this.cell_no = cell_no;
+	}
+
+
+
+	public String getEmp_stat_nm() {
+		return emp_stat_nm;
+	}
+
+
+
+	public void setEmp_stat_nm(String emp_stat_nm) {
+		this.emp_stat_nm = emp_stat_nm;
+	}
+
+
+
+	public String getEmp_div_cd_nm() {
+		return emp_div_cd_nm;
+	}
+
+
+
+	public void setEmp_div_cd_nm(String emp_div_cd_nm) {
+		this.emp_div_cd_nm = emp_div_cd_nm;
+	}
+
+
+
+	public String getEmp_pwd() {
+		return emp_pwd;
+	}
+
+
+
+	public void setEmp_pwd(String emp_pwd) {
+		this.emp_pwd = emp_pwd;
+	}
+
+
+
+	public String getEmp_lno() {
+		return emp_lno;
+	}
+
+
+
+	public void setEmp_lno(String emp_lno) {
+		this.emp_lno = emp_lno;
+	}
+
+
+
+	public String getBuilding() {
+		return building;
+	}
+
+
+
+	public void setBuilding(String building) {
+		this.building = building;
+	}
+
+
+
+	public String getFloor() {
+		return floor;
+	}
+
+
+
+	public void setFloor(String floor) {
+		this.floor = floor;
+	}
+
+
+
+	public String getPopup_svc_yn() {
+		return popup_svc_yn;
+	}
+
+
+
+	public void setPopup_svc_yn(String popup_svc_yn) {
+		this.popup_svc_yn = popup_svc_yn;
+	}
+
+
+
+	public String getCm_ver() {
+		return cm_ver;
+	}
+
+
+
+	public void setCm_ver(String cm_ver) {
+		this.cm_ver = cm_ver;
+	}
+
+
+
+	public String getCm_ip() {
+		return cm_ip;
+	}
+
+
+
+	public void setCm_ip(String cm_ip) {
+		this.cm_ip = cm_ip;
+	}
+
+
+
+	public String getCm_user() {
+		return cm_user;
+	}
+
+
+
+	public void setCm_user(String cm_user) {
+		this.cm_user = cm_user;
+	}
+
+
+
+	public String getCm_pwd() {
+		return cm_pwd;
+	}
+
+
+
+	public void setCm_pwd(String cm_pwd) {
+		this.cm_pwd = cm_pwd;
+	}
+
+
+
+	public String getMac_address() {
+		return mac_address;
+	}
+
+
+
+	public void setMac_address(String mac_address) {
+		this.mac_address = mac_address;
+	}
+
+
+
+	public String getDevice_ipaddr() {
+		return device_ipaddr;
+	}
+
+
+
+	public void setDevice_ipaddr(String device_ipaddr) {
+		this.device_ipaddr = device_ipaddr;
+	}
+
+
+
+	public String getExtension() {
+		return extension;
+	}
+
+
+
+	public void setExtension(String extension) {
+		this.extension = extension;
+	}
+
+
+
+	public String getDevice_type() {
+		return device_type;
+	}
+
+
+
+	public void setDevice_type(String device_type) {
+		this.device_type = device_type;
+	}
+
+
+
+	public String getDevice_name() {
+		return device_name;
+	}
+
+
+
+	public void setDevice_name(String device_name) {
+		this.device_name = device_name;
+	}
+
+
+
 	public String toString() {
 		
-		return "em_ID["+em_ID+"]"
-				+ "em_name["+em_name+"]"
-				+ "em_position["+em_position+"]"
-				+ "em_groupNm["+em_groupNm+"]"
-				+ "dev_macaddress["+dev_macaddress+"]"
-				+ "dev_dn["+dev_dn+"]"
-				+ "dev_CmIP["+dev_CmIP+"]"
-				+ "dev_deviceType["+dev_deviceType+"]"
-				+ "dev_ipAddr["+dev_ipAddr+"]"
-				+ "dev_popupYN["+dev_popupYN+"]"
-				+ "dev_cmUser["+dev_cmUser+"]"
-				+ "dev_cmPass["+dev_cmPass+"]";
+		StringBuffer sb = new StringBuffer();
+		sb.append("emp_id [").append(emp_id).append("] ");
+		sb.append("emp_nm_kor [").append(emp_nm_kor).append("] ");
+		sb.append("emp_nm_eng [").append(emp_nm_eng).append("] ");
+		sb.append("user_id [").append(user_id).append("] ");
+		sb.append("org_nm [").append(org_nm).append("] ");
+		sb.append("pos_nm [").append(pos_nm).append("] ");
+		sb.append("duty_nm [").append(duty_nm).append("] ");
+		sb.append("email [").append(email).append("] ");
+		sb.append("tel_no [").append(tel_no).append("] ");
+		sb.append("cell_no [").append(cell_no).append("] ");
+		sb.append("emp_stat_nm [").append(emp_stat_nm).append("] ");
+		sb.append("emp_div_cd_nm [").append(emp_div_cd_nm).append("] ");
+		sb.append("emp_pwd [").append(emp_pwd).append("] ");
+		sb.append("emp_lno [").append(emp_lno).append("] ");
+		sb.append("building [").append(building).append("] ");
+		sb.append("floor [").append(floor).append("] ");
+		sb.append("popup_svc_yn [").append(popup_svc_yn).append("] ");
+		sb.append("cm_ver [").append(cm_ver).append("] ");
+		sb.append("cm_ip [").append(cm_ip).append("] ");
+		sb.append("cm_user [").append(cm_user).append("] ");
+		sb.append("cm_pwd [").append(cm_pwd).append("] ");
+		sb.append("mac_address [").append(mac_address).append("] ");
+		sb.append("device_type [").append(device_type).append("] ");
+		sb.append("device_ipaddr [").append(device_ipaddr).append("] ");
+		sb.append("extension [").append(extension).append("] ");
+		
+		return sb.toString();
 		
 	}
 

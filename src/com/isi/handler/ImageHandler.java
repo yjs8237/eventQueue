@@ -54,60 +54,6 @@ public class ImageHandler {
 	
 	
 	
-	public boolean createFaceImage(EmployeeVO objEmployee) {
-		boolean bResult = true;
-		Image image = null;
-		String	strUrl="";
-		
-		if(objEmployee.getPic_path()==null || objEmployee.getPic_path().isEmpty() || objEmployee.getPic_path().equalsIgnoreCase("null")){
-			// DB 정보에 증명사진 경로가 없을 경우
-//			strUrl = pr.getValue(PROPERTIES.FACE_IMAGE_URL) + objEmployee.getEm_ID() + ".jpg";
-//			strUrl = XmlInfoMgr.getInstance().getEmpImgPath() + objEmployee.getEm_ID() + ".jpg";
-			strUrl = XmlInfoMgr.getInstance().getFaceImgPath() + objEmployee.getEm_ID() + ".jpg";
-			g_Log.imageLog("", "createAllFaceImage", "[" +objEmployee.getEm_ID() + "] Property Read 증명사진 URL 경로 [" +strUrl+ "]");
-		} else {
-			strUrl = objEmployee.getPic_path();
-			g_Log.imageLog("", "createAllFaceImage", "[" +objEmployee.getEm_ID() + "] 증명사진 URL 경로 [" +strUrl+ "]");
-		}
-		
-		
-		URL url = null;
-		BufferedImage img = null;
-		
-		try{
-			url = new URL(strUrl);
-			img = ImageIO.read(url);
-			
-//			File directory = new File(pr.getValue(PROPERTIES.FACE_IMAGE));
-			File directory = new File(XmlInfoMgr.getInstance().getFaceImgPath());
-			// 폴더가 없을 경우 생성
-			if(!directory.exists()){
-				directory.mkdirs();
-			}
-			
-//			File file = new File(pr.getValue(PROPERTIES.FACE_IMAGE) + "\\" + objEmployee.getEm_ID() + ".jpg");
-			File file = new File(XmlInfoMgr.getInstance().getFaceImgPath() + "\\" + objEmployee.getEm_ID() + ".jpg");
-			
-			if(img != null) {
-				ImageIO.write(img, "jpg", file);
-			} else {
-				g_Log.imageLog("", "createAllFaceImage", "[" +objEmployee.getEm_ID() + "] ### 사진이 존재하지 않음 ###");
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace(ExceptionUtil.getPrintWriter());
-			g_Log.imageLog("", "createAllFaceImage", "[" +objEmployee.getEm_ID() + "] ## Exception ## ");
-			g_Log.imageLog("", "createAllFaceImage", ExceptionUtil.getStringWriter().toString());
-//			g_Log.imageLog(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, "" , "createAllFaceImage", ExceptionUtil.getStringWriter().toString());
-			bResult = false;
-		} finally {
-			if(img!=null) {img = null;}
-			if(url!=null) {url=null;}
-		}
-		
-		return bResult;
-	}
-	
 	
 	public boolean deleteImageFile() {
 		boolean bResult = true;
@@ -116,31 +62,9 @@ public class ImageHandler {
 			String dirPath = XmlInfoMgr.getInstance().getEmpImgPath();
 			File files = new File(dirPath);
 			bResult = deleteDirectory(files);
-			
 		} catch(Exception e){
 			e.printStackTrace(ExceptionUtil.getPrintWriter());
 			g_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, "" , "deleteImageFile", ExceptionUtil.getStringWriter().toString());
-			bResult = false;
-		}
-		
-		return bResult;
-	}
-	
-	public boolean deleteFaceImageFile(EmployeeVO employee) {
-		boolean bResult = true;
-		// 팝업 이미지 내선.png
-		try{
-			if(employee.getEm_ID()==null || employee.getEm_ID().equals("null") || employee.getEm_ID().isEmpty()){
-				return false;
-			}
-//			String dirPath = pr.getValue(PROPERTIES.FACE_IMAGE) + employee.getEm_ID() + ".jpg";
-			String dirPath = XmlInfoMgr.getInstance().getFaceImgPath() + employee.getEm_ID() + ".jpg";
-			File files = new File(dirPath);
-			bResult = deleteDirectory(files);
-			
-		} catch(Exception e){
-			e.printStackTrace(ExceptionUtil.getPrintWriter());
-			g_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, "" , "deleteFaceImageFile", ExceptionUtil.getStringWriter().toString());
 			bResult = false;
 		}
 		
@@ -197,7 +121,7 @@ public class ImageHandler {
 		return result;
 	}
 	
-	public boolean deleteEmpImage(EmployeeVO updateEmployee) {
+	public boolean deleteEmpImage(String fileName) {
 		// TODO Auto-generated method stub
 		boolean bResult = true;
 		// 팝업 이미지 내선.png
@@ -208,7 +132,7 @@ public class ImageHandler {
 			File[] files = path.listFiles();
 			
 			for (File file : files) {
-				String str_path = file.getAbsolutePath() + updateEmployee.getDN() + ".png";
+				String str_path = file.getAbsolutePath() + fileName + ".png";
 				File tmpFile = new File(str_path);
 				bResult = deleteDirectory(tmpFile);
 			}
@@ -219,60 +143,33 @@ public class ImageHandler {
 			bResult = false;
 		}
 		return bResult;
-		
 	}
 	
 	
-	public boolean createImageFile(IPerson person , String model , String callID) {
+	public boolean createImageFile(EmployeeVO employee ,  String callingNum,  String model , String callID) {
 		
 		imageMgr = ImageMgr.getInstance();
 		
 		boolean bResult = true;
-		String ID = "";
-		String aniNum = "";
-		String contactNum = "";
-		String division = "";
-		String displayName = "";
-		String orgNm = "";
+		
+		String aniNum 	= "발신 : " + callingNum;
+		String name		= "이름 : " + employee.getEmp_nm_kor();
+		String position	= "직급 : " + employee.getPos_nm();
+		String division = "부서 : " + employee.getOrg_nm();
+		String floor	= "위치 : " + employee.getFloor();
 		
 		int type = -1;
-		if(person instanceof EmployeeVO){
-		
-			type = PersonType.EMPLOYEE;
-			ID = ((EmployeeVO) person).getEm_ID();
-			aniNum = ((EmployeeVO) person).getDN();
-			contactNum = aniNum;
-			division = ((EmployeeVO) person).getGroupNm();	// 부서명
-			orgNm	 = ((EmployeeVO) person).getOrgNm();	// 사업소명
-			displayName = ((EmployeeVO) person).getEm_position() + " " + ((EmployeeVO) person).getEm_name();
-			
-		} else if (person instanceof CustomerVO){
-			
-			type = PersonType.CUSTOMER;
-			ID = ((CustomerVO) person).getPhoneNum();
-			aniNum = ((CustomerVO) person).getPhoneNum();
-			contactNum = aniNum;
-			displayName = ((CustomerVO) person).getPosition() + " " + ((CustomerVO) person).getName(); 
-			orgNm	 = ((CustomerVO) person).getCompany();	// 사업소명
-			
-		}
 		
 		
 		ImageVO imageVO = ImageMgr.getInstance().getImageInfo(model);
 		
-		// 직원 사진 사번.jpg
-//		String strCallerPicture = pr.getValue(PROPERTIES.FACE_IMAGE) + ID + ".jpg";
-		String strCallerPicture = XmlInfoMgr.getInstance().getFaceImgPath() + ID + ".jpg";
 		String imageSize = imageVO.getImageSize();
-		if(imageSize == null){
+		if(imageSize == null) {
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID , "CreateImageFile", imageSize + " 모델 이미지 사이즈 정보 없음 !! ");
 			return false;
 		}
 		
-//		String strDest = pr.getValue(PROPERTIES.EMPLOYEE_IMAGE) + imageSize + "\\"+ aniNum + ".png";
-		String strDest = XmlInfoMgr.getInstance().getEmpImgPath() + imageSize + "\\"+ aniNum + ".png";
-        // 고로 이미지
-//		String logoImagePath = pr.getValue(PROPERTIES.BASE_IMAGE) + "logo.jpg";
+		String strDest = XmlInfoMgr.getInstance().getEmpImgPath() + imageSize + "\\"+ callingNum + ".png";
 		
         try {
         	
@@ -281,30 +178,19 @@ public class ImageHandler {
             if(type == PersonType.EMPLOYEE){
             	if (logdir.exists() ) {
                 	// 이미 팝업 이미지가 있다면 이미지를 생성하지 않는다. (직원 콜 의 경우만 해당)
-            		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID , "CreateImageFile", ID + " / " + aniNum + " 이미지 존재");
+            		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID , "CreateImageFile", callingNum + " 이미지 존재");
                     return true;
                 }
             }
             
-            logdir = new File(strCallerPicture);
-            if(!logdir.exists()){
-            	// 직원 사진이 없다면 default 이미지로 대체한다.
-//            	strCallerPicture = pr.getValue(PROPERTIES.BASE_IMAGE) + "default.jpg";
-            	strCallerPicture = XmlInfoMgr.getInstance().getBaseImgPath() + "default.jpg";
-            }
             String basic_img_path = XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png";
             BufferedImage basic_img = ImageIO.read(new File(basic_img_path)); // 배경이미지
-            
             
             
             int width = Integer.parseInt(imageVO.getImageSize().substring(0, 3));
             int height = Integer.parseInt(imageVO.getImageSize().substring(3));
             
             
-            int picture_x = imageVO.getPicture_x1();
-			int picture_y = imageVO.getPicture_y1();
-			int pictureWidth = imageVO.getPicture_width();
-			int pictureHeight = imageVO.getPicture_height();
 			int fontsize = (int) (height / 10);
 			
 			BufferedImage mergedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -313,91 +199,62 @@ public class ImageHandler {
 			graphics.setBackground(Color.WHITE);
 			graphics.drawImage(basic_img, 0, 0, null);
 			
-			  // 얼굴 이미지
-            BufferedImage faceImage = null;
-            try {
-                faceImage = ImageIO.read(new File(strCallerPicture)); // 띄우고자 하는 사진 
-            } catch (IOException ex) {
-            	ex.printStackTrace(ExceptionUtil.getPrintWriter());
-            	m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID , "CreateImageFile", ExceptionUtil.getStringWriter().toString());
-            }
-            
-			
-			if (faceImage != null) {
-				Image imgTarget = faceImage.getScaledInstance(pictureWidth, pictureHeight, Image.SCALE_SMOOTH);
-				int pixels[] = new int[pictureWidth * pictureHeight];
-				PixelGrabber pg = new PixelGrabber(imgTarget, 0, 0, pictureWidth, pictureHeight, pixels,0 ,pictureWidth);
-				pg.grabPixels();
-				graphics.drawImage(imgTarget, picture_x, picture_y, pictureWidth, pictureHeight, null);
-				
-//				graphics.drawImage(faceImage, picture_x, picture_y, pictureWidth, pictureHeight, null);
-				//System.out.println("[CreateImageFile] Picture is exist > " + strCallerPicture );
-			} else {
-				// Remote 원본 이미지를 가져오는 기능 추가 여부 판단 후 적용 예정
-				// System.out.println("[CreateImageFile] Picture is NOT exist > " + objEmployee.getEMP_ID() );
-			}
-			
-			
-			/*
-			if (logoImage != null) {
-				//graphics.drawImage(image2, 20, 60, null);
-				// 127 x 150 Pixel Pictuer
-				graphics.drawImage(logoImage, ((width / 20) * 17) , (height / 10), (width / 8), (height / 8), null);
-				//System.out.println("[CreateImageFile] Picture is exist > " + strCallerPicture );
-			} else {
-				// Remote 원본 이미지를 가져오는 기능 추가 여부 판단 후 적용 예정
-				// System.out.println("[CreateImageFile] Picture is NOT exist > " + objEmployee.getEMP_ID() );
-			}
-			*/
 			
 			Font font = new Font("맑은고딕", Font.BOLD, fontsize);
 			graphics.setFont(font);
 			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			
-			if(displayName != null && !displayName.isEmpty()){
-				// 직책 + 이름
-				AttributedString attName = new AttributedString( displayName );
+			if(aniNum != null && !aniNum.isEmpty()){
+				// 발신번호 표시
+				AttributedString attName = new AttributedString( aniNum );
 				attName.addAttribute(TextAttribute.FONT, font);
 				attName.addAttribute(TextAttribute.FOREGROUND, Color.black);
-				graphics.drawString(attName.getIterator(), imageVO.getName_x1(), imageVO.getName_y1());
+				graphics.drawString(attName.getIterator(), imageVO.getAninum_x(), imageVO.getAninum_y());
 				
 			}
 			
-			if(orgNm != null && !orgNm.isEmpty()) {
-				if(orgNm.length() > 9) {
-					Font newfont = new Font("맑은고딕", Font.BOLD, fontsize - 2);
-					graphics.setFont(newfont);
-					graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					// 사업소
-					AttributedString as = new AttributedString( orgNm );
-					as.addAttribute(TextAttribute.FONT, newfont);
-					as.addAttribute(TextAttribute.FOREGROUND, Color.black);
-					graphics.drawString(as.getIterator(), imageVO.getOrg_x1(), imageVO.getOrg_y1());
-				} else {
-					// 사업소
-					AttributedString as = new AttributedString( orgNm );
-					as.addAttribute(TextAttribute.FONT, font);
-					as.addAttribute(TextAttribute.FOREGROUND, Color.black);
-					graphics.drawString(as.getIterator(), imageVO.getOrg_x1(), imageVO.getOrg_y1());
-				}
-				
+			if(name != null && !name.isEmpty()) {
+				// 이름 표시
+				AttributedString attName = new AttributedString( name );
+				attName.addAttribute(TextAttribute.FONT, font);
+				attName.addAttribute(TextAttribute.FOREGROUND, Color.black);
+				graphics.drawString(attName.getIterator(), imageVO.getName_x(), imageVO.getName_y());
+			}
+			
+			if(position != null && !position.isEmpty()) {
+				// 직급
+				AttributedString attName = new AttributedString(position);
+				attName.addAttribute(TextAttribute.FONT, font);
+				attName.addAttribute(TextAttribute.FOREGROUND, Color.black);
+				graphics.drawString(attName.getIterator(), imageVO.getPosition_x(), imageVO.getPosition_y());
 			}
 			
 			if(division != null && !division.isEmpty()) {
 				// 부서
-				AttributedString attPhone1 = new AttributedString(division);
-				attPhone1.addAttribute(TextAttribute.FONT, font);
-				attPhone1.addAttribute(TextAttribute.FOREGROUND, Color.black);
-				graphics.drawString(attPhone1.getIterator(), imageVO.getDivision_x1(), imageVO.getDivision_y1());
-				
+				if(division.length() > 9) {
+					Font newfont = new Font("맑은고딕", Font.BOLD, fontsize - 2);
+					graphics.setFont(newfont);
+					graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+					// 사업소
+					AttributedString as = new AttributedString( division );
+					as.addAttribute(TextAttribute.FONT, newfont);
+					as.addAttribute(TextAttribute.FOREGROUND, Color.black);
+					graphics.drawString(as.getIterator(), imageVO.getDivision_x(), imageVO.getDivision_y());
+				} else {
+					// 사업소
+					AttributedString as = new AttributedString( division );
+					as.addAttribute(TextAttribute.FONT, font);
+					as.addAttribute(TextAttribute.FOREGROUND, Color.black);
+					graphics.drawString(as.getIterator(), imageVO.getDivision_x(), imageVO.getDivision_y());
+				}
 			}
 			
-			if(contactNum != null && !contactNum.isEmpty()){
-				// 내선번호
-				AttributedString attExtension = new AttributedString(contactNum);
-				attExtension.addAttribute(TextAttribute.FONT, font);
-				attExtension.addAttribute(TextAttribute.FOREGROUND, Color.black);
-				graphics.drawString(attExtension.getIterator(), imageVO.getExtension_x1(), imageVO.getExtension_y1());
+			if(floor != null && !floor.isEmpty()) {
+				// 위치
+				AttributedString attName = new AttributedString(floor);
+				attName.addAttribute(TextAttribute.FONT, font);
+				attName.addAttribute(TextAttribute.FOREGROUND, Color.black);
+				graphics.drawString(attName.getIterator(), imageVO.getFloor_x(), imageVO.getFloor_y());
 			}
 			
 			ImageIO.write(mergedImage, "png", new File(strDest));
@@ -411,7 +268,7 @@ public class ImageHandler {
         return bResult;
     }
 	
-
+	/*
 	public boolean createAllImageFile(java.util.ArrayList<EmployeeVO> employeeList) {
 
 		boolean bResult = true;
@@ -549,7 +406,7 @@ public class ImageHandler {
 				g_Log.imageLog( "" , "createAllImageFile", "CREATE SUCCESS : " + strDest);
 				
 				
-				*/
+				
 				
 				
 				
@@ -566,6 +423,7 @@ public class ImageHandler {
         }
         return bResult;
     }
+    */
 	
 	private String get_X(String size){
 		String retStr = "";

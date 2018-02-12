@@ -1,4 +1,4 @@
-package com.test.soap;
+package com.test.axl.soap;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -77,28 +77,28 @@ public class SoapHandler {
 //		strHttpHeader +="Connection: Keep-Alive\r\n";
 //		strHttpHeader +="\r\n";
 		
-		
-		String strHttpHeader = "POST https://"+xml.getIP()+":"+xml.getPort()+"/axl/ HTTP/1.1\r\n";
-		strHttpHeader +="Accept-Encoding: gzip,deflate \r\n";
-		strHttpHeader +="Content-type: text/xml; charset=UTF-8 \r\n";
-		strHttpHeader +="SOAPAction: \"CUCM:DB ver=" + ver + " " + apiFlag + "\"" + "\r\n";
-		strHttpHeader +="Content-Length: " + xmlBody.length() + "\r\n";
-		strHttpHeader +="Host: " + xml.getIP() + ":" + xml.getPort() + "\r\n";
-		strHttpHeader +="Connection: Keep-Alive\r\n";
-		strHttpHeader +="Authorization: Basic " + xml.getAuth() + "\r\n";
-		//strHttpHeader +="User-Agent: Apache-HttpClient/4.1.1 (java 1.5)"; 
-		strHttpHeader +="\r\n";
-		
+		StringBuffer soapHeader = new StringBuffer();
+		soapHeader.append("POST https://").append(urlIP).append(":").append(urlPort).append("/axl/ HTTP/1.1").append("\n");
+		soapHeader.append("Accept-Encoding: gzip,deflate").append("\n");
+		soapHeader.append("Content-Type: text/xml;charset=UTF-8").append("\n");
+//		soapHeader.append("SOAPAction: \"CUCM:DB ver=").append(ver).append(" executeSQLQuery\"").append("\n");
+		soapHeader.append("SOAPAction: \"CUCM:DB ver=").append(ver).append("\n");
+		soapHeader.append("Content-Length: ").append(xmlBody.length()).append("\n");	
+		soapHeader.append("Host: ").append(urlIP).append(":").append(urlPort).append("\n");
+		soapHeader.append("Connection: Keep-Alive").append("\n");
+		soapHeader.append("User-Agent: Apache-HttpClient/4.1.1 (java 1.5)").append("\n");
+		soapHeader.append("Authorization: Basic ").append(auth).append("\n").append("\n");
+			
 
-		String strXml = strHttpHeader + xmlBody;
+		String strXml = soapHeader.toString() + xmlBody;
 		
-		System.out.println(" :::: Soap Send Message :::: ");
+		System.out.println(" :::: Send Soap Message :::: ");
 		System.out.println(strXml);
 		
 		String strResult = xml.SendSoapMessage(strXml, timeOutMilliSecond);
 		
-		System.out.println(" :::: Soap Return Message :::: ");
-		System.out.println(strResult);
+//		System.out.println(" :::: Return Soap Message :::: ");
+//		System.out.println(strResult);
 		
 		return strResult;
 	}
@@ -126,10 +126,11 @@ public class SoapHandler {
 		
 		SoapXML xml = new SoapXML(urlIP, Integer.parseInt(urlPort), id, pw, ctx);
 
-		String strHttpHeader = "POST https://"+xml.getIP()+":"+xml.getPort()+"/realtimeservice2/services/RISService70 HTTP/1.1\r\n";
+		//String strHttpHeader = "POST https://"+xml.getIP()+":"+xml.getPort()+"/realtimeservice2/services/RISService70 HTTP/1.1\r\n";
+		String strHttpHeader = "POST https://"+xml.getIP()+":"+xml.getPort()+"/realtimeservice/services/RisPort HTTP/1.1\r\n";
 		strHttpHeader +="Accept-Encoding: gzip,deflate\r\n";
 		strHttpHeader +="Content-Type: text/xml;charset=UTF-8\r\n";
-		strHttpHeader +="SOAPAction: \"selectCmDeviceExt\"\r\n";
+		strHttpHeader +="SOAPAction: \"http://schemas.cisco.com/ast/soap/action/#RisPort#SelectCmDevice\"\r\n";
 		//strHttpHeader +="Accept: text/*\r\n";
 		strHttpHeader +="Content-Length: " + xmlBody.length() + "\r\n";
 		strHttpHeader +="Authorization: Basic " + xml.getAuth() + "\r\n";

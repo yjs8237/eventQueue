@@ -8,17 +8,33 @@ public class ImageVO {
 	private int picture_y1;
 	private int picture_width;
 	private int picture_height;
-	private int name_x1;
-	private int name_y1;
-	private int division_x1;
-	private int division_y1;
-	private int rank_x1;
-	private int rank_y1;
-	private int extension_x1;
-	private int extension_y1;
-	private int org_x1;
-	private int org_y1;
+	private int aninum_x;
+	private int aninum_y;
+	private int name_x;
+	private int name_y;
+	private int position_x;
+	private int position_y;
+	private int division_x;
+	private int division_y;
+	private int rank_x;
+	private int rank_y;
+	private int floor_x;
+	private int floor_y;
 	
+	
+	
+	public int getAninum_x() {
+		return aninum_x;
+	}
+	public void setAninum_x(int aninum_x) {
+		this.aninum_x = aninum_x;
+	}
+	public int getAninum_y() {
+		return aninum_y;
+	}
+	public void setAninum_y(int aninum_y) {
+		this.aninum_y = aninum_y;
+	}
 	public String getModel() {
 		return model;
 	}
@@ -61,76 +77,65 @@ public class ImageVO {
 		this.picture_height = picture_height;
 		return this;
 	}
-	public int getName_x1() {
-		return name_x1;
+	public int getName_x() {
+		return name_x;
 	}
-	public ImageVO setName_x1(int name_x1) {
-		this.name_x1 = name_x1;
-		return this;
+	public void setName_x(int name_x) {
+		this.name_x = name_x;
 	}
-	public int getName_y1() {
-		return name_y1;
+	public int getName_y() {
+		return name_y;
 	}
-	public ImageVO setName_y1(int name_y1) {
-		this.name_y1 = name_y1;
-		return this;
+	public void setName_y(int name_y) {
+		this.name_y = name_y;
 	}
-	public int getDivision_x1() {
-		return division_x1;
+	public int getPosition_x() {
+		return position_x;
 	}
-	public ImageVO setDivision_x1(int division_x1) {
-		this.division_x1 = division_x1;
-		return this;
+	public void setPosition_x(int position_x) {
+		this.position_x = position_x;
 	}
-	public int getDivision_y1() {
-		return division_y1;
+	public int getPosition_y() {
+		return position_y;
 	}
-	public ImageVO setDivision_y1(int division_y1) {
-		this.division_y1 = division_y1;
-		return this;
+	public void setPosition_y(int position_y) {
+		this.position_y = position_y;
 	}
-	public int getRank_x1() {
-		return rank_x1;
+	public int getDivision_x() {
+		return division_x;
 	}
-	public ImageVO setRank_x1(int rank_x1) {
-		this.rank_x1 = rank_x1;
-		return this;
+	public void setDivision_x(int division_x) {
+		this.division_x = division_x;
 	}
-	public int getRank_y1() {
-		return rank_y1;
+	public int getDivision_y() {
+		return division_y;
 	}
-	public ImageVO setRank_y1(int rank_y1) {
-		this.rank_y1 = rank_y1;
-		return this;
+	public void setDivision_y(int division_y) {
+		this.division_y = division_y;
 	}
-	public int getExtension_x1() {
-		return extension_x1;
+	public int getRank_x() {
+		return rank_x;
 	}
-	public ImageVO setExtension_x1(int extension_x1) {
-		this.extension_x1 = extension_x1;
-		return this;
+	public void setRank_x(int rank_x) {
+		this.rank_x = rank_x;
 	}
-	public int getExtension_y1() {
-		return extension_y1;
+	public int getRank_y() {
+		return rank_y;
 	}
-	public ImageVO setExtension_y1(int extension_y1) {
-		this.extension_y1 = extension_y1;
-		return this;
+	public void setRank_y(int rank_y) {
+		this.rank_y = rank_y;
 	}
-	public int getOrg_x1() {
-		return org_x1;
+	public int getFloor_x() {
+		return floor_x;
 	}
-	public ImageVO setOrg_x1(int org_x1) {
-		this.org_x1 = org_x1;
-		return this;
+	public void setFloor_x(int floor_x) {
+		this.floor_x = floor_x;
 	}
-	public int getOrg_y1() {
-		return org_y1;
+	public int getFloor_y() {
+		return floor_y;
 	}
-	public ImageVO setOrg_y1(int org_y1) {
-		this.org_y1 = org_y1;
-		return this;
+	public void setFloor_y(int floor_y) {
+		this.floor_y = floor_y;
 	}
-	
 	
 }

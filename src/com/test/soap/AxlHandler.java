@@ -1,22 +1,133 @@
 package com.test.soap;
 
-import java.util.Iterator;
-
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.*;
+import org.json.JSONObject;
+import org.json.XML;
 
-
-import com.test.main.CmAxlInfoModel;
+import com.test.vo.CmAxlInfoModel;
 
 
 public class AxlHandler {
 	
 	private static final String cmVer = "8.5";
 	
-	public static Object testSoap (CmAxlInfoModel cmAxlInfo) {
-		Object jsonDevice = selectDeviceInfoJSON01(cmAxlInfo);
-		return jsonDevice;
+	public Object testSoap (CmAxlInfoModel cmAxlInfo , String query) {
+		StringBuffer queryBuffer = new StringBuffer();
+		return requestSelectSoap(cmAxlInfo , getQuerySoapMessage(query));
 	}
+	
+	
+	/*
+	public  JSONObject insertPickupGroup (CmAxlInfoModel cmAxlInfo, PickupGroupModel model , PickupGroupConfigModel configModel) {
+		StringBuffer queryBuffer = new StringBuffer();
+		
+//		String query = (new StringBuilder().append(pickupGroup.getId()).append("', '4', '").append(pickupGroup.getName()).append("', '").append(fkRoutePartition).toString();
+		queryBuffer.append("insert into numplan(dnorpattern, tkpatternusage, description, fkRoutePartition)  values('");
+		queryBuffer.append(model.getPickup_grp_num()).append("', '4', '");
+		queryBuffer.append(model.getPickup_grp_name()).append("', '");
+		queryBuffer.append(configModel.getRoute_partition_key()).append("')");
+		
+		// insert numplan
+//		sendSoapMessage(cmAxlInfo , getSendSoapMessage(queryBuffer.toString()));
+//		
+//		new StringBuilder("select pkid, dnorpattern from numplan where tkpatternusage = '4' and dnorpattern = '")).append(pickupGroup.getId()).append("' and fkroutepartition = '").append(fkRoutePartition).append("'").toString());
+//		queryBuffer = new StringBuffer();
+		
+		
+		return sendSoapMessage(cmAxlInfo , getUpdateSoapMessage(queryBuffer.toString())) ;
+	}
+	
+	*/
+	
+	
+	private  String getQuerySoapMessage (String query) {
+		
+		StringBuffer soapReqMessage = new StringBuffer();
+		soapReqMessage.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ns=\"http://www.cisco.com/AXL/API/"+cmVer+"\">\n");
+		soapReqMessage.append("<soapenv:Header/>\n");
+		soapReqMessage.append("<soapenv:Body>\n");
+		soapReqMessage.append("<ns:executeSQLQuery>\n");
+		soapReqMessage.append("<sql>\n");
+		soapReqMessage.append(query).append("\n");
+		soapReqMessage.append("</sql>\n");
+		soapReqMessage.append("</ns:executeSQLQuery>\n");
+		soapReqMessage.append("</soapenv:Body>\n");
+		soapReqMessage.append("</soapenv:Envelope>\n");
+		
+		return soapReqMessage.toString();
+	}
+	
+	
+	private  String getUpdateSoapMessage (String query) {
+		
+		StringBuffer soapReqMessage = new StringBuffer();
+		soapReqMessage.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ns=\"http://www.cisco.com/AXL/API/"+cmVer+"\">\n");
+		soapReqMessage.append("<soapenv:Header/>\n");
+		soapReqMessage.append("<soapenv:Body>\n");
+		soapReqMessage.append("<ns:executeSQLUpdate>\n");
+		soapReqMessage.append("<sql>\n");
+		soapReqMessage.append(query).append("\n");
+		soapReqMessage.append("</sql>\n");
+		soapReqMessage.append("</ns:executeSQLUpdate>\n");
+		soapReqMessage.append("</soapenv:Body>\n");
+		soapReqMessage.append("</soapenv:Envelope>\n");
+		
+		return soapReqMessage.toString();
+	}
+	
+	
+	private Object requestSelectSoap(CmAxlInfoModel cmAxlInfo , String soapReqMessage) {
+		
+		Object resultObj = null;
+		
+		JSONObject xmlJson = sendSoapMessage(cmAxlInfo, soapReqMessage);
+		
+		if(xmlJson.getJSONObject("soapenv:Envelope")
+				.getJSONObject("soapenv:Body")
+				.getJSONObject("ns:executeSQLQueryResponse").get("return").equals("")){
+			
+			return resultObj;
+		}else{
+		}
+		
+		JSONObject chkJson = xmlJson.getJSONObject("soapenv:Envelope")
+				.getJSONObject("soapenv:Body")
+				.getJSONObject("ns:executeSQLQueryResponse")
+				.getJSONObject("return");
+		
+		Object test = chkJson.get("row");
+		
+		if(test instanceof JSONObject){
+			JSONObject jsonData = chkJson.getJSONObject("row");
+			resultObj = jsonData;
+		}else if(test instanceof JSONArray){
+			JSONArray jsonArray = chkJson.getJSONArray("row");
+			resultObj = jsonArray;
+		}
+		
+		return resultObj;
+	}
+	
+	private  JSONObject sendSoapMessage(CmAxlInfoModel cmAxlInfo , String soapReqMessage) {
+		
+//		System.out.println(" :::: Soap Send Message :::: ");
+//		System.out.println(soapReqMessage.toString());
+		
+		String strResult = SoapHandler.RequestSoap(cmVer, cmAxlInfo.getCmID(), cmAxlInfo.getCmPwd(), cmAxlInfo.getCmIP(), "8443", soapReqMessage.toString(), "executeSQLQuery");
+		
+		JSONObject xmlJson = null;
+		try {
+			xmlJson = XML.toJSONObject(strResult);
+			System.out.println(xmlJson.toString(4));
+		
+		} catch (JSONException e) {
+			System.out.println(e.toString());
+		}
+		
+		return xmlJson;
+	}
+	
 	private static Object selectDeviceInfoJSON01(CmAxlInfoModel cmAxlInfo) {
 		
 		Object rtnObject = null;
@@ -48,7 +159,8 @@ public class AxlHandler {
 		//System.out.println("aa = "+strXML);
 		
 		String strResult = SoapHandler.RequestSoap(cmVer, cmAxlInfo.getCmID(), cmAxlInfo.getCmPwd(), cmAxlInfo.getCmIP(), "8443", soapReqMessage.toString(), "executeSQLQuery");
-		//System.out.println(dn + " = bb = "+strResult);
+		System.out.println("json return");
+		System.out.println(strResult);
 		
 		try {
 			JSONObject xmlJson = XML.toJSONObject(strResult);
@@ -58,11 +170,16 @@ public class AxlHandler {
 				return rtnObject;
 			}
 			
-			Iterator iter = xmlJson.keys();
-			while(iter.hasNext()) {
-				String key =  iter.next().toString();
-				System.out.println(key + " : " + xmlJson.getString(key));
-			}
+//			Iterator iter = xmlJson.keys();
+//			while(iter.hasNext()) {
+//				
+//				if(iter.next() instanceof JSONObject) {
+//					System.out.println("** JSONObject **");
+//				}
+//				
+//				String key =  iter.next().toString();
+//				System.out.println(key + " : " + xmlJson.getString(key));
+//			}
 			
 			if(xmlJson.getJSONObject("soapenv:Envelope")
 					.getJSONObject("soapenv:Body")
