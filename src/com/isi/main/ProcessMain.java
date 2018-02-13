@@ -14,6 +14,11 @@ import com.isi.thread.UDPService;
 import com.isi.thread.XMLService;
 import com.test.thread.TestService;
 import com.test.thread.TestThread;
+
+import kr.co.insunginfo.EventHandlerTest;
+import kr.co.insunginfo.jtapi.EventGroup;
+import kr.co.insunginfo.jtapi.JTapiManager;
+import kr.co.insunginfo.jtapi.JtapiConnInfo;
 /**
 *
 * @author greatyun
@@ -49,45 +54,36 @@ public class ProcessMain {
 	}
 	
 	public void singleMode() {
+
+		System.out.println("Start Single Mode!!  Active Mode[" + DuplexMgr.getInstance().getActiveMode() + "]");
 		
-		System.out.println("Start Single Mode!!  Active Mode[" + DuplexMgr.getInstance().getActiveMode() +"]");
+		/*
+		String logPath = "";
+
+		EventGroup group = new EventGroup(logPath);
+
+		group.RegisterEvent(new EventHandlerTest());
+		JTapiManager jtapiMng = new JTapiManager(group, logPath);
+
+		JtapiConnInfo connInfo = new JtapiConnInfo();
+
+		connInfo.setCmID(args[0]);
+		connInfo.setCmPW(args[1]);
+		connInfo.addCmIPList(args[2]);
+		jtapiMng.ServiceStart(connInfo);
+		*/
 		
-			/*
-			 * ///////////////////////////////////////////////
-			 * 1. CM AXL Device �젙蹂� 媛��졇�삤湲� , Jtapi �뿰�룞
-			 */// ////////////////////////////////////////////
-			
-			IQueue queue = new JQueue(); // �씠踰ㅽ듃 �뜲�씠�꽣 泥섎━ �걧
-			
-			/* CM Jtapi �뿰�룞 (Device �젙蹂� 媛��졇�삤湲�, Device �젙蹂� DB Insert �븯湲�) */
-			JtapiService service = JtapiService.getInstance();
-			service.startService(queue);
-			
-			/*
-			TestThread[] thread = new TestThread[3];
-			for (int i = 0; i < thread.length; i++) {
-				thread[i] = new TestThread(queue);
-				thread[i].start();
-			}
-			*/
-			
-			System.out.println("## Success!! Jtapi Service Started ##");
-			
-			Employees.getInstance().printAllEmployee();
-			
-			
-			
-			/*
-			 * ///////////////////////////////////////////////
-			 * 3. Jtapi �씠踰ㅽ듃 泥섎━
-			 */// ////////////////////////////////////////////
-			
-			/* 70媛쒖쓽 �뒪�젅�뱶瑜� 愿�由ы븯�뒗 �뒪�젅�뱶 �� �뿉�꽌 CM �쑝濡쒕��꽣 諛쏆� Jtapi �씠踰ㅽ듃瑜� 泥섎━�븳�떎. */
-			XMLService xmlservice = new XMLService(queue);
-			xmlservice.startService();
-			
-			// xmlservice.stopService();
-			
+		
+		IQueue queue = new JQueue();
+
+		JtapiService service = JtapiService.getInstance();
+		service.startService(queue);
+
+		System.out.println("## Success!! Jtapi Service Started ##");
+
+		XMLService xmlservice = new XMLService(queue);
+		xmlservice.startService();
+		 
 	}
 	
 	public void testMode() {

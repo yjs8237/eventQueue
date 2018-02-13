@@ -152,11 +152,11 @@ public class ImageHandler {
 		
 		boolean bResult = true;
 		
-		String aniNum 	= "발신 : " + callingNum;
-		String name		= "이름 : " + employee.getEmp_nm_kor();
-		String position	= "직급 : " + employee.getPos_nm();
-		String division = "부서 : " + employee.getOrg_nm();
-		String floor	= "위치 : " + employee.getFloor();
+		String aniNum 	= "발    신   :   " + callingNum;
+		String name		= "이    름   :   " + employee.getEmp_nm_kor();
+		String position	= "직    급   :   " + employee.getPos_nm();
+		String division = "부    서   :   " + employee.getOrg_nm();
+		String floor	= "위    치   :   " + employee.getFloor();
 		
 		int type = -1;
 		
@@ -173,15 +173,13 @@ public class ImageHandler {
 		
         try {
         	
-            File logdir = new File(strDest);
-            
-            if(type == PersonType.EMPLOYEE){
-            	if (logdir.exists() ) {
-                	// 이미 팝업 이미지가 있다면 이미지를 생성하지 않는다. (직원 콜 의 경우만 해당)
-            		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID , "CreateImageFile", callingNum + " 이미지 존재");
-                    return true;
-                }
-            }
+			File logdir = new File(strDest);
+
+			if (logdir.exists()) {
+				// 이미 팝업 이미지가 있다면 이미지를 생성하지 않는다. (직원 콜 의 경우만 해당)
+				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", callingNum + " 이미지 존재");
+				return true;
+			}
             
             String basic_img_path = XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png";
             BufferedImage basic_img = ImageIO.read(new File(basic_img_path)); // 배경이미지
@@ -190,8 +188,7 @@ public class ImageHandler {
             int width = Integer.parseInt(imageVO.getImageSize().substring(0, 3));
             int height = Integer.parseInt(imageVO.getImageSize().substring(3));
             
-            
-			int fontsize = (int) (height / 10);
+			int fontsize = (int) (height / 12);
 			
 			BufferedImage mergedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 			Graphics2D graphics = (Graphics2D) mergedImage.getGraphics();
@@ -231,7 +228,7 @@ public class ImageHandler {
 			
 			if(division != null && !division.isEmpty()) {
 				// 부서
-				if(division.length() > 9) {
+				if(employee.getOrg_nm().length() > 9) {
 					Font newfont = new Font("맑은고딕", Font.BOLD, fontsize - 2);
 					graphics.setFont(newfont);
 					graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

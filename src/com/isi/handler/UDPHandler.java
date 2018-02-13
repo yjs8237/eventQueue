@@ -53,6 +53,7 @@ public class UDPHandler {
 					setCallID(aParam[7]).
 					setDN(aParam[10].replace("^", ""));
 			
+			/*
 			String ani = aParam[5];
 			String targetDN = aParam[6];
 			
@@ -69,7 +70,7 @@ public class UDPHandler {
 			CallStateMgr.getInstance().addDeviceState(aParam[6] , CALLSTATE.ALERTING_ING);
 			
 			dataBase.insertCallingHistory(aParam[7],aParam[5], aParam[6]);
-			
+			*/
 		}
 		return retCode == HttpURLConnection.HTTP_OK ? retCode : RESULT.RTN_EXCEPTION;
 
@@ -103,7 +104,7 @@ public class UDPHandler {
 					.setCallingDN(aParam[5])
 					.setDN(aParam[10].replace("^", ""))
 					.setTargetDN(aParam[2]);
-			
+			/*
 			// Target Device 정보
 			EmployeeVO emp = Employees.getInstance().getEmployee(targetDN , threadID);
 //			DeviceVO dev = DeviceMgr.getInstance().getDevice(targetDN);
@@ -139,7 +140,7 @@ public class UDPHandler {
 				callMgr.addDeviceState(calledDN, CALLSTATE.ESTABLISHED_ING);
 				dataBase.insertCalledHistory(callID,callingDN, calledDN);	// XML 통화 이력을 위한 DB INSERT
 			}
-			
+		*/	
 		}
 		
 		return retCode == HttpURLConnection.HTTP_OK ? retCode :  RESULT.RTN_EXCEPTION;
@@ -165,7 +166,7 @@ public class UDPHandler {
 					.setCallingDN(aParam[5])
 					.setDN(aParam[10].replace("^", ""))
 					.setTargetDN(aParam[2]);
-			
+			/*
 			// Target Device 정보
 			EmployeeVO emp = Employees.getInstance().getEmployee(targetDN , threadID);
 //			DeviceVO dev = DeviceMgr.getInstance().getDevice(targetDN);
@@ -183,7 +184,7 @@ public class UDPHandler {
 			
 			dataBase.insertCalledHistory(callID,callingDN, calledDN);	// XML 통화 이력을 위한 DB INSERT
 			
-			
+			*/
 		}
 		
 		return retCode == HttpURLConnection.HTTP_OK ? retCode :  RESULT.RTN_EXCEPTION;
@@ -208,7 +209,7 @@ public class UDPHandler {
 			.setDN(aParam[10].replace("^", ""))
 			.setTargetDN(aParam[2]);
 			
-			
+			/*
 			callMgr = CallStateMgr.getInstance();
 			Integer targetState 	= callMgr.getDeviceState(targetDN);
 			if(targetState == CALLSTATE.ALERTING_ING){
@@ -225,7 +226,7 @@ public class UDPHandler {
 				
 				callMgr.addDeviceState(targetDN, CALLSTATE.IDLE);	// 전화기 상태 IDLE 로 변경
 			}
-			
+			*/
 			/*
 			if(!targetDN.equals(calledDN) && !calledDN.equals(callingDN)){
 				callMgr.addDeviceState(targetDN, CALLSTATE.IDLE);	// 전화기 상태 IDLE 로 변경
@@ -260,7 +261,7 @@ public class UDPHandler {
 			.setCallingDN(callingDN)
 			.setDN(targetDN)
 			.setTargetDN(targetDN);
-			
+			/*
 			// Target Device 정보
 			EmployeeVO emp = Employees.getInstance().getEmployee(targetDN , threadID);
 //			DeviceVO dev = DeviceMgr.getInstance().getDevice(targetDN);
@@ -300,7 +301,7 @@ public class UDPHandler {
 				}
 				break;
 			}
-			
+			*/
 		}
 		
 		return retCode == HttpURLConnection.HTTP_OK ? retCode :  RESULT.RTN_EXCEPTION;
@@ -317,11 +318,11 @@ public class UDPHandler {
 				.setAlertingdn(callVO.getCalledDN())
 				.setCallingDn(callVO.getCallingDN())
 				.setTargetdn(callVO.getTargetDN())
-				.setTargetIP(employee.getIpAddr())
-				.setTargetModel(employee.getDeviceType())
+				.setTargetIP(employee.getDevice_ipaddr())
+				.setTargetModel(employee.getDevice_type())
 				.setCalledDn(callVO.getCalledDN())
-				.setCmUser(employee.getCmUser())
-				.setCmPassword(employee.getCmPass());
+				.setCmUser(employee.getCm_user())
+				.setCmPassword(employee.getCm_pwd());
 
 		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "makeEstablishXmlVO", xmlVO.toString());
 
@@ -337,11 +338,11 @@ public class UDPHandler {
 		.setAlertingdn(callVO.getCalledDN())
 		.setCallingDn(callVO.getCallingDN()).setTargetdn(callVO.getTargetDN())
 //		.setTerminal(event.getTerminal())
-		.setTargetIP(employee.getIpAddr())
-		.setTargetModel(employee.getDeviceType())
+		.setTargetIP(employee.getDevice_ipaddr())
+		.setTargetModel(employee.getDevice_type())
 		.setCalledDn(callVO.getCalledDN())
-		.setCmUser(employee.getCmUser())
-		.setCmPassword(employee.getCmPass());
+		.setCmUser(employee.getCm_user())
+		.setCmPassword(employee.getCm_pwd());
 		
 		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG,threadID, "makeEstablishXmlVO", xmlVO.toString());
 		
@@ -357,11 +358,11 @@ public class UDPHandler {
 		.setAlertingdn(callVO.getCalledDN())
 		.setCallingDn(callVO.getCallingDN()).setTargetdn(callVO.getTargetDN())
 //		.setTerminal(event.getTerminal())
-		.setTargetIP(employee.getIpAddr())
-		.setTargetModel(employee.getDeviceType())
+		.setTargetIP(employee.getDevice_ipaddr())
+		.setTargetModel(employee.getDevice_type())
 		.setCalledDn(callVO.getCalledDN())
-		.setCmUser(employee.getCmUser())
-		.setCmPassword(employee.getCmPass());
+		.setCmUser(employee.getCm_user())
+		.setCmPassword(employee.getCm_pwd());
 		
 		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "makeDisconnectXmlVO", xmlVO.toString());
 		

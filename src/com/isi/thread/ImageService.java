@@ -24,12 +24,12 @@ public class ImageService extends Thread {
 		}
 
 		
-		/*
+		
 		// 최초 직원 이미지 파일 생성
-		if (employees.creatEmployeeImg() != RESULT.RTN_SUCCESS) {
+		if (employees.createAllImages() != RESULT.RTN_SUCCESS) {
 			System.out.println("!! ERROR !! [creatEmployeeImg]");
 		}
-		*/
+		
 	}
 	
 

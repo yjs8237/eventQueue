@@ -34,6 +34,7 @@ import com.isi.file.PropertyRead;
 import com.isi.process.IQueue;
 import com.isi.vo.DeviceVO;
 import com.isi.vo.EmployeeVO;
+import com.isi.vo.JTapiResultVO;
 
 /*
  * To change this template, choose Tools | Templates
@@ -188,7 +189,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 						ip = "";
 					}
 					System.out.println("MonitorStart -> " + addr.getName() + " , " + ip + " , " + model);
-					MonitorStart(addr.getName(), ip, model);
+					MonitorStart(addr.getName());
 				}
 			}
 
@@ -220,8 +221,10 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		return RESULT.RTN_SUCCESS;
 	}
 
-	public int MonitorStart(String aDn, String aIP, String aModel) {
-
+	public JTapiResultVO MonitorStart(String aDn) {
+		
+		JTapiResultVO resultVO = new JTapiResultVO();
+		
 		CiscoAddress addr = null;
 		DevEvt dev = null; // 장이 이벤트 객체
 		// Device device = null; // 장치데이터
@@ -234,12 +237,16 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 						"[" + aDn + "] [ERROR] MonitorStart - unregistered device ");
 				// m_Log.server("[" + aDn + "] [ERROR] MonitorStart -
 				// unregistered device ");
-				return RESULT.ERR_DEV_UNREG;
+				resultVO.setCode(RESULT.ERR_DEV_UNREG);
+				resultVO.setMessage("Device Unregistered");
+				return resultVO;
 			}
 			if (addr.getState() == CiscoAddress.IN_SERVICE) {
 				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStart",
 						"[" + aDn + "] [ERROR] MonitorStart- already registered device ");
-				return RESULT.ERR_DEV_ALREADY_LOGIN;
+				resultVO.setCode(RESULT.ERR_DEV_ALREADY_LOGIN);
+				resultVO.setMessage("Already Login");
+				return resultVO;
 			}
 			
 			// 기존에 이미 모니터링이 걸려 있으면 계속하지 않는다.
@@ -250,7 +257,9 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 						"[" + aDn + "] [ERROR] MonitorStart - already addred device ");
 				// m_Log.server("[" + aDn + "] [ERROR] MonitorStart - already
 				// addred device ");
-				return RESULT.ERR_DEV_ALREADY_LOGIN;
+				resultVO.setCode(RESULT.ERR_DEV_ALREADY_LOGIN);
+				resultVO.setMessage("Already Login");
+				return resultVO;
 			}
 
 			// 모니터링이 성공하면 장치를 추가
@@ -294,25 +303,33 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		} catch (PlatformExceptionImpl pe) {
 			pe.printStackTrace(pw);
 			m_Log.server(LOGTYPE.ERR_LOG, "MonitorStart", sw.toString());
+			
 			if (PlatformExceptionImpl.CTIERR_LINE_RESTRICTED == pe.getErrorCode()) {
 				// m_Log.warning("[" + aDn + "] monitor start fail - line
 				// restricted");
 			} else {
 				// m_Log.warning("[" + aDn + "] monitor start fail ", pe);
 			}
-			return RESULT.RTN_EXCEPTION;
+			resultVO.setCode(RESULT.RTN_EXCEPTION);
+			resultVO.setMessage(pe.getLocalizedMessage());
+			return resultVO;
 		} catch (Exception e) {
 			e.printStackTrace(pw);
 			m_Log.server(LOGTYPE.ERR_LOG, "MonitorStart", sw.toString());
 			// m_Log.server("[" + aDn + "] monitor start fail ", e);
-			return RESULT.RTN_EXCEPTION;
+			resultVO.setCode(RESULT.RTN_EXCEPTION);
+			resultVO.setMessage(e.getLocalizedMessage());
+			return resultVO;
 		}
-
-		return RESULT.RTN_SUCCESS;
+		
+		resultVO.setCode(RESULT.RTN_SUCCESS);
+		resultVO.setMessage("success");
+		return resultVO;
 	}
 
-	public int MonitorStop(String aDn) {
+	public JTapiResultVO MonitorStop(String aDn) {
 
+		JTapiResultVO resultVO = new JTapiResultVO();
 		Address addr = null;
 		DevEvt dev = null;
 		try {
@@ -321,16 +338,21 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			if (addr == null) {
 				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStop",
 						"[" + aDn + "] [ERROR] MonitorStop - unregistered device ");
-				return RESULT.ERR_DEV_UNREG;
+				resultVO.setCode(RESULT.ERR_DEV_UNREG);
+				resultVO.setMessage("Device Unregistered");
+				return resultVO;
 			}
 
 			dev = getLine(aDn);
 
 			if (dev == null) {
-				return RESULT.ERR_DEV_ISNOT_LOGIN;
+				resultVO.setCode(RESULT.ERR_DEV_ISNOT_LOGIN);
+				resultVO.setMessage("Not Login");
+				return resultVO;
 			}
-
+			
 			addr.removeCallObserver(dev);
+			addr.removeObserver(dev);
 
 			Terminal[] termarray = addr.getTerminals();
 			for (int i = 0; i < termarray.length; i++) {
@@ -340,9 +362,12 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 
 			if (m_DevMap.remove(aDn) == null) {
 
-				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStop", "[" + aDn + "] [ERROR] MonitorStop cat't remove itme ");
-				return RESULT.RTN_EXCEPTION;
+				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStop", "[" + aDn + "] [ERROR] MonitorStop cat't remove item ");
+				resultVO.setCode(RESULT.RTN_EXCEPTION);
+				resultVO.setMessage("Cannot remove HashMap");
+				return resultVO;
 			}
+			
 			m_Log.server(LOGTYPE.STAND_LOG, "MonitorStop", "[" + aDn + "] success monitor stop ");
 
 			// 모니터링이 종료되면 장치를 삭제한다.
@@ -352,9 +377,13 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		} catch (Exception e) {
 			e.printStackTrace(pw);
 			m_Log.server(LOGTYPE.ERR_LOG, "MonitorStop", sw.toString());
-			return RESULT.RTN_EXCEPTION;
+			resultVO.setCode(RESULT.RTN_EXCEPTION);
+			resultVO.setMessage(e.getLocalizedMessage());
+			return resultVO;
 		}
-		return RESULT.RTN_SUCCESS;
+		resultVO.setCode(RESULT.RTN_SUCCESS);
+		resultVO.setMessage("success");
+		return resultVO;
 	}
 
 	public DevEvt getLine(String dn) {

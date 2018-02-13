@@ -38,7 +38,7 @@ public class JsonHandler {
 		
 	}
 	
-	
+	/*
 	public JSONObject getEmployeeInfo(List employeeList) {
 		
 		if(employeeList == null) {
@@ -77,7 +77,7 @@ public class JsonHandler {
 		return jsonData;
 		
 	}
-	
+	*/
 	
 	public JSONObject convertMapToJSON(Map map) {
 		jsonData = new JSONObject();

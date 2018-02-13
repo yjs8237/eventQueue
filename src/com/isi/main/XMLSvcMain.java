@@ -55,6 +55,12 @@ public class XMLSvcMain {
 		
 		database.disconnectDB();
 		
+		
+		
+		HttpServerHandler httpHandler = new HttpServerHandler();
+		httpHandler.startService();
+		
+		
 		/*
 		CMInfo cmInfo = CMInfo.getInstance();
 		cmInfo.setCmUser(pr.getValue(PROPERTIES.CM1_USER));

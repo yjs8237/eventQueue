@@ -11,21 +11,17 @@ package com.isi.vo;
 */
 public class EmployeeVO  implements IPerson{
 	
-	private int emp_seq;
-	private String emp_seq_str;
 	private String emp_id;
 	private String emp_nm_kor;
 	private String emp_nm_eng;
-	private String user_id;
+	
 	private String org_nm;
 	private String pos_nm;
 	private String duty_nm;
 	private String email;
-	private String tel_no;
 	private String cell_no;
 	private String emp_stat_nm;
 	private String emp_div_cd_nm;
-	private String emp_pwd;
 	private String emp_lno;
 	private String building;
 	private String floor;
@@ -38,36 +34,11 @@ public class EmployeeVO  implements IPerson{
 	private String device_ipaddr;
 	private String extension;
 	private String device_type;
-	private String device_name;
+	
 
 	public EmployeeVO (){
 		
 	}
-	
-
-
-	public int getEmp_seq() {
-		return emp_seq;
-	}
-
-
-
-	public void setEmp_seq(int emp_seq) {
-		this.emp_seq = emp_seq;
-	}
-
-
-
-	public String getEmp_seq_str() {
-		return emp_seq_str;
-	}
-
-
-
-	public void setEmp_seq_str(String emp_seq_str) {
-		this.emp_seq_str = emp_seq_str;
-	}
-
 
 
 	public String getEmp_id() {
@@ -103,19 +74,6 @@ public class EmployeeVO  implements IPerson{
 	public void setEmp_nm_eng(String emp_nm_eng) {
 		this.emp_nm_eng = emp_nm_eng;
 	}
-
-
-
-	public String getUser_id() {
-		return user_id;
-	}
-
-
-
-	public void setUser_id(String user_id) {
-		this.user_id = user_id;
-	}
-
 
 
 	public String getOrg_nm() {
@@ -166,18 +124,6 @@ public class EmployeeVO  implements IPerson{
 
 
 
-	public String getTel_no() {
-		return tel_no;
-	}
-
-
-
-	public void setTel_no(String tel_no) {
-		this.tel_no = tel_no;
-	}
-
-
-
 	public String getCell_no() {
 		return cell_no;
 	}
@@ -214,15 +160,6 @@ public class EmployeeVO  implements IPerson{
 
 
 
-	public String getEmp_pwd() {
-		return emp_pwd;
-	}
-
-
-
-	public void setEmp_pwd(String emp_pwd) {
-		this.emp_pwd = emp_pwd;
-	}
 
 
 
@@ -370,16 +307,6 @@ public class EmployeeVO  implements IPerson{
 
 
 
-	public String getDevice_name() {
-		return device_name;
-	}
-
-
-
-	public void setDevice_name(String device_name) {
-		this.device_name = device_name;
-	}
-
 
 
 	public String toString() {
@@ -388,16 +315,16 @@ public class EmployeeVO  implements IPerson{
 		sb.append("emp_id [").append(emp_id).append("] ");
 		sb.append("emp_nm_kor [").append(emp_nm_kor).append("] ");
 		sb.append("emp_nm_eng [").append(emp_nm_eng).append("] ");
-		sb.append("user_id [").append(user_id).append("] ");
+		
 		sb.append("org_nm [").append(org_nm).append("] ");
 		sb.append("pos_nm [").append(pos_nm).append("] ");
 		sb.append("duty_nm [").append(duty_nm).append("] ");
 		sb.append("email [").append(email).append("] ");
-		sb.append("tel_no [").append(tel_no).append("] ");
+		
 		sb.append("cell_no [").append(cell_no).append("] ");
 		sb.append("emp_stat_nm [").append(emp_stat_nm).append("] ");
 		sb.append("emp_div_cd_nm [").append(emp_div_cd_nm).append("] ");
-		sb.append("emp_pwd [").append(emp_pwd).append("] ");
+		
 		sb.append("emp_lno [").append(emp_lno).append("] ");
 		sb.append("building [").append(building).append("] ");
 		sb.append("floor [").append(floor).append("] ");

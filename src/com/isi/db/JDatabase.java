@@ -390,7 +390,7 @@ public class JDatabase  {
         	if(rs != null){
         		while(rs.next()) {
         			ImageVO imageVO = new ImageVO();
-        			imageVO.setModel(rs.getString("device_type"));
+        			imageVO.setModel(rs.getString("device_model"));
         			imageVO.setImageSize(rs.getString("display_size"));
         			imageVO.setPicture_x1(rs.getInt("pic_x"));
         			imageVO.setPicture_y1(rs.getInt("pic_y"));
@@ -406,7 +406,7 @@ public class JDatabase  {
         			imageVO.setDivision_y(rs.getInt("division_y"));
         			imageVO.setFloor_x(rs.getInt("floor_x"));
         			imageVO.setFloor_y(rs.getInt("floor_y"));
-        			ImageMgr.getInstance().addImage(rs.getString("device_type"), imageVO);
+        			ImageMgr.getInstance().addImage(rs.getString("device_model"), imageVO);
             	}
         	} else {
         		System.out.println("NO DB DATA");

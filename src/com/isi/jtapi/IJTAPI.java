@@ -3,6 +3,7 @@ package com.isi.jtapi;
 import com.isi.axl.CiscoPhoneInfo;
 import com.isi.event.IEventObserver;
 import com.isi.event.IEvt;
+import com.isi.vo.JTapiResultVO;
 
 public interface IJTAPI  {
 
@@ -10,8 +11,8 @@ public interface IJTAPI  {
 	public int ServiceStop();
 	public int MonitorAllStart(CiscoPhoneInfo address);
 	public int MonitorAllStop();
-	public int MonitorStart(String aDn, String aIP, String aModel);
-	public int MonitorStop(String aDn);
+	public JTapiResultVO MonitorStart(String aDn);
+	public JTapiResultVO MonitorStop(String aDn);
 //	Provider getProvider();
 //	public Log getLog();
 	/*

@@ -46,116 +46,21 @@ public class TestEvtHandler {
 		CallStateMgr.getInstance().addDeviceState(vo.getCalledDN(), CALLSTATE.ALERTING_ING);
 
 		dataBase.insertCallingHistory("", vo.getCallingDN(), vo.getCalledDN());
-
+/*
 		// Target Device 정보
 		EmployeeVO emp = Employees.getInstance().getEmployee(vo.getCalledDN() , threadID);
 //		DeviceVO dev = DeviceMgr.getInstance().getDevice(vo.getCalledDN());
 		if (emp != null) {
 			xmlHandler.evtRing(makeAlertingXmlVO(vo, threadID), threadID);
 		}
-		
+*/		
 		isRinging = true;	
 		
 		return RESULT.RTN_SUCCESS;
 	}
 	
 
-	public int callEstablishedEvt (Evt evt)  throws Exception{
-		
-		TermConnEvt event = (TermConnEvt) evt;
-		
-		String callingDN 	= event.getCallingDn(); 	// 전화를 건 사람의 DN
-		String calledDN		= event.getCalledDn();		// 전화를 받은 사람의 DN
-		String terminal 	= event.getTerminal();		// 이벤트 정보에 포함되어 있는 Termina(Mac address)
-		String redirectDN 	= event.getRedirectDn();	// Redirect DN
-		String DN			= event.getDn();			// DN
-		String deviceDN		= event.getDevice();		// Device DN
-		int ctlCause 		= event.getCtlCause();		// 콜 타입
-		boolean isEastblish	= false;
-		
-		DeviceVO device = null;
-		if (device == null){
-			return RESULT.RTN_UNDEFINED_ERR;
-		}
-		
-		switch (ctlCause) {
-		
-
-		case CALLSTATE.CONFERENCE:					// 전화회의 콜 
-			int metaCode = event.getMetaCode();		// MetaCode
-			if(metaCode == CALLSTATE.META_CALL_MERGING){
-				
-				if(redirectDN.equals(callingDN) && callingDN.equals(DN) && !DN.equals(deviceDN)){
-					LogMgr.getInstance().write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, event.get_GCallID(), "callEstablishedEvt", ">>>>>>>>>>>>>>>>>>>>>>>> " + event.toString());
-					DeviceVO dev = null;
-					if(dev!=null){
-						xmlHandler.evtEstablished(makeEstablishXmlVO(event , dev) , deviceDN);
-					}
-					isEastblish = true;
-				} else if(!deviceDN.equals(DN) && deviceDN.equals(redirectDN)){
-					LogMgr.getInstance().write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, event.get_GCallID(), "callEstablishedEvt", ">>>>>>>>>>>>>>>>>>>>>>>> " + event.toString());
-					DeviceVO dev = null;
-					if(dev != null){
-						xmlHandler.evtEstablished(makeEstablishXmlVO(event , dev) , deviceDN);
-					}
-					isEastblish = true;
-				}
-				
-			}
-			break;
-		
-		case CALLSTATE.UNHOLD:	// 통화중 투콜 토글 시
-//			if(!terminal.equals(device.getTerminal())){ 
-//				if(event.getDevice().equals(event.getDn())){	// 이벤트 정보내에 Device 번호와 DN 번호가 같을 경우 push 처리
-//					LogMgr.getInstance().write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, event.get_GCallID(), "callEstablishedEvt", ">>>>>>>>>>> UN HOLD >>>>>>>>>>>>> " + event.toString());
-//					
-//					callMgr = CallStateMgr.getInstance();
-//					callMgr.addDeviceState(callingDN, CALLSTATE.ESTABLISHED_ING);
-//					callMgr.addDeviceState(calledDN, CALLSTATE.ESTABLISHED_ING);
-//					
-//					DeviceVO dev = DeviceMgr.getInstance().getDevice(deviceDN);
-//					if(dev != null) {
-//						Thread.sleep(100);	// 토글 시 push 가 너무 빠르게 이루어지면 기본화면이 XML 화면을 뒤덮기 때문에.. sleep 0.1 초 살짝 줘볼까
-//						xmlHandler.evtEstablished(makeEstablishXmlVO(event, dev) , callingDN);
-//					}
-////					isEastblish = true;	// 보류해제시에는 통화이력 정보가 남을 필요가 없다
-//				}
-//			}
-			break;
-			
-		default:	//일반 콜
-			// 이벤트정보에 포함된 terminal 정보와 Calling DN 으로 검색된 Device의 terminal 정보가 같으면
-			// Establish 이벤트를 처리하지 않는다. (Establish 는 전화를 받는 사람이 전화를 받아야 발생한다)
-//			if(!terminal.equals(device.getTerminal())){ 
-//				if(event.getDevice().equals(event.getDn())){	// 이벤트 정보내에 Device 번호와 DN 번호가 같을 경우 push 처리
-//					LogMgr.getInstance().write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, event.get_GCallID(), "callEstablishedEvt", ">>>>>>>>>>>>>>>>>>>>>>>> " + event.toString());
-//					DeviceVO dev = DeviceMgr.getInstance().getDevice(deviceDN);
-//					if(dev != null){
-//						xmlHandler.evtEstablished(makeEstablishXmlVO(event, dev) , callingDN);
-//					}
-//					isEastblish = true;
-//				}
-//			}
-			break;
-		}
-		
-		
-		if(isEastblish){	// 통화이력 관리 정보
-			
-			if(ctlCause != CALLSTATE.CONFERENCE){ // 전화회의 경우, 통화이력 정보를 새로 추가할 필요가 없다.
-				
-//				System.out.println("############ Established ############ calling["+callingDN+"] called["+calledDN+"]");
-				callMgr = CallStateMgr.getInstance(); 
-				callMgr.addDeviceState(callingDN, CALLSTATE.ESTABLISHED_ING);
-				callMgr.addDeviceState(calledDN, CALLSTATE.ESTABLISHED_ING);
-				
-				dataBase.insertCalledHistory("",callingDN, calledDN);	// XML 통화 이력을 위한 DB INSERT
-			}
-		}
-		
-		return RESULT.RTN_SUCCESS;
-		
-	}
+	
 
 	public int callDisconnectEvt(TestCallVO vo)  throws Exception {
 

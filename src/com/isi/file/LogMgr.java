@@ -47,6 +47,7 @@ public class LogMgr  {
     }
     
     
+    
 	public synchronized void write(String level, String type, String callkey, String methodName,String msg) {
 		
 		String isConsoleDebug = XmlInfoMgr.getInstance().getConsoleDebugYN();
@@ -91,13 +92,6 @@ public class LogMgr  {
 			
 			BufferedWriter br = new BufferedWriter(new FileWriterWithEncoding(logFile,"euc-kr" , true));
 			
-			/*
-			 * // 로그깨짐방지(ASCII코드 20 이하의 값은 스페이스 처리) if (msg != null &&
-			 * msg.length() > 0) { for (int i = 0; i < msg.getBytes().length;
-			 * i++) { try { char c = msg.charAt(i); if ((int) c > 20) {
-			 * sb.append(c); } else { sb.append(" "); } }catch(Exception e){
-			 * //e.printStackTrace(); continue; } } }
-			 */
 			String strMsg= "";
 			if(type.equals(LOGTYPE.ERR_LOG)){
 				strMsg = String.format("[%s][CallKey:%10s][Method:%10s][%s]\r\n",

@@ -310,7 +310,7 @@ public class XMLHandler {
 		
 		int returnCode = -1;	// Http Push 결과 리턴 코드
 		
-		IPerson person;
+		EmployeeVO person;
 		
 		
 		// 고객정보 팝업 여부 설정이 Y 인 경우에만 고객정보 테이블 Select 한다. 쓸데없는 트랜잭션 유발 금지

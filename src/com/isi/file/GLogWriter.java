@@ -253,4 +253,11 @@ public class GLogWriter implements ILog{
 		write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.IMAGE, callId, methodName, msg);
 	}
 
+
+	@Override
+	public void logInOutLog(String requestID , String methodName, String msg) {
+		// TODO Auto-generated method stub
+		write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.LOGINOUT, requestID, methodName, msg);
+	}
+
 }

@@ -23,8 +23,10 @@ import com.isi.data.XmlInfoMgr;
 import com.isi.db.JDatabase;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.*;
+import com.isi.service.JtapiService;
 import com.isi.vo.CustomerVO;
 import com.isi.vo.EmployeeVO;
+import com.isi.vo.JTapiResultVO;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -156,33 +158,42 @@ public class HttpServerHandler {
 				returnCode = RESULT.RTN_EXCEPTION;
 			}
 			
-			return returnCode == RESULT.RTN_SUCCESS ? RESULT.HTTP_SUCCESS : returnCode;
+			return resultJSONData;
 			
 		}
 		
-		private int procLogout  (String parameter, String requestID) {
+		private String procLogout  (String parameter, String requestID) {
 			Map <String, String> map = new HashMap<String, String>();
 			map = queryToMap(parameter);
 			
-			if(map == null) {
-				return RESULT.HTTP_PARAM_ERROR;
-			}
+			JSONObject jsonObj = new JSONObject();
 			
-			if(map.isEmpty()) {
-				return RESULT.HTTP_PARAM_ERROR;
+			if(map == null || map.isEmpty()) {
+				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", "all");
+				return jsonObj.toString();
 			}
 			
 			EmployeeVO employee = getEmployeeInfo(map);
-			if(employee.getEm_ID() == null || employee.getEm_ID().isEmpty() || employee.getEm_ID().equals("null")){
-				logwrite.httpLog(requestID , "procLogout()", "getEm_ID 정보 없음 !!");
-				return RESULT.HTTP_PARAM_ERROR;
+			String vaildParam = checkParameter(employee);
+			if(!vaildParam.equals("OK")) {
+				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", vaildParam);
+				return jsonObj.toString();
 			}
 			
-			/*
-			 * 로그아웃기능 개발 메모리에서 삭제
-			 */
+			String resultMsg = "success";
+			JTapiResultVO resultVO = JtapiService.getInstance().monitorStop(employee.getExtension());
 			
-			return RESULT.RTN_SUCCESS;
+			Employees.getInstance().logoutEmployee(employee , requestID);
+			
+			jsonObj.put("code", resultVO.getCode());
+			jsonObj.put("msg", resultVO.getMessage());
+			return jsonObj.toString();
+			
+			
 		}
 		private String procLogin  (String parameter, String requestID) {
 			
@@ -200,14 +211,6 @@ public class HttpServerHandler {
 			}
 			
 			EmployeeVO employee = getEmployeeInfo(map);
-			if(employee.getEmp_id() == null || employee.getEmp_id().isEmpty() || employee.getEmp_id().equals("null")){
-				logwrite.httpLog(requestID , "procLogin()", "getEm_ID 정보 없음 !!");
-				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
-				jsonObj.put("msg", "bad parameter data");
-				jsonObj.put("param", "emp_id");
-				return jsonObj.toString();
-			}
-			
 			
 			String vaildParam = checkParameter(employee);
 			if(!vaildParam.equals("OK")) {
@@ -217,16 +220,14 @@ public class HttpServerHandler {
 				return jsonObj.toString();
 			}
 			
-			Employees.getInstance().getEmployeeByCellNum(employee.getCell_no(), callID)
+			String resultMsg = "success";
+			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(employee.getExtension());
 			
+			Employees.getInstance().loginEmployee(employee , requestID);
 			
-			/*
-			 * 로그인 구현 로직 개발
-			 * 이미 직원 정보가 메모리에 올라가 있으면 -> 업데이트 , 없으면 -> 추가
-			 * 
-			 */
-			
-			return RESULT.RTN_SUCCESS;
+			jsonObj.put("code", resultVO.getCode());
+			jsonObj.put("msg", resultVO.getMessage());
+			return jsonObj.toString();
 		}
 		
 		
@@ -254,73 +255,6 @@ public class HttpServerHandler {
 			return result;
 		}
 		
-		
-	
-		private int procPickup (String parameter, String requestID) {
-			
-			Map <String, String> map = new HashMap<String, String>();
-			map = queryToMap(parameter);
-			
-			if(map == null) {
-				return RESULT.HTTP_PARAM_ERROR;
-			}
-			
-			if(map.isEmpty()) {
-				return RESULT.HTTP_PARAM_ERROR;
-			}
-			
-			EmployeeVO employee = getEmployeeInfo(map);
-			if(employee.getEm_ID() == null || employee.getEm_ID().isEmpty() || employee.getEm_ID().equals("null")){
-				logwrite.httpLog(requestID , "procPickup()", "getEm_ID 정보 없음 !!");
-				return RESULT.HTTP_PARAM_ERROR;
-			}
-			
-			/*
-			 * 픽업그룹 가져오는 로직 개발
-			 */
-			
-			
-			return RESULT.RTN_SUCCESS;
-		}
-
-		private int procUpdateAll(String parameter, String requestID) {
-			// TODO Auto-generated method stub
-			// 직원정보 갱신 ( DB 기준 )
-			Employees.getInstance().getEmployeeList();
-			return RESULT.RTN_SUCCESS;
-		}
-
-		private int procUpdateImg(String parameter, String requestID) {
-			// TODO Auto-generated method stub
-			Map <String, String> map = new HashMap<String, String>();
-			map = queryToMap(parameter);
-			
-			if(map == null) {
-				return RESULT.HTTP_PARAM_ERROR;
-			}
-			
-			if(map.isEmpty()) {
-				return RESULT.HTTP_PARAM_ERROR;
-			}
-			
-			EmployeeVO employee = getEmployeeInfo(map);
-			
-			if(employee.getEm_ID() == null || employee.getEm_ID().isEmpty() || employee.getEm_ID().equals("null")){
-				logwrite.httpLog(requestID , "procUpdateImg()", "getEm_ID 정보 없음 !! UPDATE 무시");
-				return RESULT.HTTP_PARAM_ERROR;
-			}
-			
-			int retCode = Employees.getInstance().updateEmpImage(employee , requestID);
-			
-			if(retCode == RESULT.RTN_SUCCESS){
-				logwrite.httpLog(requestID , "procUpdateImg()", "UPDATE SUCCESS !! ");
-			} else {
-				logwrite.httpLog(requestID , "procUpdateImg()", "UPDATE FAIL !! ");
-			}
-			
-			return retCode;
-			
-		}
 
 		private String getURL(String url) {
 			// TODO Auto-generated method stub
@@ -335,85 +269,6 @@ public class HttpServerHandler {
 			return retStr;
 		}
 
-		private int procSelect(String parameter, String requestID) {
-			// TODO Auto-generated method stub
-			Map <String, String> map = new HashMap<String, String>();
-			map = queryToMapExtension(parameter);
-			String stExtension = map.get("extension");
-			employeeList = Employees.getInstance().getAllEmployee(stExtension , "");
-			logwrite.httpLog(requestID, "procSelect", "employeeList size -> " + employeeList.size());
-			if(employeeList == null){
-				return RESULT.RTN_EXCEPTION;
-			} else {
-				return RESULT.RTN_SUCCESS;
-			}
-		}
-		
-		private int procDelete(String parameter , String requestID) {
-			// TODO Auto-generated method stub
-			Map <String, String> map = new HashMap<String, String>();
-			map = queryToMap(parameter);
-			
-			if(Employees.getInstance().deleteEmployee(map.get("")) == null){
-				return RESULT.HTTP_PARAM_ERROR;
-			} else {
-				return RESULT.RTN_SUCCESS;
-			}
-			
-		}
-		private int procUpdate(String parameter , String requestID) {
-			// TODO Auto-generated method stub
-			Map <String, String> map = new HashMap<String, String>();
-			map = queryToMap(parameter);
-			
-			if(map == null) {
-				return RESULT.HTTP_PARAM_ERROR;
-			}
-			
-			if(map.isEmpty()) {
-				return RESULT.HTTP_PARAM_ERROR;
-			}
-			
-			EmployeeVO employee = getEmployeeInfo(map);
-			
-			if(employee.getDN() == null || employee.getDN().isEmpty() || employee.getDN().equals("null")){
-				logwrite.httpLog(requestID , "procUpdate()", "DN 정보 없음 !! UPDATE 무시");
-				return RESULT.HTTP_PARAM_ERROR;
-			}
-			
-			employee = nullCheckObj(employee);
-			
-			logwrite.httpLog(requestID , "procUpdate()", "UPDATE 요청 정보 -> " + employee.toString());
-			
-			int retCode = Employees.getInstance().updateEmployee(employee , requestID);
-		
-			if(retCode == RESULT.RTN_SUCCESS){
-				logwrite.httpLog(requestID , "procUpdate()", "UPDATE SUCCESS !! ");
-			} else {
-				logwrite.httpLog(requestID , "procUpdate()", "UPDATE FAIL !! ");
-			}
-			
-			return retCode;
-		}
-
-		private EmployeeVO nullCheckObj(EmployeeVO employee) {
-			// TODO Auto-generated method stub
-			if(employee.getCmIP() == null) { employee.setCmIP(""); }
-			if(employee.getCmPass() == null) { employee.setCmPass(""); }
-			if(employee.getCmUser() == null) { employee.setCmUser(""); }
-			if(employee.getDeviceType() == null) { employee.setDeviceType(""); }
-			if(employee.getDN() == null) { employee.setDN(""); }
-			if(employee.getEm_ID() == null) { employee.setEm_ID(""); }
-			if(employee.getEm_name() == null) { employee.setEm_name(""); }
-			if(employee.getEm_position() == null) { employee.setEm_position(""); }
-			if(employee.getGroupNm() == null) { employee.setGroupNm(""); }
-			if(employee.getIpAddr() == null) { employee.setIpAddr(""); }
-			if(employee.getMacaddress() == null) { employee.setMacaddress(""); }
-			if(employee.getPopupYN() == null) { employee.setPopupYN(""); }
-			return employee;
-		}
-
-		
 		
 		private EmployeeVO getEmployeeInfo(Map<String, String> map) {
 			// TODO Auto-generated method stub
@@ -425,6 +280,9 @@ public class HttpServerHandler {
 				switch (key) {
 				case "emp_id":
 					employee.setEmp_id(getEmployeeInfo(map, key));
+					break;
+				case "emp_lno":
+					employee.setEmp_lno(getEmployeeInfo(map, key));
 					break;
 				case "emp_nm_kor":
 					employee.setEmp_nm_kor(getEmployeeInfo(map, key));

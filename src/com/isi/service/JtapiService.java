@@ -18,6 +18,7 @@ import com.isi.jtapi.IJTAPI;
 import com.isi.jtapi.JTAPI2;
 import com.isi.process.IQueue;
 import com.isi.process.JQueue;
+import com.isi.vo.JTapiResultVO;
 /**
 *
 * @author greatyun
@@ -105,14 +106,38 @@ public class JtapiService {
 		return RESULT.RTN_SUCCESS;
 	}
 	
-	
-	public int addDevice(String aDn , String aIP, String aModel){
+	public JTapiResultVO monitorStart(String extension) {
 		
-		for (int i = 0; i < m_jtapi.length; i++) {
-			m_jtapi[i].MonitorStart(aDn, aIP, aModel);
+		JTapiResultVO resultVO = null;
+		if(extension == null || extension.isEmpty()) {
+			return resultVO;
 		}
 		
-		return RESULT.RTN_SUCCESS;
+		for (int i = 0; i < m_jtapi.length; i++) {
+			resultVO = m_jtapi[i].MonitorStart(extension);
+			if(resultVO.getCode() != RESULT.RTN_SUCCESS) {
+				return resultVO;
+			}
+		}
+		
+		return resultVO;
+	}
+	
+	public JTapiResultVO monitorStop(String extension) {
+		
+		JTapiResultVO resultVO = null;
+		if(extension == null || extension.isEmpty()) {
+			return null;
+		}
+		
+		for (int i = 0; i < m_jtapi.length; i++) {
+			resultVO = m_jtapi[i].MonitorStop(extension);
+			if(resultVO.getCode() != RESULT.RTN_SUCCESS) {
+				return resultVO;
+			}
+		}
+		
+		return resultVO;
 	}
 	
 }

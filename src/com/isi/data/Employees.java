@@ -59,31 +59,50 @@ public class Employees {
 		}
 		return employees;
 	}
-	/*
-	public int updateDeviceIpaddrInfo(String DN , String ipAddr) {
-		List list =	(ArrayList) this.map.get(DN);
-		
-		if(list != null) {
-			EmployeeVO empVO = null;
-			List tempList = new ArrayList<>();
-			
-			for (int i = 0; i < list.size(); i++) {
-				empVO = (EmployeeVO)list.get(i);
-				if(empVO.getIpAddr() == null || empVO.getIpAddr().isEmpty()) {
-					empVO.setIpAddr(ipAddr);
-				}
-				tempList.add(empVO);
-			}
-			
-			if(tempList.size() > 0) {
-				map.put(DN, tempList);
-			}
-			
-		} 
-		return 0;
-	}
-	*/
 	
+	
+	public int loginEmployee ( EmployeeVO employee , String requestID) {
+		if(employee == null) {
+			return RESULT.RTN_EXCEPTION;
+		}
+		
+		if(employee.getMac_address() == null || employee.getMac_address().isEmpty()) {
+			return RESULT.RTN_EXCEPTION;
+		}
+		
+		logoutEmployee(employee , requestID);
+		
+		List list = new ArrayList<>();
+		list.add(employee);
+		empMapByCellNum.put(employee.getCell_no() , list);
+		empMapByExtension.put(employee.getExtension() , list);
+		empMapByMac.put(employee.getMac_address() , list);
+		
+		m_Log.httpLog(requestID , "loginEmployee", ">> LOGIN << SUCCESS extension [" + employee.getExtension() + "] cell_no [" + employee.getCell_no() + "] mac_address [" + employee.getMac_address() + "]");
+		
+		return RESULT.RTN_SUCCESS;
+	}
+	
+	
+	public int logoutEmployee (EmployeeVO employee , String requestID) {
+		if(employee == null) {
+			return RESULT.RTN_EXCEPTION;
+		}
+		
+		if(employee.getMac_address() == null || employee.getMac_address().isEmpty()) {
+			return RESULT.RTN_EXCEPTION;
+		}
+		
+		empMapByCellNum.remove(employee.getCell_no());
+		empMapByExtension.remove(employee.getExtension());
+		empMapByMac.remove(employee.getMac_address());
+		
+		m_Log.httpLog(requestID , "logoutEmployee", ">> LOGOUT << SUCCESS extension [" + employee.getExtension() + "] cell_no [" + employee.getCell_no() + "] mac_address [" + employee.getMac_address() + "]");
+		
+		return RESULT.RTN_SUCCESS;
+	}
+	
+	/*
 	public int addEmployee (EmployeeVO employee){
 		if(employee == null) {
 			return RESULT.RTN_EXCEPTION;
@@ -114,49 +133,20 @@ public class Employees {
 		
 		return RESULT.RTN_SUCCESS;
 	}
-	
-	public int updateEmpImage (EmployeeVO updateEmployee , String requestID) {
-		
-		Image image = null;
-		String	strUrl="";
-		URL url = null;
-		BufferedImage img = null;
-		
-		try{
-			/*
-			imgHandler = new ImageHandler();
-			// 직원 증명사진 삭제
-			imgHandler.deleteFaceImageFile(updateEmployee);
-			// 직원 증명사진 다운로드
-			imgHandler.createFaceImage(updateEmployee);
-			// 기존 팝업이미지 삭제
-			imgHandler.deleteEmpImage(updateEmployee);
-			// 신규 팝업이미지 생성
-			imgHandler.createAllImageFile(updateEmployee);
-			*/
-			
-		} catch (Exception e) {
-			e.printStackTrace(ExceptionUtil.getPrintWriter());
-			m_Log.httpLog(requestID , "updateEmpImage", "[" +updateEmployee.getEmp_id() + "] ## Exception ## ");
-			m_Log.httpLog("", "updateEmpImage", ExceptionUtil.getStringWriter().toString());
-			return RESULT.RTN_EXCEPTION;
-		}
-		
-		
-		return RESULT.RTN_SUCCESS;
-	}
+	*/
 	
 	
-	public List getEmployeeListByExtension (String stExtension,String callID){
-		return (ArrayList) empMapByExtension.get(stExtension);
+	
+	public List getEmployeeListByExtension (String... strs){
+		return (ArrayList) empMapByExtension.get(strs[0]);
 	}
 	
 	public List getEmployeeListByCellNum (String cell_num,String callID){
 		return (ArrayList) empMapByCellNum.get(cell_num);
 	}
 	
-	public EmployeeVO getEmployeeByCellNum (String cell_num , String callID){
-		ArrayList list = (ArrayList) empMapByCellNum.get(cell_num);
+	public EmployeeVO getEmployeeByCellNum (String... strs){
+		ArrayList list = (ArrayList) empMapByCellNum.get(strs[1]);
 		
 		EmployeeVO employee = null;
 		
@@ -174,12 +164,16 @@ public class Employees {
 		}
 		
 		if(employee != null){
-			logwrite.standLog(callID, "getEmployeeByCellNum", "GET Employee Information RESULT [" + employee.toString() + "]");
+			logwrite.standLog(strs[1], "getEmployeeByCellNum", "GET Employee Information RESULT [" + employee.toString() + "]");
 		} else {
-			logwrite.standLog(callID, "getEmployeeByCellNum", "GET Employee NULL !!! [" + cell_num + "]");
+			logwrite.standLog(strs[1], "getEmployeeByCellNum", "GET Employee NULL !!! [" + strs[0] + "]");
 		}
 		
 		return employee;
+	}
+	
+	public boolean checkEmployee(String extension) {
+		return empMapByExtension.containsKey(extension);
 	}
 	
 	
@@ -210,6 +204,33 @@ public class Employees {
 		return employee;
 	}
 	
+	public EmployeeVO getEmployeeByMacAddress (String mac_address , String callID){
+		ArrayList list = (ArrayList) empMapByMac.get(mac_address);
+		
+		EmployeeVO employee = null;
+		
+		if(list != null) {
+			if(list != null && list.size() > 1){
+				for (int i = 0; i < list.size(); i++) {
+					employee = (EmployeeVO) list.get(i);
+					if(employee.getPopup_svc_yn().equalsIgnoreCase("Y")){
+						break;
+					}
+				}
+			} else {
+				employee = (EmployeeVO) list.get(0);
+			}
+		}
+		
+		if(employee != null){
+			logwrite.standLog(callID, "getEmployeeByExtension", "GET Employee Information RESULT [" + employee.toString() + "]");
+		} else {
+			logwrite.standLog(callID, "getEmployeeByExtension", "GET Employee NULL !!! [" + mac_address + "]");
+		}
+		
+		return employee;
+	}
+	
 	public int getEmployeeList(){
 		
 		if(this.empMapByCellNum.size() > 0) {
@@ -218,6 +239,10 @@ public class Employees {
 		
 		if(this.empMapByExtension.size() > 0) {
 			this.empMapByExtension.clear();
+		}
+		
+		if(this.empMapByMac.size() > 0) {
+			this.empMapByMac.clear();
 		}
 		
 		if(getMemberInfo() != RESULT.RTN_SUCCESS) {
@@ -349,26 +374,25 @@ public class Employees {
                 			String extension = rs.getString("extension");
                 			String cell_num = rs.getString("cell_no");
                 			
-                			employeeInfo.setEmp_id(rs.getObject("emp_id").toString());
-                			employeeInfo.setEmp_nm_kor(rs.getObject("emp_nm_kor").toString());
-                			employeeInfo.setEmp_nm_eng(rs.getObject("emp_nm_eng").toString());
-                			employeeInfo.setOrg_nm(rs.getObject("org_nm").toString());
-                			employeeInfo.setPos_nm(rs.getObject("pos_nm").toString());
-                			employeeInfo.setDuty_nm(rs.getObject("duty_nm").toString());
-                			employeeInfo.setEmail(rs.getObject("email").toString());
-                			employeeInfo.setTel_no(rs.getObject("tel_no").toString());
+                			employeeInfo.setEmp_id(rs.getString("emp_id"));
+                			employeeInfo.setEmp_nm_kor(rs.getString("emp_nm_kor"));
+                			employeeInfo.setEmp_nm_eng(rs.getString("emp_nm_eng"));
+                			employeeInfo.setOrg_nm(rs.getString("org_nm"));
+                			employeeInfo.setPos_nm(rs.getString("pos_nm"));
+                			employeeInfo.setDuty_nm(rs.getString("duty_nm"));
+                			employeeInfo.setEmail(rs.getString("email"));
                 			employeeInfo.setExtension(extension);
                 			employeeInfo.setCell_no(cell_num);
-                			employeeInfo.setEmp_stat_nm(rs.getObject("emp_stat_nm").toString());
-                			employeeInfo.setEmp_div_cd_nm(rs.getObject("emp_div_cd_nm").toString());
-                			employeeInfo.setEmp_lno(rs.getObject("emp_lno").toString());
-                			employeeInfo.setBuilding(rs.getObject("building").toString());
-                			employeeInfo.setFloor(rs.getObject("floor").toString());
-                			employeeInfo.setCm_ver(rs.getObject("cm_ver").toString());
-                			employeeInfo.setCm_ip(rs.getObject("cm_ip").toString());
-                			employeeInfo.setCm_user(rs.getObject("cm_user").toString());
-                			employeeInfo.setCm_pwd(rs.getObject("cm_pwd").toString());
-                			employeeInfo.setPopup_svc_yn(rs.getObject("popup_svc_yn").toString());
+                			employeeInfo.setEmp_stat_nm(rs.getString("emp_stat_nm"));
+                			employeeInfo.setEmp_div_cd_nm(rs.getString("emp_div_cd_nm"));
+                			employeeInfo.setEmp_lno(rs.getString("emp_lno"));
+                			employeeInfo.setBuilding(rs.getString("building"));
+                			employeeInfo.setFloor(rs.getString("floor"));
+                			employeeInfo.setCm_ver(rs.getString("cm_ver"));
+                			employeeInfo.setCm_ip(rs.getString("cm_ip"));
+                			employeeInfo.setCm_user(rs.getString("cm_user"));
+                			employeeInfo.setCm_pwd(rs.getString("cm_pwd"));
+                			employeeInfo.setPopup_svc_yn(rs.getString("popup_svc_yn"));
                 			
                 			
                 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, "", "getMemberInfo" ,employeeInfo.toString());
@@ -393,7 +417,8 @@ public class Employees {
                 				list.add(employeeInfo);
                 				empMapByCellNum.put(cell_num, list);
                 			}
-                			
+//                			System.out.println("## SUCCESS getEmployeeList!! ## TOTAL EMPLOYEE COUNT EXTENSION : " + empMapByExtension.size());
+//                	    	System.out.println("## SUCCESS getEmployeeList!! ## TOTAL EMPLOYEE COUNT CELLNUM : " + empMapByCellNum.size());
 //                			employeeMap.put(rs.getString("extension"), employeeInfo);
                 		
                 		}
@@ -446,6 +471,23 @@ public class Employees {
 		}
 	}
 	
+	public int createAllImages() {
+		imgHandler = new ImageHandler();
+		
+		Set keySet = empMapByExtension.keySet();
+		Iterator iter = keySet.iterator();
+		while(iter.hasNext()) {
+			String key = (String) iter.next();
+			List list = (List) empMapByExtension.get(key);
+			
+			for (int i = 0; i < list.size(); i++) {
+				EmployeeVO empVO = (EmployeeVO) list.get(i);
+				imgHandler.createImageFile(empVO, "010-3222-8237", "119", "");
+			}
+		}
+		
+		return 0;
+	}
 	
 	
 }
