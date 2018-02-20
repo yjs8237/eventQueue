@@ -40,6 +40,8 @@ public interface IPPhone {
 	public static final String PHONE_7937 				= 			"431";
 	public static final String PHONE_7940 				= 			"8";
 	
+	public static final String PHONE_7961 				= 			"30018";
+	
 	public static final String PHONE_7962 				= 			"404";
 	public static final String PHONE_7965 				= 			"436";
 	

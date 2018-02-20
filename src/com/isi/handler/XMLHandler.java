@@ -86,29 +86,60 @@ public class XMLHandler {
 			
 			switch (model) {
 			
-			case IPPhone.PHONE_8841:
+			case IPPhone.PHONE_7921:
 				returnCode = pushImage(employee, xmlInfo , callID);
-//				returnCode = pushText(person, xmlInfo , callID);
+				break;
+			
+			case IPPhone.PHONE_7925:
+				returnCode = pushImage(employee, xmlInfo , callID);
 				break;
 				
-			case IPPhone.PHONE_8851:
+			case IPPhone.PHONE_7926:
 				returnCode = pushImage(employee, xmlInfo , callID);
-//				returnCode = pushText(person, xmlInfo , callID);
 				break;
 				
 			case IPPhone.PHONE_7941:
 				returnCode = pushImage(employee, xmlInfo , callID);
-//				returnCode = pushText(person, xmlInfo , callID);
+				break;
+			
+			case IPPhone.PHONE_7942:
+				returnCode = pushImage(employee, xmlInfo , callID);
+				break;
+			
+			case IPPhone.PHONE_7945:
+				returnCode = pushImage(employee, xmlInfo , callID);
 				break;
 				
-			case IPPhone.PHONE_7971:
+			case IPPhone.PHONE_7961:
 				returnCode = pushImage(employee, xmlInfo , callID);
-//				returnCode = pushText(person, xmlInfo , callID);
+				break;
+				
+			case IPPhone.PHONE_7965:
+				returnCode = pushImage(employee, xmlInfo , callID);
 				break;
 				
 			case IPPhone.PHONE_7970:
 				returnCode = pushImage(employee, xmlInfo , callID);
-//				returnCode = pushText(person, xmlInfo , callID);
+				break;
+				
+			case IPPhone.PHONE_7971:
+				returnCode = pushImage(employee, xmlInfo , callID);
+				break;
+				
+			case IPPhone.PHONE_7975:
+				returnCode = pushImage(employee, xmlInfo , callID);
+				break;
+			
+			case IPPhone.PHONE_8841:
+				returnCode = pushImage(employee, xmlInfo , callID);
+				break;
+				
+			case IPPhone.PHONE_8851:
+				returnCode = pushImage(employee, xmlInfo , callID);
+				break;
+				
+			case IPPhone.PHONE_IPCOMMUNICATOR:
+				returnCode = pushImage(employee, xmlInfo , callID);
 				break;
 				
 			case IPPhone.PHONE_9971:

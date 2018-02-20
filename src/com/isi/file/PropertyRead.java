@@ -23,7 +23,7 @@ public class PropertyRead {
 
 //	public static final String propFilePath = System.getProperty("user.dir") + "\\conf\\servers.properties";
 //	public static final String propFilePath = "C:\\Development\\SRC\\workspace_pwc\\ISXML\\conf\\servers.properties";
-	public static final String propFilePath = "C:\\Development\\SRC\\workspace_pwc\\ISXML\\conf\\servers.properties";
+	public static final String propFilePath = "C:\\Development\\SRC\\ISXML\\conf\\servers.properties";
 	
 	private  Map<String, String> iniConfigMap = null;
 	private  boolean bPropertyStatus = false;
