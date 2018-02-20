@@ -14,6 +14,7 @@ import javax.management.relation.RelationTypeNotFoundException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.isi.constans.APITYPE;
 import com.isi.constans.LOGLEVEL;
 import com.isi.constans.LOGTYPE;
 import com.isi.constans.PROPERTIES;
@@ -147,6 +148,10 @@ public class HttpServerHandler {
 					resultJSONData = procLogout(parameter , requestID);
 					break;
 					
+				case "/resetdevice":
+					resultJSONData = procResetDevice(parameter , requestID);
+					break;
+					
 				default:
 					returnCode = RESULT.HTTP_URL_ERROR;
 					break;
@@ -160,6 +165,38 @@ public class HttpServerHandler {
 			
 			return resultJSONData;
 			
+		}
+		
+		
+		private String procResetDevice (String parameter , String requestID) {
+			Map <String, String> map = new HashMap<String, String>();
+			map = queryToMap(parameter);
+			
+			JSONObject jsonObj = new JSONObject();
+			
+			if(map == null || map.isEmpty()) {
+				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", "all");
+				return jsonObj.toString();
+			}
+			
+			EmployeeVO employee = getEmployeeInfo(map);
+			String vaildParam = checkParameter(employee , APITYPE.API_DEVICERESET);
+			if(!vaildParam.equals("OK")) {
+				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", vaildParam);
+				return jsonObj.toString();
+			}
+			
+			String resultMsg = "success";
+			JtapiService.getInstance().monitorStop(employee.getExtension());
+			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(employee.getExtension());
+			
+			jsonObj.put("code", resultVO.getCode());
+			jsonObj.put("msg", resultVO.getMessage());
+			return jsonObj.toString();
 		}
 		
 		private String procLogout  (String parameter, String requestID) {
@@ -176,7 +213,7 @@ public class HttpServerHandler {
 			}
 			
 			EmployeeVO employee = getEmployeeInfo(map);
-			String vaildParam = checkParameter(employee);
+			String vaildParam = checkParameter(employee , APITYPE.API_LOGOUT);
 			if(!vaildParam.equals("OK")) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
 				jsonObj.put("msg", "bad parameter data");
@@ -212,7 +249,7 @@ public class HttpServerHandler {
 			
 			EmployeeVO employee = getEmployeeInfo(map);
 			
-			String vaildParam = checkParameter(employee);
+			String vaildParam = checkParameter(employee , APITYPE.API_LOGIN);
 			if(!vaildParam.equals("OK")) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
 				jsonObj.put("msg", "bad parameter data");
@@ -230,31 +267,33 @@ public class HttpServerHandler {
 			return jsonObj.toString();
 		}
 		
-		
-		private String checkParameter (EmployeeVO employee) {
+		private String checkParameter(EmployeeVO employee, int apiType) {
 			String result = "OK";
 			String checkData = "";
 			try {
-				
-				Class targetClass = Class.forName("com.isi.vo.EmployeeVO");
+				Class targetClass;
+				if (apiType < 2) {
+					targetClass = Class.forName("com.isi.vo.EmployeeVO");
+				} else {
+					targetClass = Class.forName("com.isi.vo.DeviceResetVO");
+				}
 				Method methods[] = targetClass.getDeclaredMethods();
-				
+
 				for (int i = 0; i < methods.length; i++) {
 					String methodName = methods[i].getName();
-					if(methodName.startsWith("get")) {
+					if (methodName.startsWith("get")) {
 						Object obj = methods[i].invoke(employee);
-						if(obj == null || obj.toString().isEmpty()) {
+						if (obj == null || obj.toString().isEmpty()) {
 							return methodName.replaceAll("get", "").toLowerCase();
 						}
 					}
 				}
-				
+
 			} catch (Exception e) {
 			}
-			
+
 			return result;
 		}
-		
 
 		private String getURL(String url) {
 			// TODO Auto-generated method stub

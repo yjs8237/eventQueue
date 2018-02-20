@@ -9,12 +9,11 @@ package com.isi.vo;
 *
 * @author greatyun
 */
-public class EmployeeVO  implements IPerson{
+public class EmployeeVO  implements IPerson {
 	
 	private String emp_id;
 	private String emp_nm_kor;
 	private String emp_nm_eng;
-	
 	private String org_nm;
 	private String pos_nm;
 	private String duty_nm;

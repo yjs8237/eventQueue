@@ -1,5 +1,7 @@
 package com.test.axl.soap;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -390,12 +392,11 @@ public class AxlHandler {
 	
 	private  JSONArray sendSoapMessage(CmAxlInfoModel cmAxlInfo , String soapReqMessage ) {
 		
+		SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss:SSS");
 		
-		JSONObject resultJsonObj = new JSONObject();
-		
+		System.out.println("****************** before : " + format.format(new Date()));
 		String strResult = SoapHandler.RequestSoap(cmVer, cmAxlInfo.getCmID(), cmAxlInfo.getCmPwd(), cmAxlInfo.getCmIP(), "8443", soapReqMessage.toString(), "executeSQLQuery");
-		
-		String responseKey = "";
+		System.out.println("****************** after : " + format.format(new Date()));
 		if(soapReqMessage.indexOf("axlapi:executeSQLQuery") > 0) {
 			// SELECT Request
 			return jsonQueryResParsing(strResult);

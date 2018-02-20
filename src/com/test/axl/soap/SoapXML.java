@@ -16,15 +16,29 @@ import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Iterator;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeaders;
+import javax.xml.soap.Name;
+import javax.xml.soap.Node;
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPConnection;
+import javax.xml.soap.SOAPConnectionFactory;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.soap.SOAPPart;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -32,7 +46,11 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
+import com.test.main.TrustAllCertificates;
+import com.test.main.TrustAllHosts;
 
 /**
  * @author skan
@@ -294,6 +312,161 @@ public class SoapXML {
 			}
 		}
 		return "Error Unknwon!!";
+	}
+	
+	
+	
+	public String testSoapRequestV2 () {
+		
+		String endpointUrl ="https://192.168.230.120:8443/axl/";
+		
+		 try {
+		        final boolean isHttps = endpointUrl.toLowerCase().startsWith("https");
+		        HttpsURLConnection httpsConnection = null;
+		        // Open HTTPS connection
+		        if (isHttps) {
+		            // Create SSL context and trust all certificates
+		            SSLContext sslContext = SSLContext.getInstance("SSL");
+		            TrustManager[] trustAll = new TrustManager[] {new TrustAllCertificates()};
+		            sslContext.init(null, trustAll, new java.security.SecureRandom());
+		            // Set trust all certificates context to HttpsURLConnection
+		            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+		            // Open HTTPS connection
+		            URL url = new URL(endpointUrl);
+		            httpsConnection = (HttpsURLConnection) url.openConnection();
+		            // Trust all hosts
+		            httpsConnection.setHostnameVerifier(new TrustAllHosts());
+		            // Connect
+		            httpsConnection.connect();
+		        }
+		        
+		        
+		        
+		        // Send HTTP SOAP request and get response
+		        SOAPConnection soapConnection = SOAPConnectionFactory.newInstance().createConnection();
+		        SOAPMessage response = soapConnection.call(createSOAPRequest(), endpointUrl);
+		        // Close connection
+		        soapConnection.close();
+		        // Close HTTPS connection
+		        if (isHttps) {
+		            httpsConnection.disconnect();
+		        }
+		        
+		        System.out.println("23222");
+//		        response.writeTo(System.out);
+		        
+		        SOAPBody soapBody = response.getSOAPBody();
+		        
+		        NodeList list = soapBody.getElementsByTagName("row");
+//		        DeviceLineInfo info = null;
+		        for(int i = 0; i < list.getLength(); i++)
+		        {
+//		            info = new DeviceLineInfo();
+//		            Node node = list.item(i);
+//		            NodeList children = node.getChildNodes();
+//		            if(children.item(0).getFirstChild() != null)
+//		                info.setPkid(children.item(0).getFirstChild().getNodeValue());
+//		            if(children.item(1).getFirstChild() != null)
+//		                info.setDn(children.item(1).getFirstChild().getNodeValue());
+//		            if(children.item(2).getFirstChild() != null)
+//		                info.setAlertingName(children.item(2).getFirstChild().getNodeValue());
+//		            if(children.item(3).getFirstChild() != null)
+//		                info.setDescription(children.item(3).getFirstChild().getNodeValue());
+//		            if(children.item(4).getFirstChild() != null)
+//		                info.setFkRoutePartition(children.item(4).getFirstChild().getNodeValue());
+		        }
+		        
+		        
+		        
+		        return "";
+		    } catch (Exception ex) {
+		        // Do Something
+		    	ex.printStackTrace();
+		    }
+		    return null;
+	}
+	
+	
+	public String testSoapRequest (String ReqMsg) {
+		
+		try {
+			SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
+		    SOAPConnection soapConnection = soapConnectionFactory.createConnection();
+
+		    
+		    // Send SOAP Message to SOAP Server
+		    String url = "https://192.168.230.120:8443/axl/";
+		    SOAPMessage soapResponse = soapConnection.call(createSOAPRequest(), url);
+		    soapResponse.writeTo(System.out);
+		    SOAPPart soapPart = soapResponse.getSOAPPart();
+		    SOAPEnvelope envelope = soapPart.getEnvelope();
+		    SOAPBody soapBody = envelope.getBody();
+		    
+		    
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getLocalizedMessage());
+		}
+		
+		return "";
+	}
+	
+	private SOAPMessage createSOAPRequest() throws Exception {
+		
+		MessageFactory messageFactory = MessageFactory.newInstance();
+		SOAPMessage soapMessage = messageFactory.createMessage();
+		SOAPPart soapPart = soapMessage.getSOAPPart();
+
+
+		// SOAP Envelope
+		SOAPEnvelope envelope = soapPart.getEnvelope();
+		envelope.addNamespaceDeclaration("ns", "http://www.cisco.com/AXL/API/8.5");
+		
+		/*
+		 * Constructed SOAP Request Message: 
+		 * <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:example="http://ws.cdyne.com/"> <SOAP-ENV:Header/> <SOAP-ENV:Body>
+		 * <example:VerifyEmail> <example:email>mutantninja@gmail.com</example:email>
+		 * <example:LicenseKey>123</example:LicenseKey> </example:VerifyEmail>
+		 * </SOAP-ENV:Body> </SOAP-ENV:Envelope>
+		 */
+
+		// SOAP Body
+		SOAPBody soapBody = envelope.getBody();
+		SOAPElement soapBodyFirst = soapBody.addChildElement("executeSQLQuery", "ns");
+		QName name = new QName("sequence");
+		soapBodyFirst.addAttribute(name, "?");
+		SOAPElement soapBodySecond = soapBodyFirst.addChildElement("sql");
+		soapBodySecond.addTextNode("select pkid, name from device where name = 'SEP001AA2660E8A'");
+		
+		
+		/*
+		SOAPElement soapBodyElem = soapBody.addChildElement("VerifyEmail", "axlapi");
+		
+		SOAPElement soapBodyElem1 = soapBodyElem.addChildElement("email", "axlapi");
+		soapBodyElem1.addTextNode("mutantninja@gmail.com");
+		SOAPElement soapBodyElem2 = soapBodyElem.addChildElement("LicenseKey", "axlapi");
+		soapBodyElem2.addTextNode("123");
+		 */
+		MimeHeaders headers = soapMessage.getMimeHeaders();
+		headers.addHeader("Accept-Encoding", "gzip,deflate");
+		headers.addHeader("Content-Type", "text/xml;charset=UTF-8");
+		headers.addHeader("Content-Length", String.valueOf(soapBody.toString().length()));
+		headers.addHeader("SOAPAction", "CUCM:DB ver=8.5");
+		headers.addHeader("Connection", "Keep-Alive");
+		headers.addHeader("User-Agent", "Apache-HttpClient/4.1.1 (java 1.5)");
+		headers.addHeader("Authorization", "Basic eG1sdXNlcjohSW5zdW5nMjAxOCM=");
+		
+
+		soapMessage.saveChanges();
+		
+		
+		/* Print the request message */
+		System.out.println("Request SOAP Message:");
+		soapMessage.writeTo(System.out);
+		System.out.println("");
+		System.out.println("------");
+
+		return soapMessage;
 	}
 	
 	public String SendSoapMessageTest(String ReqMsg, int nDefaultTimeOutMilliSecond) {
