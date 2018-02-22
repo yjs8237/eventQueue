@@ -164,7 +164,10 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		}
 		return RESULT.RTN_SUCCESS;
 	}
-
+	
+	
+	
+	
 	public int MonitorAllStart(CiscoPhoneInfo address) {
 		
 		Address[] addrArray = null;
@@ -231,7 +234,9 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		try {
 
 			addr = (CiscoAddress) m_Provider.getAddress(aDn);
-
+			//Terminal terminal = m_Provider.getTerminal(aDn);
+			
+			
 			if (addr == null) {
 				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStart",
 						"[" + aDn + "] [ERROR] MonitorStart - unregistered device ");

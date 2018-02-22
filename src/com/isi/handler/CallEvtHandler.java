@@ -163,7 +163,7 @@ public class CallEvtHandler {
 					EmployeeVO emp = employeeMgr.getEmployeeByExtension(DN , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(DN);
 					if(emp!=null){
-						xmlHandler.evtEstablished(makeEstablishXmlVO(event , emp, callID) , deviceDN , callID);
+//						xmlHandler.evtEstablished(makeEstablishXmlVO(event , emp, callID) , deviceDN , callID);
 					}
 					isEastblish = true;
 				} else if(!deviceDN.equals(DN) && deviceDN.equals(redirectDN)){
@@ -176,7 +176,7 @@ public class CallEvtHandler {
 					EmployeeVO emp = employeeMgr.getEmployeeByExtension(DN , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(DN);
 					if(emp != null){
-						xmlHandler.evtEstablished(makeEstablishXmlVO(event , emp, callID) , deviceDN , callID);
+//						xmlHandler.evtEstablished(makeEstablishXmlVO(event , emp, callID) , deviceDN , callID);
 					}
 					isEastblish = true;
 				}
@@ -197,7 +197,7 @@ public class CallEvtHandler {
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(deviceDN);
 					if(emp != null) {
 						Thread.sleep(100);	// 토글 시 push 가 너무 빠르게 이루어지면 기본화면이 XML 화면을 뒤덮기 때문에.. sleep 0.1 초 살짝 줘볼까
-						xmlHandler.evtEstablished(makeEstablishXmlVO(event, emp, callID) , callingDN , callID);
+//						xmlHandler.evtEstablished(makeEstablishXmlVO(event, emp, callID) , callingDN , callID);
 					}
 //					isEastblish = true;	// 보류해제시에는 통화이력 정보가 남을 필요가 없다
 				}
@@ -219,7 +219,7 @@ public class CallEvtHandler {
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(deviceDN);
 					if(emp != null){
 //						makeDisconnectXmlVO(event , emp , callID)
-						xmlHandler.evtEstablished(makeEstablishXmlVO(event, emp, callID) , callingDN , callID);
+//						xmlHandler.evtEstablished(makeEstablishXmlVO(event, emp, callID) , callingDN , callID);
 					}
 					isEastblish = true;
 				}

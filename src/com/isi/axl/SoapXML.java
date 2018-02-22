@@ -101,8 +101,8 @@ public class SoapXML {
             InputStream in = socket.getInputStream();
             OutputStream out = socket.getOutputStream();
             
-            System.out.println("SEND SOAP MESSAGE");
-            System.out.println(aReqMsg);
+//            System.out.println("SEND SOAP MESSAGE");
+//            System.out.println(aReqMsg);
             
             StringBuffer sb = new StringBuffer(8192);
             byte[] bArray  = new byte[8192];
@@ -120,7 +120,7 @@ public class SoapXML {
                 }
             }
             
-            System.out.println("RECV SOAP MSG : " + sb.toString());
+//            System.out.println("RECV SOAP MSG : " + sb.toString());
             
             RemoveSizeInfo(sb);
             m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.GLOBAL, "SendSoapMessage", "RECV SOAP -> " + sb.toString());

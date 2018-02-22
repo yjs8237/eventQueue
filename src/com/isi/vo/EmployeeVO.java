@@ -9,7 +9,7 @@ package com.isi.vo;
 *
 * @author greatyun
 */
-public class EmployeeVO  implements IPerson {
+public class EmployeeVO  extends BaseVO implements IPerson {
 	
 	private String emp_id;
 	private String emp_nm_kor;

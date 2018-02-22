@@ -11,23 +11,30 @@ import java.util.*;
 
 import javax.management.relation.RelationTypeNotFoundException;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import com.isi.axl.soap.SxmlHandler;
 import com.isi.constans.APITYPE;
+import com.isi.constans.CALLSTATE;
 import com.isi.constans.LOGLEVEL;
 import com.isi.constans.LOGTYPE;
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
+import com.isi.data.CallStateMgr;
 import com.isi.data.Employees;
 import com.isi.data.XmlInfoMgr;
 import com.isi.db.JDatabase;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.*;
 import com.isi.service.JtapiService;
+import com.isi.vo.BaseVO;
 import com.isi.vo.CustomerVO;
+import com.isi.vo.DeviceResetVO;
+import com.isi.vo.DeviceStatusVO;
 import com.isi.vo.EmployeeVO;
 import com.isi.vo.JTapiResultVO;
+import com.isi.vo.PickupVO;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -152,6 +159,14 @@ public class HttpServerHandler {
 					resultJSONData = procResetDevice(parameter , requestID);
 					break;
 					
+				case "/callstatus":
+					resultJSONData = procCallStatus(parameter , requestID);
+					break;
+					
+				case "/pickup":
+					resultJSONData = procCallPickup(parameter , requestID);
+					break;
+					
 				default:
 					returnCode = RESULT.HTTP_URL_ERROR;
 					break;
@@ -167,6 +182,107 @@ public class HttpServerHandler {
 			
 		}
 		
+		private String procCallPickup (String parameter , String requestID) {
+			Map <String, String> map = new HashMap<String, String>();
+			map = queryToMap(parameter);
+			
+			JSONObject jsonObj = new JSONObject();
+			
+			if(map == null || map.isEmpty()) {
+				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", "all");
+				return jsonObj.toString();
+			}
+			
+			BaseVO baseVO = getPickupInfo(map);
+			String vaildParam = checkParameter(baseVO , APITYPE.API_PICKUP);
+			if(!vaildParam.equals("OK")) {
+				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", vaildParam);
+				return jsonObj.toString();
+			}
+			
+			PickupVO pickupVO = (PickupVO) baseVO;
+//			JtapiService.getInstance().monitorStop(resetVO.getExtension());
+//			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(resetVO.getExtension());
+			
+			logwrite.httpLog(requestID, "procCallPickup", "DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
+			
+			jsonObj.put("code", resultVO.getCode());
+			jsonObj.put("msg", resultVO.getMessage());
+			return jsonObj.toString();
+		}
+		
+		private String procCallStatus (String parameter , String requestID) {
+			Map <String, String> map = new HashMap<String, String>();
+			map = queryToMap(parameter);
+			
+			JSONObject jsonObj = new JSONObject();
+			
+			if(map == null || map.isEmpty()) {
+				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", "all");
+				return jsonObj.toString();
+			}
+			
+			BaseVO baseVO = getDeviceStatusInfo(map);
+			String vaildParam = checkParameter(baseVO , APITYPE.API_CALLSTATUS);
+			if(!vaildParam.equals("OK")) {
+				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", vaildParam);
+				return jsonObj.toString();
+			}
+			
+			String resultMsg = "success";
+			DeviceStatusVO devStatusVO = (DeviceStatusVO) baseVO;
+			
+			JSONArray resultArr = new JSONArray();
+			List<String> extensionList = devStatusVO.getExtensionList();
+			for (int i = 0; i < extensionList.size(); i++) {
+				String extension = extensionList.get(i);
+				int deviceStatus = 0;
+				if(CallStateMgr.getInstance().getDeviceState(extension) == null) {
+					deviceStatus = CALLSTATE.IDLE;
+				} else {
+					deviceStatus = CallStateMgr.getInstance().getDeviceState(extension);
+				}
+				String message = "";
+				if(deviceStatus == CALLSTATE.ALERTING_ING) {
+					message = "ALERTING";
+				} else if(deviceStatus == CALLSTATE.ESTABLISHED_ING) {
+					message = "ESTABLISHED";
+				} else if (deviceStatus == CALLSTATE.IDLE) {
+					message = "IDLE";
+				}
+				JSONObject tempJson = new JSONObject();
+				tempJson.put("extension", extension);
+				tempJson.put("statusCode", deviceStatus);
+				tempJson.put("statusMessage", message);
+				
+				resultArr.put(tempJson);
+				
+				logwrite.httpLog(requestID, "procCallStatus", "DEVICE STATUS RESULT EXTENSION ["+extension+"] CODE [" + deviceStatus + "] MESSAGE [" + message + "]");
+			}
+			
+			
+			
+			/*
+			 * deviceStatus
+			 * 	ALERTING_ING		=		900;		// Ring (발신 주체)
+				ESTABLISHED_ING		=		902;		// 통화연결 (발신 주체)
+				IDLE				=		904;		// 통화종료 
+			 */
+			// 
+			
+			jsonObj.put("code", 200);
+			jsonObj.put("msg", "success");
+			jsonObj.put("list", resultArr);
+			return jsonObj.toString();
+		}
 		
 		private String procResetDevice (String parameter , String requestID) {
 			Map <String, String> map = new HashMap<String, String>();
@@ -181,8 +297,8 @@ public class HttpServerHandler {
 				return jsonObj.toString();
 			}
 			
-			EmployeeVO employee = getEmployeeInfo(map);
-			String vaildParam = checkParameter(employee , APITYPE.API_DEVICERESET);
+			BaseVO baseVO = getDeviceResetInfo(map);
+			String vaildParam = checkParameter(baseVO , APITYPE.API_DEVICERESET);
 			if(!vaildParam.equals("OK")) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
 				jsonObj.put("msg", "bad parameter data");
@@ -190,9 +306,11 @@ public class HttpServerHandler {
 				return jsonObj.toString();
 			}
 			
-			String resultMsg = "success";
-			JtapiService.getInstance().monitorStop(employee.getExtension());
-			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(employee.getExtension());
+			DeviceResetVO resetVO = (DeviceResetVO) baseVO;
+			JtapiService.getInstance().monitorStop(resetVO.getExtension());
+			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(resetVO.getExtension());
+			
+			logwrite.httpLog(requestID, "procResetDevice", "DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
 			
 			jsonObj.put("code", resultVO.getCode());
 			jsonObj.put("msg", resultVO.getMessage());
@@ -212,8 +330,8 @@ public class HttpServerHandler {
 				return jsonObj.toString();
 			}
 			
-			EmployeeVO employee = getEmployeeInfo(map);
-			String vaildParam = checkParameter(employee , APITYPE.API_LOGOUT);
+			BaseVO baseVO = getEmployeeInfo(map);
+			String vaildParam = checkParameter(baseVO , APITYPE.API_LOGOUT);
 			if(!vaildParam.equals("OK")) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
 				jsonObj.put("msg", "bad parameter data");
@@ -221,10 +339,13 @@ public class HttpServerHandler {
 				return jsonObj.toString();
 			}
 			
-			String resultMsg = "success";
-			JTapiResultVO resultVO = JtapiService.getInstance().monitorStop(employee.getExtension());
+			EmployeeVO empVO = (EmployeeVO) baseVO;
+			JTapiResultVO resultVO = JtapiService.getInstance().monitorStop(empVO.getExtension());
+			int loginResult = Employees.getInstance().logoutEmployee(empVO , requestID);
 			
-			Employees.getInstance().logoutEmployee(employee , requestID);
+			logwrite.httpLog(requestID, "procLogout", "DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
+			logwrite.httpLog(requestID, "procLogout", "EMPLOYEE LOGOUT RESULT CODE [" + loginResult + "]");
+			
 			
 			jsonObj.put("code", resultVO.getCode());
 			jsonObj.put("msg", resultVO.getMessage());
@@ -239,17 +360,14 @@ public class HttpServerHandler {
 			
 			JSONObject jsonObj = new JSONObject();
 			
-			
 			if(map == null || map.isEmpty()) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
 				jsonObj.put("msg", "bad parameter data");
 				jsonObj.put("param", "all");
 				return jsonObj.toString();
 			}
-			
-			EmployeeVO employee = getEmployeeInfo(map);
-			
-			String vaildParam = checkParameter(employee , APITYPE.API_LOGIN);
+			BaseVO baseVO = getEmployeeInfo(map);
+			String vaildParam = checkParameter(baseVO , APITYPE.API_LOGIN);
 			if(!vaildParam.equals("OK")) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
 				jsonObj.put("msg", "bad parameter data");
@@ -257,32 +375,64 @@ public class HttpServerHandler {
 				return jsonObj.toString();
 			}
 			
-			String resultMsg = "success";
-			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(employee.getExtension());
+			EmployeeVO empVO = (EmployeeVO) baseVO;
 			
-			Employees.getInstance().loginEmployee(employee , requestID);
+			/*
+			 * 전화기 상태체크
+			 */
+			if(!DeviceStatusHandler.getInstance().isRegisteredDevice(empVO.getMac_address())) {
+				logwrite.httpLog(requestID, "procLogin", empVO.getMac_address() + " is not Registered!!");
+			}
+			//////////////////////////////////////////////////////////////////////////////////////////
+			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(empVO.getExtension());
+			int loginResult = Employees.getInstance().loginEmployee(empVO , requestID);
+			
+			logwrite.httpLog(requestID, "procLogin", "DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
+			logwrite.httpLog(requestID, "procLogin", "EMPLOYEE LOGIN RESULT CODE [" + loginResult + "]");
+			
 			
 			jsonObj.put("code", resultVO.getCode());
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 		}
 		
-		private String checkParameter(EmployeeVO employee, int apiType) {
+		private String checkParameter(BaseVO baseVO, int apiType) {
 			String result = "OK";
 			String checkData = "";
+			Object object = null;
 			try {
-				Class targetClass;
-				if (apiType < 2) {
+				Class targetClass = null;
+				if (apiType == APITYPE.API_LOGIN || apiType == APITYPE.API_LOGOUT) {
+					
 					targetClass = Class.forName("com.isi.vo.EmployeeVO");
-				} else {
+					EmployeeVO empVO = (EmployeeVO) baseVO;
+					object = empVO;
+					
+				} else if(apiType == APITYPE.API_DEVICERESET) {
+					
 					targetClass = Class.forName("com.isi.vo.DeviceResetVO");
+					DeviceResetVO devResetVO = (DeviceResetVO) baseVO;
+					object = devResetVO;
+					
+				} else if(apiType == APITYPE.API_CALLSTATUS){
+					
+					targetClass = Class.forName("com.isi.vo.DeviceStatusVO");
+					DeviceStatusVO devStatusVO = (DeviceStatusVO) baseVO;
+					object = devStatusVO;
+					
+				} else if (apiType == APITYPE.API_PICKUP){
+					
+					targetClass = Class.forName("com.isi.vo.PickupVO");
+					PickupVO pickupVO = (PickupVO) baseVO;
+					object = pickupVO;
+					
 				}
 				Method methods[] = targetClass.getDeclaredMethods();
 
 				for (int i = 0; i < methods.length; i++) {
 					String methodName = methods[i].getName();
 					if (methodName.startsWith("get")) {
-						Object obj = methods[i].invoke(employee);
+						Object obj = methods[i].invoke(object);
 						if (obj == null || obj.toString().isEmpty()) {
 							return methodName.replaceAll("get", "").toLowerCase();
 						}
@@ -307,7 +457,96 @@ public class HttpServerHandler {
 			
 			return retStr;
 		}
+		
+		private DeviceStatusVO splitExtension(String extension) {
+			DeviceStatusVO deviceStatus = new DeviceStatusVO();
+			if(extension == null) {
+				return null;
+			}
+			
+			String [] extArr = extension.split(",");
+			for (int i = 0; i < extArr.length; i++) {
+				deviceStatus.setExtension(extArr[i]);
+			}
+			return deviceStatus;
+		}
+		
+		
+		private PickupVO getPickupInfo (Map<String, String> map) {
+			PickupVO pickupVO = new PickupVO();
+			Set keySet = map.keySet();
+			Iterator iter = keySet.iterator();
+			while (iter.hasNext()) {
+				String key = (String) iter.next();
+				switch (key) {
+					case "myExtension" :
+						pickupVO.setMyExtension(map.get("myExtension").toString());
+						break;
+					case "pickupExtension" :
+						pickupVO.setPickupExtension(map.get("setMyExtension").toString());
+						break;
+					default : 
+						break;
+				}
+			}
 
+			return pickupVO;
+		}
+		
+		private DeviceStatusVO getDeviceStatusInfo (Map<String, String> map) {
+			// TODO Auto-generated method stub
+			DeviceStatusVO deviceStatus = null;
+			Set keySet = map.keySet();
+			Iterator iter = keySet.iterator();
+			while (iter.hasNext()) {
+				String key = (String) iter.next();
+				switch (key) {
+					case "extension" :
+						deviceStatus = splitExtension(map.get("extension").toString());
+						break;
+					default : 
+						break;
+				}
+			}
+
+			return deviceStatus;
+		}
+		
+		
+		private DeviceResetVO getDeviceResetInfo (Map<String, String> map) {
+			// TODO Auto-generated method stub
+			DeviceResetVO deviceReset = new DeviceResetVO();
+			Set keySet = map.keySet();
+			Iterator iter = keySet.iterator();
+			while (iter.hasNext()) {
+				String key = (String) iter.next();
+				switch (key) {
+					case "extension" : 
+						deviceReset.setExtension(map.get("extension").toString());
+						break;
+					case "mac_address" :
+						deviceReset.setMac_address(map.get("mac_address").toString());
+						break;
+					case "device_ipaddr" :
+						deviceReset.setDevice_ipaddr(map.get("device_ipaddr").toString());
+						break;
+					case "cm_ip" : 
+						deviceReset.setCm_ip(map.get("cm_ip").toString());
+						break;
+					case "cm_user" : 
+						deviceReset.setCm_user(map.get("cm_user").toString());
+						break;
+					case "cm_pwd" : 
+						deviceReset.setCm_pwd(map.get("cm_pwd").toString());
+						break;
+					default : 
+						break;
+				}
+			}
+
+			return deviceReset;
+		}
+		
 		
 		private EmployeeVO getEmployeeInfo(Map<String, String> map) {
 			// TODO Auto-generated method stub

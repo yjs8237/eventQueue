@@ -200,7 +200,7 @@ public class XMLSvcCallable implements Callable<Integer>{
 			// Established 전화 받았을 경우
 			case IEvt.CallCtl_TermConn_TalkingEv:
 				// 미래에셋대우 XML 은 Establish 일때 팝업을 하지 않는다.
-//				evtHandler.callEstablishedEvt(evt);
+				evtHandler.callEstablishedEvt(evt , callID);
 				break;
 
 			// Disconnect 전화 끊었을 경우

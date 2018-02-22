@@ -381,7 +381,15 @@ public class Employees {
                 			employeeInfo.setPos_nm(rs.getString("pos_nm"));
                 			employeeInfo.setDuty_nm(rs.getString("duty_nm"));
                 			employeeInfo.setEmail(rs.getString("email"));
-                			employeeInfo.setExtension(extension);
+                			
+                			// 프로세스 기동 시점 기준 현재 로그인상태 유저는 로그인되어 있는 내선번호를 메모리에 올린다
+                			if(rs.getString("loginExtension") != null) {
+                				extension = rs.getString("loginExtension");
+                				employeeInfo.setExtension(extension);
+                			} else {
+                				employeeInfo.setExtension(extension);
+                			}
+                			
                 			employeeInfo.setCell_no(cell_num);
                 			employeeInfo.setEmp_stat_nm(rs.getString("emp_stat_nm"));
                 			employeeInfo.setEmp_div_cd_nm(rs.getString("emp_div_cd_nm"));
@@ -393,7 +401,6 @@ public class Employees {
                 			employeeInfo.setCm_user(rs.getString("cm_user"));
                 			employeeInfo.setCm_pwd(rs.getString("cm_pwd"));
                 			employeeInfo.setPopup_svc_yn(rs.getString("popup_svc_yn"));
-                			
                 			
                 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, "", "getMemberInfo" ,employeeInfo.toString());
                 			// key : 내선번호 , value : Employee VO 객체

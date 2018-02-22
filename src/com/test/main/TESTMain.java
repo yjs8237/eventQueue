@@ -8,8 +8,13 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.bestez.common.tr.HostWebtIO;
 import com.bestez.common.vo.CustInfoVO;
+import com.isi.axl.soap.SoapHandler;
+import com.isi.axl.soap.SxmlHandler;
 import com.isi.handler.PushHandler;
 import com.isi.handler.XMLHandler;
 import com.isi.vo.XmlVO;
@@ -32,14 +37,19 @@ public class TESTMain {
 //		String query = "SELECT * FROM numplan " ;
 //		axlHandler.testSoap(query);
 		
-		SoapXML xml = new SoapXML("", 1, "", "");
+//		SxmlHandler soap = new SxmlHandler();
+//		Object obj = soap.selectDeviceStatusJSON("10.156.114.203", "xmluser", "Samil@3131", "SEP00215554192A");
+//		JSONObject jsonObj = (JSONObject) obj;
+//		String jsonP = jsonObj.toString(4);
+//		System.out.println(jsonP);
 		
 		
-		SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss:SSS");
+		String temp = "00000001";
+		String [] arr = temp.split(",");
 		
-		System.out.println("****************** before : " + format.format(new Date()));
-		xml.testSoapRequestV2();
-		System.out.println("****************** after : " + format.format(new Date()));
+		for (int i = 0; i < arr.length; i++) {
+			System.out.println(arr[i]);
+		}
 		
 	}
 

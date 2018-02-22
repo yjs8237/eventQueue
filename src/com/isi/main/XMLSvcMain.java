@@ -56,7 +56,6 @@ public class XMLSvcMain {
 		database.disconnectDB();
 		
 		
-		
 		HttpServerHandler httpHandler = new HttpServerHandler();
 		httpHandler.startService();
 		

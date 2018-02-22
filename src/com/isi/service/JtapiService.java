@@ -88,7 +88,7 @@ public class JtapiService {
 	                	// ## 주석
 //	                	JCtiData.getData().updateDeviceIP(phoneinfo);
 	                	
-	                	m_jtapi[i].MonitorAllStart(phoneinfo);
+//	                	m_jtapi[i].MonitorAllStart(phoneinfo);
 	                }
 			 }
 			 
@@ -105,6 +105,10 @@ public class JtapiService {
 		
 		return RESULT.RTN_SUCCESS;
 	}
+	
+	
+	
+	
 	
 	public JTapiResultVO monitorStart(String extension) {
 		

@@ -11,7 +11,7 @@ import com.isi.vo.CallStateVO;
 public class CallStateMgr {
 	
 	private static CallStateMgr callStateMgr = new CallStateMgr();
-	final private Map deviceMap = Collections.synchronizedMap(new HashMap());
+	final private Map <String, Integer> deviceMap = Collections.synchronizedMap(new HashMap());
 	
 	private CallStateMgr() {}
 	
@@ -38,12 +38,7 @@ public class CallStateMgr {
 	}
 	
 	public synchronized Integer getDeviceState(String DN){
-		
-		return (Integer) deviceMap.get(DN);
-//		if(deviceMap.get(DN) == null) {
-//			return null;
-//		} else 
-//		return (Integer)deviceMap.get(DN) == null ? CALLSTATE.IDLE : (Integer)deviceMap.get(DN);
+		return deviceMap.get(DN);
 	}
 	
 	private String getCallStateString(int state){

@@ -1,6 +1,6 @@
 package com.isi.vo;
 
-public class DeviceResetVO {
+public class DeviceResetVO extends BaseVO {
 	
 	private String extension;
 	private String mac_address;
