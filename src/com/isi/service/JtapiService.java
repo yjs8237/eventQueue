@@ -108,7 +108,24 @@ public class JtapiService {
 	
 	
 	
-	
+	public JTapiResultVO pickup(String myExtension , String pickupExtension) {
+		
+		JTapiResultVO resultVO = null;
+		if(myExtension == null || myExtension.isEmpty()) {
+			return resultVO;
+		}
+		
+		if(pickupExtension == null || pickupExtension.isEmpty()) {
+			return resultVO;
+		}
+		
+		resultVO = m_jtapi[0].pickupCall(myExtension, pickupExtension);
+		if(resultVO.getCode() != RESULT.RTN_SUCCESS) {
+			return resultVO;
+		}
+		
+		return resultVO;
+	}
 	
 	public JTapiResultVO monitorStart(String extension) {
 		

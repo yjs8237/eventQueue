@@ -206,14 +206,15 @@ public class HttpServerHandler {
 			
 			PickupVO pickupVO = (PickupVO) baseVO;
 //			JtapiService.getInstance().monitorStop(resetVO.getExtension());
-//			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(resetVO.getExtension());
+			JTapiResultVO resultVO = JtapiService.getInstance().pickup(pickupVO.getMyExtension() , pickupVO.getPickupExtension());
 			
 			logwrite.httpLog(requestID, "procCallPickup", "DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
-			
+//			
 			jsonObj.put("code", resultVO.getCode());
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 		}
+		
 		
 		private String procCallStatus (String parameter , String requestID) {
 			Map <String, String> map = new HashMap<String, String>();
@@ -376,6 +377,8 @@ public class HttpServerHandler {
 			}
 			
 			EmployeeVO empVO = (EmployeeVO) baseVO;
+			
+//			System.out.println(empVO.toString());
 			
 			/*
 			 * 전화기 상태체크

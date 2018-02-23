@@ -103,6 +103,7 @@ public class XMLSvcMain {
 				
 				AliveProc alive = new AliveProc();
 				int result = alive.startAliveProc(); 
+				
 				if(result == RESULT.RTN_SUCCESS){
 					logwrite.duplexLog(duplexMgr.getActiveMode(), "XMLSvcMain main()",  "START STANDBY MODE !!");
 					duplexMgr.setStandByMode();

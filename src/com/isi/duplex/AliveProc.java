@@ -34,11 +34,15 @@ public class AliveProc {
 		
 		try{
 			
+			/*
 			if(pr.getValue(PROPERTIES.SIDE_INFO).equals("A")) {
 				ip = XmlInfoMgr.getInstance().getSideBIP();
 			} else {
 				ip = XmlInfoMgr.getInstance().getSideAIP();
 			}
+			*/
+			ip = XmlInfoMgr.getInstance().getRemoteIP();
+			
 			port = Integer.parseInt(XmlInfoMgr.getInstance().getRemotePort());
 			
 //			System.out.println("서버 접속 시도");

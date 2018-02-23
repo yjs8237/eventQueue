@@ -44,6 +44,7 @@ import com.isi.vo.JTapiResultVO;
 public class JTAPI2 implements IJTAPI, ProviderObserver {
 
 	private Map m_DevMap = Collections.synchronizedMap(new HashMap());
+	private Map m_TerminalMap = Collections.synchronizedMap(new HashMap());
 	private ILog m_Log = null;// Logging.getInstance(Logging.JTAPI);
 	private ILog m_PackLog = null;
 	private Condition m_conditionInSvc = new Condition();
@@ -280,7 +281,9 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			addr.addObserver(dev);
 
 			Terminal[] termarray = addr.getTerminals();
-
+			
+			m_TerminalMap.put(aDn, termarray);	// 내 당겨받기 그룹에 사용될 Terminal 객체 
+			
 			// DN과 관련된 모든 터미날에 모니터링을 시작한다.
 			for (int i = 0; i < termarray.length; i++) {
 				CiscoTerminal term = (CiscoTerminal) termarray[i];
@@ -414,6 +417,63 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				}
 			}
 		}
+	}
+ 
+	@Override
+	public JTapiResultVO pickupCall(String myExtension, String pickupExtension) {
+		// TODO Auto-generated method stub
+		/*
+		loginUser.sendCloseMessage(null);
+        String userID = request.getParameter("userID");
+        UCUser user = adminController.getUser(userID);
+        CiscoTerminal term = user.getTerminal();
+        try
+        {
+            CiscoTerminalConnection target = null;
+            TerminalConnection tc[] = term.getTerminalConnections();
+            for(int i = 0; i < tc.length; i++)
+                if(((CiscoTerminalConnection)tc[i]).getCallControlState() == 97)
+                    target = (CiscoTerminalConnection)tc[i];
+
+            if(target != null)
+            {
+                CiscoConnection cc = (CiscoConnection)target.getConnection();
+                cc.redirect(loginUser.getPhone());
+            }
+        }
+		*/
+		
+//		Terminal terminal = m_Provider.getTerminal(aDn);
+		JTapiResultVO resultVO = new JTapiResultVO();
+		Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(pickupExtension);
+		
+		try {
+			for (int i = 0; i < terminalArr.length; i++) {
+				Terminal terminal = terminalArr[i];
+				CiscoTerminalConnection target = null;
+	            TerminalConnection tc[] = terminal.getTerminalConnections();
+	            for(int j = 0; j < tc.length; j++) {
+	            	if(((CiscoTerminalConnection)tc[j]).getCallControlState() == 97) {
+	            		target = (CiscoTerminalConnection)tc[j];
+	            	}
+	            }
+	            if(target != null)
+	            {
+	                CiscoConnection cc = (CiscoConnection)target.getConnection();
+	                cc.redirect(myExtension);
+	            }
+			}
+		} catch (Exception e) {
+			e.printStackTrace(pw);
+			m_Log.server(LOGTYPE.ERR_LOG, "pickupCall", sw.toString());
+			resultVO.setCode(RESULT.RTN_EXCEPTION);
+			resultVO.setMessage(e.getLocalizedMessage());
+			return resultVO;
+		}
+		resultVO.setCode(RESULT.RTN_SUCCESS);
+		resultVO.setMessage("success");
+		return resultVO;
+	
 	}
 
 }

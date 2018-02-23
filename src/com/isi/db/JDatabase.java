@@ -289,10 +289,12 @@ public class JDatabase  {
         				xmlInfoMgr.setDuplexYN(rs.getString("config_value"));
         				
         			} else if(rs.getString("config_name").equals("side_a_ip")) {
+        				xmlInfoMgr.setSideAIP(rs.getString("config_value"));
         				if(!PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
         					xmlInfoMgr.setRemoteIP(rs.getString("config_value"));
         				}
         			} else if(rs.getString("config_name").equals("side_b_ip")) {
+        				xmlInfoMgr.setSideBIP(rs.getString("config_value"));
         				if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
         					xmlInfoMgr.setRemoteIP(rs.getString("config_value"));
         				}
@@ -300,7 +302,7 @@ public class JDatabase  {
         				
         				xmlInfoMgr.setRemotePort(rs.getString("config_value"));
         				
-        			} else if(rs.getString("config_name").equals("custinfo_popup") ) {
+        			} else if(rs.getString("config_name").equals("custinfo_pupup") ) {
         				
         				xmlInfoMgr.setCustinfoPopupYN(rs.getString("config_value"));
         				
@@ -360,7 +362,7 @@ public class JDatabase  {
         				
         				xmlInfoMgr.setEmpImgPath(rs.getString("config_value"));
         				
-        			} else if(rs.getString("config_name").equals("log_del_days") ) {
+        			} else if(rs.getString("config_name").equals("log_del_day") ) {
         				
         				xmlInfoMgr.setLogDelDays(rs.getInt("config_value"));
         				

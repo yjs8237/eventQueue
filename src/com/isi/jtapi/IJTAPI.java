@@ -13,6 +13,7 @@ public interface IJTAPI  {
 	public int MonitorAllStop();
 	public JTapiResultVO MonitorStart(String aDn);
 	public JTapiResultVO MonitorStop(String aDn);
+	public JTapiResultVO pickupCall(String myExtension , String pickupExtension);
 //	Provider getProvider();
 //	public Log getLog();
 	/*

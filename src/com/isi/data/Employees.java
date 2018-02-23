@@ -136,7 +136,6 @@ public class Employees {
 	*/
 	
 	
-	
 	public List getEmployeeListByExtension (String... strs){
 		return (ArrayList) empMapByExtension.get(strs[0]);
 	}
@@ -489,7 +488,7 @@ public class Employees {
 			
 			for (int i = 0; i < list.size(); i++) {
 				EmployeeVO empVO = (EmployeeVO) list.get(i);
-				imgHandler.createImageFile(empVO, "010-3222-8237", "119", "");
+//				imgHandler.createImageFile(empVO, "010-3222-8237", "119", "");
 			}
 		}
 		

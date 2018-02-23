@@ -63,16 +63,18 @@ public class CallEvtHandler {
 				if(employeeList != null && employeeList.size() > 0) {
 					for (int i = 0; i < employeeList.size(); i++) {
 						EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
-						
+						System.out.println("call event");
+						System.out.println(employeeVO.toString());
 						if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
-							
 							return RESULT.ERROR;
 						}
 						
-						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "########### 2 ##########");
+//						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "########### 2 ##########");
 						
 						xmlHandler.evtRing(makeAlertingXmlVO(event , employeeVO , callID) , callID);
 					}
+				} else {
+					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", event.getDevice() + " 사용자 정보 없음" );
 				}
 				
 				/*
