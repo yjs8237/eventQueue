@@ -93,20 +93,16 @@ public class JsonHandler {
 	
 	
 	
-	private void setJsonReturnCode(int returnCode) {
+	private void setJsonReturnCode(String returnCode) {
 		jsonData.put("code", returnCode);
 		jsonData.put("msg", setHttpResponseData(returnCode));
 	}
 	
-	private String setHttpResponseData(int retCode) {
+	private String setHttpResponseData(String retCode) {
 		// TODO Auto-generated method stub
 		String str = "";
 		
 		switch (retCode) {
-		
-		case RESULT.RTN_SUCCESS:
-			str = "success";
-			break;
 			
 		case RESULT.HTTP_SUCCESS:
 			str = "success";

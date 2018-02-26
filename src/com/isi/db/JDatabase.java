@@ -78,7 +78,7 @@ public class JDatabase  {
             
             disconnectDB();
             
-            m_Log.standLog(invokeName, "connectDB", "DB Connection Try URL["+aURL+"] ID["+aID+"] PW["+aPwd+"]");
+            //m_Log.standLog(invokeName, "connectDB", "DB Connection Try URL["+aURL+"] ID["+aID+"] PW["+aPwd+"]");
             
             m_conn = DriverManager.getConnection(aURL, aID, aPwd);
             m_driver = className;
@@ -88,7 +88,8 @@ public class JDatabase  {
             return RESULT.RTN_SUCCESS;
        } catch (Exception e) {   
     	   e.printStackTrace(pw);
-    	   m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, "", "connectDB", sw.toString());
+    	   System.out.println(sw.toString());
+    	   //m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, "", "connectDB", sw.toString());
            return RESULT.RTN_EXCEPTION;            
        }
     }
@@ -280,92 +281,100 @@ public class JDatabase  {
         		
         		while(rs.next()) {
         			
+        			String logStr = "";
+        			
         			if(rs.getString("config_name").equals("xml_mode") ) {
-        				
         				xmlInfoMgr.setXmlMode(rs.getString("config_value"));
-        				
+        				logStr += "xml_mode : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("duplex_yn") ) {
-        				
         				xmlInfoMgr.setDuplexYN(rs.getString("config_value"));
-        				
+        				logStr += "duplex_yn : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("side_a_ip")) {
         				xmlInfoMgr.setSideAIP(rs.getString("config_value"));
+        				logStr += "side_a_ip : " + rs.getString("config_value") + " ";
         				if(!PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
         					xmlInfoMgr.setRemoteIP(rs.getString("config_value"));
+        					logStr += "remote_ip : " + rs.getString("config_value") + " ";
         				}
         			} else if(rs.getString("config_name").equals("side_b_ip")) {
         				xmlInfoMgr.setSideBIP(rs.getString("config_value"));
+        				logStr += "side_b_ip : " + rs.getString("config_value") + " ";
         				if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
         					xmlInfoMgr.setRemoteIP(rs.getString("config_value"));
+        					logStr += "remote_ip : " + rs.getString("config_value") + " ";
         				}
         			} else if(rs.getString("config_name").equals("remote_port") ) {
         				
         				xmlInfoMgr.setRemotePort(rs.getString("config_value"));
-        				
+        				logStr += "remote_port : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("custinfo_pupup") ) {
         				
         				xmlInfoMgr.setCustinfoPopupYN(rs.getString("config_value"));
-        				
+        				logStr += "custinfo_pupup : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("cm_cnt") ) {
         				
         				xmlInfoMgr.setCmCnt(Integer.parseInt(rs.getString("config_value")));
-        				
+        				logStr += "cm_cnt : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("cm_ip01") ) {
         				
         				xmlInfoMgr.setCm1IpAddr(rs.getString("config_value"));
+        				logStr += "cm_ip01 : " + rs.getString("config_value") + " ";
         				xmlInfoMgr.setCm1User(rs.getString("config_desc1"));
+        				logStr += "cm_user1 : " + rs.getString("config_desc1") + " ";
         				xmlInfoMgr.setCm1Pwd(rs.getString("config_desc2"));
-        				
+        				logStr += "cm_pwd1 : " + rs.getString("config_desc2") + " ";
         			} else if(rs.getString("config_name").equals("cm_ip03") ) {
         				
         				xmlInfoMgr.setCm2IpAddr(rs.getString("config_value"));
+        				logStr += "cm_ip03 : " + rs.getString("config_value") + " ";
         				xmlInfoMgr.setCm2User(rs.getString("config_desc1"));
+        				logStr += "cm_user2 : " + rs.getString("config_desc1") + " ";
         				xmlInfoMgr.setCm2Pwd(rs.getString("config_desc2"));
-        				
+        				logStr += "cm_pwd2 : " + rs.getString("config_desc2") + " ";
         			} else if(rs.getString("config_name").equals("conn_timeout") ) {
         				
         				xmlInfoMgr.setConnectTimeout(rs.getInt("config_value"));
-        				
+        				logStr += "conn_timeout : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("read_timeout") ) {
         				
         				xmlInfoMgr.setReadTimeout(rs.getInt("config_value"));
-        				
+        				logStr += "read_timeout : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("xml_push_url") ) {
         				
         				xmlInfoMgr.setXmlPushUrl(rs.getString("config_value"));
-        				
+        				logStr += "xml_push_url : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("http_port") ) {
         				
         				xmlInfoMgr.setHttpPort(rs.getInt("config_value"));
-        				
+        				logStr += "http_port : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("console_debug") ) {
         				
         				xmlInfoMgr.setConsoleDebugYN(rs.getString("config_value"));
-        				
+        				logStr += "console_debug : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("log_level") ) {
         				
         				xmlInfoMgr.setLogLevel(rs.getInt("config_value"));
-        				
+        				logStr += "log_level : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("log_path") ) {
         				
         				xmlInfoMgr.setLogPath(rs.getString("config_value"));
-        				
+        				logStr += "log_path : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("base_img_path") ) {
         				
         				xmlInfoMgr.setBaseImgPath(rs.getString("config_value"));
-        				
+        				logStr += "base_img_path : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("face_img_path") ) {
         				
         				xmlInfoMgr.setFaceImgPath(rs.getString("config_value"));
-        				
+        				logStr += "face_img_path : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("emp_img_path") ) {
         				
         				xmlInfoMgr.setEmpImgPath(rs.getString("config_value"));
-        				
+        				logStr += "emp_img_path : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("log_del_day") ) {
         				
         				xmlInfoMgr.setLogDelDays(rs.getInt("config_value"));
-        				
+        				logStr += "log_del_day : " + rs.getString("config_value") + " ";
         			}
         			
             	}
@@ -408,7 +417,25 @@ public class JDatabase  {
         			imageVO.setDivision_y(rs.getInt("division_y"));
         			imageVO.setFloor_x(rs.getInt("floor_x"));
         			imageVO.setFloor_y(rs.getInt("floor_y"));
+        			
+        			m_Log.standLog("", "selectImageInfoByModel", 
+        					imageVO.getModel() + " " + 
+        					imageVO.getImageSize() + " " + 
+        					imageVO.getPicture_x1()+ " " +
+        					imageVO.getPicture_y1()+ " " +
+        					imageVO.getPicture_width()+ " " +
+        					imageVO.getPicture_height()+ " " +
+        					imageVO.getAninum_x()+ " " +
+        					imageVO.getAninum_y()+ " " +
+        					imageVO.getPosition_x()+ " " +
+        					imageVO.getPosition_y()+ " " +
+        					imageVO.getDivision_x()+ " " +
+        					imageVO.getDivision_y()+ " " +
+        					imageVO.getFloor_x()+ " " +
+        					imageVO.getFloor_y());
+        			
         			ImageMgr.getInstance().addImage(rs.getString("device_model"), imageVO);
+        			
             	}
         	} else {
         		System.out.println("NO DB DATA");

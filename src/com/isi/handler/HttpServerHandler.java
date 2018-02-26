@@ -1,6 +1,8 @@
 package com.isi.handler;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -28,6 +30,7 @@ import com.isi.db.JDatabase;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.*;
 import com.isi.service.JtapiService;
+import com.isi.thread.DeviceCheck;
 import com.isi.vo.BaseVO;
 import com.isi.vo.CustomerVO;
 import com.isi.vo.DeviceResetVO;
@@ -102,7 +105,7 @@ public class HttpServerHandler {
 				break;
 				
 			case "POST":
-				
+				responseDATA = procPost(exchange , requestID);
 				break;
 			default:
 				break;
@@ -118,7 +121,37 @@ public class HttpServerHandler {
 			responseBody.close();
 			
 		}
-	
+		
+		private String procPost (HttpExchange exchange, String requestID) {
+			int returnCode = RESULT.RTN_EXCEPTION;
+			
+			String resultJSONData = "";
+			
+			try {
+				 
+				Headers responseHeaders = exchange.getResponseHeaders();
+				responseHeaders.set("Content-Type", "text/html");
+				responseHeaders.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+				responseHeaders.set("Access-Control-Max-Age", "3600");
+				responseHeaders.set("Access-Control-Allow-Headers", "x-requested-with");
+				responseHeaders.set("Access-Control-Allow-Origin", "*");
+				
+				BufferedReader br = new BufferedReader(new InputStreamReader(exchange.getRequestBody(), "UTF-8"));
+				
+				String line = "";
+				while((line = br.readLine()) != null) {
+					System.out.println(line);
+				}
+				
+			} catch (Exception e) {
+				
+			}
+			
+			
+			return resultJSONData;
+		}
+		
+		
 		private String procGet(HttpExchange exchange, String requestID) {
 			
 			int returnCode = RESULT.RTN_EXCEPTION;
@@ -126,7 +159,7 @@ public class HttpServerHandler {
 			String resultJSONData = "";
 			
 			try {
-				
+				 
 				Headers responseHeaders = exchange.getResponseHeaders();
 				responseHeaders.set("Content-Type", "text/html");
 				responseHeaders.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
@@ -137,6 +170,7 @@ public class HttpServerHandler {
 				URI uri = exchange.getRequestURI();
 				String url = uri.toString().trim();
 				String parameter = exchange.getRequestURI().getQuery();
+				
 				
 //				System.out.println("url -> " + url);
 				
@@ -168,7 +202,7 @@ public class HttpServerHandler {
 					break;
 					
 				default:
-					returnCode = RESULT.HTTP_URL_ERROR;
+					//returnCode = RESULT.HTTP_URL_ERROR;
 					break;
 				}
 				
@@ -189,13 +223,14 @@ public class HttpServerHandler {
 			JSONObject jsonObj = new JSONObject();
 			
 			if(map == null || map.isEmpty()) {
-				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
 				jsonObj.put("msg", "bad parameter data");
 				jsonObj.put("param", "all");
 				return jsonObj.toString();
 			}
 			
 			BaseVO baseVO = getPickupInfo(map);
+			/*
 			String vaildParam = checkParameter(baseVO , APITYPE.API_PICKUP);
 			if(!vaildParam.equals("OK")) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
@@ -203,6 +238,7 @@ public class HttpServerHandler {
 				jsonObj.put("param", vaildParam);
 				return jsonObj.toString();
 			}
+			*/
 			
 			PickupVO pickupVO = (PickupVO) baseVO;
 //			JtapiService.getInstance().monitorStop(resetVO.getExtension());
@@ -210,11 +246,10 @@ public class HttpServerHandler {
 			
 			logwrite.httpLog(requestID, "procCallPickup", "DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
 //			
-			jsonObj.put("code", resultVO.getCode());
+			jsonObj.put("code", "200");
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 		}
-		
 		
 		private String procCallStatus (String parameter , String requestID) {
 			Map <String, String> map = new HashMap<String, String>();
@@ -223,13 +258,14 @@ public class HttpServerHandler {
 			JSONObject jsonObj = new JSONObject();
 			
 			if(map == null || map.isEmpty()) {
-				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
 				jsonObj.put("msg", "bad parameter data");
 				jsonObj.put("param", "all");
 				return jsonObj.toString();
 			}
 			
 			BaseVO baseVO = getDeviceStatusInfo(map);
+			/*
 			String vaildParam = checkParameter(baseVO , APITYPE.API_CALLSTATUS);
 			if(!vaildParam.equals("OK")) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
@@ -237,7 +273,7 @@ public class HttpServerHandler {
 				jsonObj.put("param", vaildParam);
 				return jsonObj.toString();
 			}
-			
+			*/
 			String resultMsg = "success";
 			DeviceStatusVO devStatusVO = (DeviceStatusVO) baseVO;
 			
@@ -279,7 +315,7 @@ public class HttpServerHandler {
 			 */
 			// 
 			
-			jsonObj.put("code", 200);
+			jsonObj.put("code", "200");
 			jsonObj.put("msg", "success");
 			jsonObj.put("list", resultArr);
 			return jsonObj.toString();
@@ -292,13 +328,14 @@ public class HttpServerHandler {
 			JSONObject jsonObj = new JSONObject();
 			
 			if(map == null || map.isEmpty()) {
-				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
 				jsonObj.put("msg", "bad parameter data");
 				jsonObj.put("param", "all");
 				return jsonObj.toString();
 			}
 			
 			BaseVO baseVO = getDeviceResetInfo(map);
+			/*
 			String vaildParam = checkParameter(baseVO , APITYPE.API_DEVICERESET);
 			if(!vaildParam.equals("OK")) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
@@ -306,6 +343,7 @@ public class HttpServerHandler {
 				jsonObj.put("param", vaildParam);
 				return jsonObj.toString();
 			}
+			*/
 			
 			DeviceResetVO resetVO = (DeviceResetVO) baseVO;
 			JtapiService.getInstance().monitorStop(resetVO.getExtension());
@@ -313,7 +351,7 @@ public class HttpServerHandler {
 			
 			logwrite.httpLog(requestID, "procResetDevice", "DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
 			
-			jsonObj.put("code", resultVO.getCode());
+			jsonObj.put("code", "200");
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 		}
@@ -325,13 +363,14 @@ public class HttpServerHandler {
 			JSONObject jsonObj = new JSONObject();
 			
 			if(map == null || map.isEmpty()) {
-				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
 				jsonObj.put("msg", "bad parameter data");
 				jsonObj.put("param", "all");
 				return jsonObj.toString();
 			}
 			
 			BaseVO baseVO = getEmployeeInfo(map);
+			/*
 			String vaildParam = checkParameter(baseVO , APITYPE.API_LOGOUT);
 			if(!vaildParam.equals("OK")) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
@@ -339,6 +378,7 @@ public class HttpServerHandler {
 				jsonObj.put("param", vaildParam);
 				return jsonObj.toString();
 			}
+			*/
 			
 			EmployeeVO empVO = (EmployeeVO) baseVO;
 			JTapiResultVO resultVO = JtapiService.getInstance().monitorStop(empVO.getExtension());
@@ -348,7 +388,7 @@ public class HttpServerHandler {
 			logwrite.httpLog(requestID, "procLogout", "EMPLOYEE LOGOUT RESULT CODE [" + loginResult + "]");
 			
 			
-			jsonObj.put("code", resultVO.getCode());
+			jsonObj.put("code", "200");
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 			
@@ -362,12 +402,13 @@ public class HttpServerHandler {
 			JSONObject jsonObj = new JSONObject();
 			
 			if(map == null || map.isEmpty()) {
-				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
 				jsonObj.put("msg", "bad parameter data");
 				jsonObj.put("param", "all");
 				return jsonObj.toString();
 			}
 			BaseVO baseVO = getEmployeeInfo(map);
+			/*
 			String vaildParam = checkParameter(baseVO , APITYPE.API_LOGIN);
 			if(!vaildParam.equals("OK")) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
@@ -375,17 +416,27 @@ public class HttpServerHandler {
 				jsonObj.put("param", vaildParam);
 				return jsonObj.toString();
 			}
-			
+			*/
 			EmployeeVO empVO = (EmployeeVO) baseVO;
 			
 //			System.out.println(empVO.toString());
 			
 			/*
-			 * 전화기 상태체크
+			 * 전화기 상태체크 (로그인 시도한 전화기와 내선번호가 정확하게 Regi 되었나 확인)
 			 */
-			if(!DeviceStatusHandler.getInstance().isRegisteredDevice(empVO.getMac_address())) {
-				logwrite.httpLog(requestID, "procLogin", empVO.getMac_address() + " is not Registered!!");
+			if(!DeviceStatusHandler.getInstance().isRegisteredDevice(empVO.getExtension(), empVO.getMac_address())) {
+//				logwrite.httpLog(requestID, "procLogin", empVO.getMac_address() + " is not Registered!!");
+				logwrite.httpLog(requestID, "procLogin", empVO.getExtension() + " , " +  empVO.getMac_address() + " is not Registered!!");
+				
+				// 전화기 내선번호가 아직 등록되지 않은 상태이면, 백그라운드 스레드로 전화기 상태 체크 시작
+				DeviceCheck deviceCheck = new DeviceCheck(logwrite , requestID, empVO);
+				deviceCheck.start();
+				
+				jsonObj.put("code", "200");
+				jsonObj.put("msg", "success");
+				return jsonObj.toString();
 			}
+			
 			//////////////////////////////////////////////////////////////////////////////////////////
 			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(empVO.getExtension());
 			int loginResult = Employees.getInstance().loginEmployee(empVO , requestID);
@@ -394,7 +445,7 @@ public class HttpServerHandler {
 			logwrite.httpLog(requestID, "procLogin", "EMPLOYEE LOGIN RESULT CODE [" + loginResult + "]");
 			
 			
-			jsonObj.put("code", resultVO.getCode());
+			jsonObj.put("code", String.valueOf(resultVO.getCode()));
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 		}

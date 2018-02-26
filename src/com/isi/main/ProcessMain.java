@@ -1,5 +1,7 @@
 package com.isi.main;
 
+import java.util.List;
+
 import com.isi.constans.RESULT;
 import com.isi.data.Employees;
 import com.isi.duplex.DuplexMgr;
@@ -83,6 +85,14 @@ public class ProcessMain {
 
 		XMLService xmlservice = new XMLService(queue);
 		xmlservice.startService();
+		
+		
+		// Daemon 구동시 로그인상태였던 내선은 바로 모니터링 시작한다.
+		List <String>loginList = Employees.getInstance().getInitLoginExtlist();
+		for (int i = 0; i < loginList.size(); i++) {
+			String extenion = loginList.get(i);
+			service.monitorStart(extenion);
+		}
 		 
 	}
 	

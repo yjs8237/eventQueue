@@ -35,6 +35,9 @@ public class Employees {
 	private Map <String, Object> empMapByCellNum = new HashMap<String, Object>();
 	private Map <String, Object> empMapByMac = new HashMap<String, Object>();
 	private Map <String, Object> customerMap = new HashMap<String, Object>();
+	
+	private List<String> initLoginExtlist;
+	
 	private JDatabase m_Conn = null;
 	private ILog m_Log = new GLogWriter();
 	private LogMgr logwrite;
@@ -50,6 +53,7 @@ public class Employees {
 		sw = new StringWriter();
 		pw = new PrintWriter(sw);
 		logwrite = LogMgr.getInstance();
+		initLoginExtlist = new ArrayList<>();
 	}
 	
 	public synchronized static Employees getInstance() {
@@ -58,6 +62,10 @@ public class Employees {
 			employees = new Employees();
 		}
 		return employees;
+	}
+	
+	public List getInitLoginExtlist () {
+		return this.initLoginExtlist;
 	}
 	
 	
@@ -222,9 +230,9 @@ public class Employees {
 		}
 		
 		if(employee != null){
-			logwrite.standLog(callID, "getEmployeeByExtension", "GET Employee Information RESULT [" + employee.toString() + "]");
+			logwrite.standLog(callID, "getEmployeeByMacAddress", "GET Employee Information RESULT [" + employee.toString() + "]");
 		} else {
-			logwrite.standLog(callID, "getEmployeeByExtension", "GET Employee NULL !!! [" + mac_address + "]");
+			logwrite.standLog(callID, "getEmployeeByMacAddress", "GET Employee NULL !!! [" + mac_address + "]");
 		}
 		
 		return employee;
@@ -385,6 +393,7 @@ public class Employees {
                 			if(rs.getString("loginExtension") != null) {
                 				extension = rs.getString("loginExtension");
                 				employeeInfo.setExtension(extension);
+                				initLoginExtlist.add(extension);
                 			} else {
                 				employeeInfo.setExtension(extension);
                 			}

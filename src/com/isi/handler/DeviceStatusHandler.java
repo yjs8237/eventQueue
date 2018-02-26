@@ -26,7 +26,7 @@ public class DeviceStatusHandler {
 		pw = new PrintWriter(sw);
 		logwrite = LogMgr.getInstance();
 	}
-
+	
 	public synchronized static DeviceStatusHandler getInstance() {
 
 		if (object == null) {
@@ -35,7 +35,7 @@ public class DeviceStatusHandler {
 		return object;
 	}
 		
-	public boolean isRegisteredDevice(String mac_address) {
+	public boolean isRegisteredDevice(String extension, String mac_address) {
 		SxmlHandler soap = new SxmlHandler();
 		
 		xmlInfo = XmlInfoMgr.getInstance();
@@ -50,6 +50,7 @@ public class DeviceStatusHandler {
 			jsonArr = (JSONArray) obj;
 		}
 		
+//		System.out.println(jsonArr.toString(4));
 		
 		if(jsonArr == null) {
 			return false;
@@ -61,14 +62,23 @@ public class DeviceStatusHandler {
 		
 		JSONObject jsonObj = jsonArr.getJSONObject(0);
 		
+//		System.out.println(jsonObj.toString(4));
+		
 		JSONObject tempJson = (JSONObject) jsonObj.get("DirNumber");
 		if(tempJson == null) {
 			return false;
 		}
 		
-		String deviceStatus = tempJson.get("content").toString();
+		String [] arr = tempJson.get("content").toString().split("-");
+		String currentExtension = arr[0];
+		String deviceStatus = arr[1];
+		
 		
 //		System.out.println("deviceStatus : " + deviceStatus);
+		
+		if(!extension.equals(currentExtension)) {
+			return false;
+		}
 		
 		if(!deviceStatus.endsWith("Registered")) {
 			return false;
@@ -77,7 +87,6 @@ public class DeviceStatusHandler {
 		return true;
 		
 	}
-	
 	
 	
 }

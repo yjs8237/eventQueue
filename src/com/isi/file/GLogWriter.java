@@ -42,7 +42,12 @@ public class GLogWriter implements ILog{
     
 	public synchronized void write(String level, String type, String svcType, String callkey, String methodName, String msg) {
 		
+		if(logDirectory == null || logDirectory.isEmpty() || logDirectory.equals("null")) {
+			return;
+		}
+		
 		String isConsoleDebug = XmlInfoMgr.getInstance().getConsoleDebugYN();
+		
 		
 		try {
 			util = new Utils();

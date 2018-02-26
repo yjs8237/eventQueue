@@ -56,10 +56,6 @@ public class XMLSvcMain {
 		database.disconnectDB();
 		
 		
-		HttpServerHandler httpHandler = new HttpServerHandler();
-		httpHandler.startService();
-		
-		
 		/*
 		CMInfo cmInfo = CMInfo.getInstance();
 		cmInfo.setCmUser(pr.getValue(PROPERTIES.CM1_USER));
@@ -111,7 +107,7 @@ public class XMLSvcMain {
 					if(result == RESULT.TCP_CONN_FAIL){
 						logwrite.duplexLog(duplexMgr.getActiveMode(), "XMLSvcMain main()",  "REMOTE Server Connection Fail..");
 						logwrite.duplexLog(duplexMgr.getActiveMode(), "XMLSvcMain main()",  "START ACTIVE MODE !!");
-						System.out.println("TCP Connection FAIL!!");
+						System.out.println("REMOTE XML SERVER TCP CONNECTION FAIL!!");
 						duplexMgr.setActiveMode();
 					}
 				}
@@ -139,6 +135,10 @@ public class XMLSvcMain {
 					logwrite.duplexLog(duplexMgr.getActiveMode(), "XMLSvcMain main()",  "Start Active Mode !! ");
 //					main.testMode();	// 부하테스트 모드
 					main.singleMode(); // ISPS 없는 싱글모드
+					
+					HttpServerHandler httpHandler = new HttpServerHandler();
+					httpHandler.startService();
+					
 					break;
 				} else {
 //					System.out.println("Standby Mode 시작!!!!");

@@ -48,11 +48,9 @@ public class PushHandler {
 	
 	 public int push(String xml, XmlVO xmlInfo, boolean getResult) {
 		 
-		 
 		 String phoneIP = xmlInfo.getTargetIP();
 		 HttpURLConnection conn = null;
 		 BufferedWriter bw = null;
-		 
 		 
 		 int returnCode = RESULT.RTN_EXCEPTION;
 		 

@@ -63,8 +63,6 @@ public class CallEvtHandler {
 				if(employeeList != null && employeeList.size() > 0) {
 					for (int i = 0; i < employeeList.size(); i++) {
 						EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
-						System.out.println("call event");
-						System.out.println(employeeVO.toString());
 						if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
 							return RESULT.ERROR;
 						}
@@ -125,7 +123,7 @@ public class CallEvtHandler {
 			return RESULT.RTN_EXCEPTION;
 		}
 		
-//		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvt", "## >>>>>>>>>>>>>>>>>>>>>>>> " + evt.toString());
+		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvt", "## >>>>>>>>>>>>>>>>>>>>>>>> " + evt.toString());
 		
 		TermConnEvt event = (TermConnEvt) evt;
 		
@@ -143,11 +141,11 @@ public class CallEvtHandler {
 		Employees employeeMgr = Employees.getInstance();
 		EmployeeVO employee = employeeMgr.getEmployeeByExtension(callingDN , callID);
 		if (employee == null){
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvt", "Employee null");
 			return RESULT.RTN_UNDEFINED_ERR;
 		}
 		
 		switch (ctlCause) {
-		
 
 		case CALLSTATE.CONFERENCE:					// 전화회의 콜 
 			
@@ -261,7 +259,7 @@ public class CallEvtHandler {
 		int disconType		=	-1;
 		boolean isDisconnect	= false;
 		
-//		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, event.get_GCallID(), "callDisconnectEvt", "+++++++++++++++++++++++++++ " + event.toString());
+		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, event.get_GCallID(), "callDisconnectEvt", "+++++++++++++++++++++++++++ " + event.toString());
 		
 		Employees employees = Employees.getInstance();
 		

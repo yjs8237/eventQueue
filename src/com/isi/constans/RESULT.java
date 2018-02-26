@@ -8,8 +8,8 @@ public interface RESULT {
 	public static final int RTN_SUCCESS 	= 		0;		// 성공 결과 코드
 	public static final int ERROR 	= 		-1;		// 실패 결과 코드
 	
-	public static final int HTTP_URL_ERROR	=		404;	// 잘못된 URL 요청
-	public static final int HTTP_PARAM_ERROR	=		405;	// 잘못된 URL 요청
+	public static final String HTTP_URL_ERROR	=		"404";	// 잘못된 URL 요청
+	public static final String HTTP_PARAM_ERROR	=		"405";	// 잘못된 URL 요청
 	
 	
 	
@@ -106,7 +106,7 @@ public interface RESULT {
     final static int RTN_UNDEFINED_ERR              = RTN_EXCEPTION - 2;// 정의되지 않은 에러가 발생했습니다.
     final static int RTN_TIMEOUT                    = RTN_EXCEPTION - 3;// 제한된 시간이 초과되었습니다.
     
-    final static int HTTP_SUCCESS					= 200;
+    final static String HTTP_SUCCESS					= "200";
     
    
     
