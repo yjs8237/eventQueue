@@ -58,7 +58,7 @@ public class CallEvtHandler {
 				// 내선 콜 상태 정보 SET
 //				CallStateMgr.getInstance().addDeviceState(event.getCallingDn() , CALLSTATE.ALERTING_ING);
 				CallStateMgr.getInstance().addDeviceState(event.getCalledDn() , CALLSTATE.ALERTING_ING);
-				
+				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", ">>>>>>>>>>>>>>>>>>>>>>>> " + event.getCalledDn() + " , Status : " + CALLSTATE.ALERTING_ING);
 				List employeeList = Employees.getInstance().getEmployeeListByExtension(event.getDevice(), callID);
 				if(employeeList != null && employeeList.size() > 0) {
 					for (int i = 0; i < employeeList.size(); i++) {
@@ -259,7 +259,7 @@ public class CallEvtHandler {
 		int disconType		=	-1;
 		boolean isDisconnect	= false;
 		
-		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, event.get_GCallID(), "callDisconnectEvt", "+++++++++++++++++++++++++++ " + event.toString());
+//		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, event.get_GCallID(), "callDisconnectEvt", "+++++++++++++++++++++++++++ " + event.toString());
 		
 		Employees employees = Employees.getInstance();
 		

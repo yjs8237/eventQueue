@@ -114,7 +114,6 @@ public class ServerSockThread extends Thread{
 				String recv_msg = buffer_reader.readLine();
 				logwrite.duplexLog(duplexMgr.getActiveMode(),"ServerSockThread run()", "RECV[" + recv_msg + "]");
 				
-				
 				String time = DuplexMgr.getInstance().getCurrentTime();
 				send(makeJsonData(aliveCheckResponse, time));
 				

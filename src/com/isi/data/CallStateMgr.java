@@ -37,6 +37,10 @@ public class CallStateMgr {
 		*/
 	}
 	
+	public boolean hasDeviceState (String DN) {
+		return deviceMap.containsKey(DN);
+	}
+	
 	public synchronized Integer getDeviceState(String DN){
 		return deviceMap.get(DN);
 	}

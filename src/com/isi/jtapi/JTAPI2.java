@@ -447,6 +447,12 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		JTapiResultVO resultVO = new JTapiResultVO();
 		Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(pickupExtension);
 		
+		if(terminalArr == null || terminalArr.length == 0) {
+			resultVO.setCode(RESULT.RTN_EXCEPTION);
+			resultVO.setMessage("NOT LOGIN " + pickupExtension);
+			return resultVO;
+		}
+		
 		try {
 			for (int i = 0; i < terminalArr.length; i++) {
 				Terminal terminal = terminalArr[i];

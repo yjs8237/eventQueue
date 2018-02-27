@@ -131,13 +131,15 @@ public class XMLSvcMain {
 				if (duplexMgr.getActiveMode()) {
 					
 					System.out.println("Active Mode 시작!!!!");
-					
+					logwrite.standLog("", "main", "Start Active Mode !! ");
 					logwrite.duplexLog(duplexMgr.getActiveMode(), "XMLSvcMain main()",  "Start Active Mode !! ");
 //					main.testMode();	// 부하테스트 모드
 					main.singleMode(); // ISPS 없는 싱글모드
 					
 					HttpServerHandler httpHandler = new HttpServerHandler();
 					httpHandler.startService();
+					
+					logwrite.standLog("", "main", "Start HTTP Handler success !! ");
 					
 					break;
 				} else {
@@ -158,8 +160,7 @@ public class XMLSvcMain {
 		
 		try{
 			
-		deleteFiles(logPath, days);
-//		deleteFiles(middleLogPath, days);	
+			deleteFiles(logPath, days);
 			
 		}catch(Exception e){
 			

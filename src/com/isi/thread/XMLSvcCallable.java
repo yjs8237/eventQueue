@@ -27,13 +27,12 @@ import com.isi.vo.DeviceVO;
 *
 * @author greatyun
 */
-public class XMLSvcCallable implements Callable<Integer>{
+public class XMLSvcCallable implements Callable<Integer> {
 	
 	private IQueue 			queue;
 	private CallEvtHandler 	evtHandler;
 	private boolean 		stopThread		= false;
 	private LogMgr			logwrite;
-//	private JDatabase		dataBase;
 	private CallStateMgr	callMgr;
 	private String			threadID;
 	
@@ -122,7 +121,6 @@ public class XMLSvcCallable implements Callable<Integer>{
 			 */
 			
 			if(calledDN.startsWith("9")){calledDN = calledDN.substring(1);}	
-//			System.out.println("######## evtConnEvt Alerting ######### callID["+callID+"]callingDN["+callingDN+"]calledDN["+calledDN+"]");
 			CallStateMgr.getInstance().addDeviceState(calledDN , CALLSTATE.ALERTING_ING);
 //			dataBase.insertCallingHistory(callID,callingDN, calledDN);
 			break;
@@ -158,7 +156,6 @@ public class XMLSvcCallable implements Callable<Integer>{
 				Integer calledDNStatus = callMgr.getDeviceState(calledDN);
 				if(calledDNStatus != null) {
 					if(calledDNStatus == CALLSTATE.ALERTING_ING) {
-//						System.out.println("######## evtConnEvt Established NORMAL ######### callID["+callID+"]callingDN["+callingDN+"]calledDN["+calledDN+"]");
 						callMgr.addDeviceState(callingDN, CALLSTATE.ESTABLISHED_ING);
 						callMgr.addDeviceState(calledDN, CALLSTATE.ESTABLISHED_ING);
 //						dataBase.insertCalledHistory(callID,callingDN, calledDN);
@@ -167,7 +164,6 @@ public class XMLSvcCallable implements Callable<Integer>{
 			} else if(isNetworkCall && evt.getCtlCause() == CALLSTATE.TRANSFER){
 				if(!DN.equals(deviceDN)){
 					callMgr = CallStateMgr.getInstance(); 
-//					System.out.println("######## evtConnEvt Established TRANSFER ######### callID["+callID+"]callingDN["+callingDN+"]calledDN["+calledDN+"]");
 					callMgr.addDeviceState(DN, CALLSTATE.ESTABLISHED_ING);
 					callMgr.addDeviceState(deviceDN, CALLSTATE.ESTABLISHED_ING);
 //					dataBase.insertCalledHistory(callID,DN, deviceDN);
@@ -185,8 +181,6 @@ public class XMLSvcCallable implements Callable<Integer>{
 
 	private void evtTermConnEvt(TermConnEvt evt, String callID) throws Exception {
 		// TODO Auto-generated method stub
-		
-//		logwrite.testLog("#### evtTermConnEvt #### " + evt.toString());
 		
 		switch(evt.getEventID()) {
 			// Ring 이 울릴경우
@@ -216,8 +210,6 @@ public class XMLSvcCallable implements Callable<Integer>{
 	}
 	
 	private void evtTermEvt(TermEvt evt , String callID)  throws Exception{
-	
-		
 		
 	}
 	

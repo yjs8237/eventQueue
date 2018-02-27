@@ -282,10 +282,13 @@ public class HttpServerHandler {
 			for (int i = 0; i < extensionList.size(); i++) {
 				String extension = extensionList.get(i);
 				int deviceStatus = 0;
-				if(CallStateMgr.getInstance().getDeviceState(extension) == null) {
+				
+				if(!CallStateMgr.getInstance().hasDeviceState(extension)) {
+					logwrite.httpLog(requestID, "procCallStatus", extension + " NULL");
 					deviceStatus = CALLSTATE.IDLE;
 				} else {
 					deviceStatus = CallStateMgr.getInstance().getDeviceState(extension);
+					logwrite.httpLog(requestID, "procCallStatus", extension + " " + deviceStatus);
 				}
 				String message = "";
 				if(deviceStatus == CALLSTATE.ALERTING_ING) {
@@ -537,7 +540,7 @@ public class HttpServerHandler {
 						pickupVO.setMyExtension(map.get("myExtension").toString());
 						break;
 					case "pickupExtension" :
-						pickupVO.setPickupExtension(map.get("setMyExtension").toString());
+						pickupVO.setPickupExtension(map.get("pickupExtension").toString());
 						break;
 					default : 
 						break;
