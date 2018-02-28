@@ -29,6 +29,7 @@ import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
 import com.isi.file.LogMgr;
 import com.isi.file.PropertyRead;
+import com.isi.utils.Common;
 import com.isi.vo.CustomerVO;
 import com.isi.vo.EmployeeVO;
 import com.isi.vo.IPerson;
@@ -173,7 +174,16 @@ public class ImageHandler {
 		
         try {
         	
-			File logdir = new File(strDest);
+        	File logdir = new File(strDest);
+        	
+        	ImageMgr imageMgr = ImageMgr.getInstance();
+        	EmployeeVO empVO = imageMgr.getImgEmpInfo(callingNum);
+        	if(empVO == null || !Common.compareEmployee(employee , empVO)) {
+        		// 직원정보가 변경되었을 경우 이미지파일 지우고 다시만들기
+        		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", callingNum + " UPDATE IMAGE FILE !! ");
+        		logdir.delete();
+        		imageMgr.addImgEmpInfo(callingNum, employee);
+        	}
 
 			if (logdir.exists()) {
 				// 이미 팝업 이미지가 있다면 이미지를 생성하지 않는다. (직원 콜 의 경우만 해당)
@@ -183,7 +193,6 @@ public class ImageHandler {
             
             String basic_img_path = XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png";
             BufferedImage basic_img = ImageIO.read(new File(basic_img_path)); // 배경이미지
-            
             
             int width = Integer.parseInt(imageVO.getImageSize().substring(0, 3));
             int height = Integer.parseInt(imageVO.getImageSize().substring(3));
@@ -195,7 +204,6 @@ public class ImageHandler {
 			
 			graphics.setBackground(Color.WHITE);
 			graphics.drawImage(basic_img, 0, 0, null);
-			
 			
 			Font font = new Font("맑은고딕", Font.BOLD, fontsize);
 			graphics.setFont(font);
@@ -422,6 +430,10 @@ public class ImageHandler {
     }
     */
 	
+
+
+
+
 	private String get_X(String size){
 		String retStr = "";
 		

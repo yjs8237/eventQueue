@@ -5,39 +5,41 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.sql.ResultSet;
-import java.util.*;
-
-import javax.management.relation.RelationTypeNotFoundException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.isi.axl.soap.SxmlHandler;
 import com.isi.constans.APITYPE;
 import com.isi.constans.CALLSTATE;
 import com.isi.constans.LOGLEVEL;
 import com.isi.constans.LOGTYPE;
-import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
 import com.isi.data.CallStateMgr;
 import com.isi.data.Employees;
+import com.isi.data.ImageMgr;
+import com.isi.data.XMLData;
 import com.isi.data.XmlInfoMgr;
-import com.isi.db.JDatabase;
 import com.isi.exception.ExceptionUtil;
-import com.isi.file.*;
+import com.isi.file.GLogWriter;
+import com.isi.file.ILog;
+import com.isi.file.PropertyRead;
 import com.isi.service.JtapiService;
 import com.isi.thread.DeviceCheck;
+import com.isi.utils.Common;
 import com.isi.vo.BaseVO;
-import com.isi.vo.CustomerVO;
 import com.isi.vo.DeviceResetVO;
 import com.isi.vo.DeviceStatusVO;
 import com.isi.vo.EmployeeVO;
 import com.isi.vo.JTapiResultVO;
 import com.isi.vo.PickupVO;
+import com.isi.vo.XmlVO;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -88,7 +90,6 @@ public class HttpServerHandler {
 	
 	private class HttpProcHandler implements HttpHandler{
 		
-		String requestURL = "";
 		String requestMethod = "";
 		
 		@Override
@@ -98,7 +99,7 @@ public class HttpServerHandler {
 			String requestID = String.valueOf(System.currentTimeMillis()) + "-" + String.valueOf(Thread.currentThread().getName()) + String.valueOf(Thread.currentThread().getId());
 			String responseDATA = "";
 			requestMethod = exchange.getRequestMethod().toUpperCase().trim();
-			int retCode = RESULT.RTN_EXCEPTION;
+			
 			switch (requestMethod) {
 			case "GET":
 				responseDATA = procGet(exchange , requestID);
@@ -111,7 +112,6 @@ public class HttpServerHandler {
 				break;
 			}
 			
-			
 			exchange.sendResponseHeaders(200, responseDATA.length());
 			
 			OutputStream responseBody = exchange.getResponseBody();
@@ -123,12 +123,11 @@ public class HttpServerHandler {
 		}
 		
 		private String procPost (HttpExchange exchange, String requestID) {
-			int returnCode = RESULT.RTN_EXCEPTION;
 			
 			String resultJSONData = "";
 			
 			try {
-				 
+				
 				Headers responseHeaders = exchange.getResponseHeaders();
 				responseHeaders.set("Content-Type", "text/html");
 				responseHeaders.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
@@ -147,76 +146,77 @@ public class HttpServerHandler {
 				
 			}
 			
-			
 			return resultJSONData;
 		}
 		
 		
 		private String procGet(HttpExchange exchange, String requestID) {
-			
+
 			int returnCode = RESULT.RTN_EXCEPTION;
-			
+
 			String resultJSONData = "";
-			
+
 			try {
-				 
+
 				Headers responseHeaders = exchange.getResponseHeaders();
 				responseHeaders.set("Content-Type", "text/html");
 				responseHeaders.set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
 				responseHeaders.set("Access-Control-Max-Age", "3600");
 				responseHeaders.set("Access-Control-Allow-Headers", "x-requested-with");
 				responseHeaders.set("Access-Control-Allow-Origin", "*");
-		        
+
 				URI uri = exchange.getRequestURI();
 				String url = uri.toString().trim();
 				String parameter = exchange.getRequestURI().getQuery();
-				
-				
-//				System.out.println("url -> " + url);
-				
+
+				// System.out.println("url -> " + url);
+
 				url = getURL(url);
-				
-				logwrite.httpLog(requestID,"procGet()", "REQUEST URL[" + url + "] PARAM["+parameter+"]");
-				
+
+				logwrite.httpLog(requestID, "procGet()", "REQUEST URL[" + url + "] PARAM[" + parameter + "]");
+
 				switch (url) {
-				
-					
+
 				case "/login":
-					resultJSONData = procLogin(parameter , requestID);
+					resultJSONData = procLogin(parameter, requestID);
 					break;
-					
+
 				case "/logout":
-					resultJSONData = procLogout(parameter , requestID);
+					resultJSONData = procLogout(parameter, requestID);
 					break;
-					
+
 				case "/resetdevice":
-					resultJSONData = procResetDevice(parameter , requestID);
+					resultJSONData = procResetDevice(parameter, requestID);
 					break;
-					
+
 				case "/callstatus":
-					resultJSONData = procCallStatus(parameter , requestID);
+					resultJSONData = procCallStatus(parameter, requestID);
 					break;
-					
+
 				case "/pickup":
-					resultJSONData = procCallPickup(parameter , requestID);
+					resultJSONData = procCallPickup(parameter, requestID);
 					break;
 					
+				case "/employee":
+					resultJSONData = procEmployee(parameter, requestID);
+					break;
+
 				default:
-					//returnCode = RESULT.HTTP_URL_ERROR;
+					// returnCode = RESULT.HTTP_URL_ERROR;
 					break;
 				}
-				
-			} catch(Exception  e){
+
+			} catch (Exception e) {
 				e.printStackTrace(ExceptionUtil.getPrintWriter());
-				logwrite.httpLog(requestID ,"procGet()", ExceptionUtil.getStringWriter().toString());
+				logwrite.httpLog(requestID, "procGet()", ExceptionUtil.getStringWriter().toString());
 				returnCode = RESULT.RTN_EXCEPTION;
 			}
-			
+
 			return resultJSONData;
-			
+
 		}
 		
-		private String procCallPickup (String parameter , String requestID) {
+		private String procEmployee (String parameter , String requestID) {
 			Map <String, String> map = new HashMap<String, String>();
 			map = queryToMap(parameter);
 			
@@ -229,9 +229,20 @@ public class HttpServerHandler {
 				return jsonObj.toString();
 			}
 			
-			BaseVO baseVO = getPickupInfo(map);
+			String extension = map.get("extension");
+			
+			List list = Employees.getInstance().getEmployeeListByExtension(extension, "");
+			String retStr = "";
+			for (int i = 0; i < list.size(); i++) {
+				retStr += list.get(i).toString(); 
+				retStr += "\n";
+			}
+			
+			if(retStr.isEmpty()) {
+				retStr = "NO DATA";
+			}
 			/*
-			String vaildParam = checkParameter(baseVO , APITYPE.API_PICKUP);
+			String vaildParam = checkParameter(baseVO , APITYPE.API_LOGIN);
 			if(!vaildParam.equals("OK")) {
 				jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
 				jsonObj.put("msg", "bad parameter data");
@@ -240,12 +251,53 @@ public class HttpServerHandler {
 			}
 			*/
 			
-			PickupVO pickupVO = (PickupVO) baseVO;
-//			JtapiService.getInstance().monitorStop(resetVO.getExtension());
-			JTapiResultVO resultVO = JtapiService.getInstance().pickup(pickupVO.getMyExtension() , pickupVO.getPickupExtension());
 			
-			logwrite.httpLog(requestID, "procCallPickup", "DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
-//			
+			return retStr;
+		}
+		
+		private String procCallPickup(String parameter, String requestID) {
+			Map<String, String> map = new HashMap<String, String>();
+			map = queryToMap(parameter);
+
+			JSONObject jsonObj = new JSONObject();
+
+			if (map == null || map.isEmpty()) {
+				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", "all");
+				return jsonObj.toString();
+			}
+
+			BaseVO baseVO = getPickupInfo(map);
+			/*
+			 * String vaildParam = checkParameter(baseVO , APITYPE.API_PICKUP);
+			 * if(!vaildParam.equals("OK")) { jsonObj.put("code", RESULT.HTTP_PARAM_ERROR);
+			 * jsonObj.put("msg", "bad parameter data"); jsonObj.put("param", vaildParam);
+			 * return jsonObj.toString(); }
+			 */
+
+			PickupVO pickupVO = (PickupVO) baseVO;
+			// JtapiService.getInstance().monitorStop(resetVO.getExtension());
+			JTapiResultVO resultVO = JtapiService.getInstance().pickup(pickupVO.getMyExtension(),
+					pickupVO.getPickupExtension());
+			
+			EmployeeVO pickupEmp = Employees.getInstance().getEmployeeByExtension(pickupVO.getPickupExtension(), "");
+			
+			XmlVO xmlVO = new XmlVO();
+			xmlVO.setTargetIP(pickupEmp.getDevice_ipaddr());
+			xmlVO.setCmUser(pickupEmp.getCm_user());
+			xmlVO.setCmPassword(pickupEmp.getCm_pwd());
+			xmlVO.setTargetdn(pickupEmp.getExtension());
+			
+			XMLHandler 		xmlHandler = new XMLHandler();
+			xmlHandler.evtDisconnect(xmlVO , "");
+			// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+			xmlHandler.evtDisconnectV2(xmlVO , "");
+			
+			
+			logwrite.httpLog(requestID, "procCallPickup",
+					"DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
+			//
 			jsonObj.put("code", "200");
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
@@ -307,9 +359,6 @@ public class HttpServerHandler {
 				
 				logwrite.httpLog(requestID, "procCallStatus", "DEVICE STATUS RESULT EXTENSION ["+extension+"] CODE [" + deviceStatus + "] MESSAGE [" + message + "]");
 			}
-			
-			
-			
 			/*
 			 * deviceStatus
 			 * 	ALERTING_ING		=		900;		// Ring (발신 주체)
@@ -440,6 +489,7 @@ public class HttpServerHandler {
 				return jsonObj.toString();
 			}
 			
+			
 			//////////////////////////////////////////////////////////////////////////////////////////
 			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(empVO.getExtension());
 			int loginResult = Employees.getInstance().loginEmployee(empVO , requestID);
@@ -497,6 +547,7 @@ public class HttpServerHandler {
 				}
 
 			} catch (Exception e) {
+				
 			}
 
 			return result;
@@ -527,7 +578,6 @@ public class HttpServerHandler {
 			}
 			return deviceStatus;
 		}
-		
 		
 		private PickupVO getPickupInfo (Map<String, String> map) {
 			PickupVO pickupVO = new PickupVO();

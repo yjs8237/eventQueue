@@ -1,6 +1,7 @@
 package com.isi.thread;
 
 import com.isi.data.Employees;
+import com.isi.exception.ExceptionUtil;
 import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
 import com.isi.handler.DeviceStatusHandler;
@@ -13,6 +14,7 @@ public class DeviceCheck extends Thread{
 	private ILog logwrite;
 	private EmployeeVO empVO;
 	private String requestID;
+	
 	public DeviceCheck (ILog logwrite , String requestID , EmployeeVO emp) {
 		this.logwrite = logwrite;
 		this.requestID = requestID;
@@ -32,7 +34,7 @@ public class DeviceCheck extends Thread{
 			
 			while(true) {
 				
-				if(cnt > 30) {
+				if(cnt > 60) {
 					logwrite.httpLog(requestID, "run", "--> Check Device Count [" + cnt + "] FAIL!! STOP CHEKING ");
 					break;
 				}
@@ -62,7 +64,8 @@ public class DeviceCheck extends Thread{
 			logwrite.httpLog(requestID, "run", "--> Cheking device thread stop...");
 			
 		} catch (Exception e) {
-			
+			e.printStackTrace(ExceptionUtil.getPrintWriter());
+			logwrite.httpLog(requestID, "run", ExceptionUtil.getStringWriter().toString());
 		}
 		
 	}

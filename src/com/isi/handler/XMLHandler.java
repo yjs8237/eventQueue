@@ -43,14 +43,21 @@ public class XMLHandler {
 	private String 			custInfoPopupYN;
 	private String			threadID;
 	
+	public XMLHandler() {
+		employees = Employees.getInstance();	// 직원정보 관리 객체 - 싱글톤타입 
+		pr = PropertyRead.getInstance();
+		m_Log = LogMgr.getInstance();
+		xmlData = new XMLData();
+		this.threadID = threadID;
+		custInfoPopupYN = XmlInfoMgr.getInstance().getCustinfoPopupYN();
+	}
+	
 	public XMLHandler(JDatabase dataBase, String threadID) {
 		employees = Employees.getInstance();	// 직원정보 관리 객체 - 싱글톤타입 
 		pr = PropertyRead.getInstance();
 		m_Log = LogMgr.getInstance();
 		xmlData = new XMLData();
-//		this.dataBase = dataBase;
 		this.threadID = threadID;
-//		custInfoPopupYN = pr.getValue(PROPERTIES.CUSTINFO_POPUP);
 		custInfoPopupYN = XmlInfoMgr.getInstance().getCustinfoPopupYN();
 	}
 	

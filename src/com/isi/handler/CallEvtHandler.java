@@ -53,12 +53,12 @@ public class CallEvtHandler {
 		if(event.getDevice().equals(event.getCalledDn())) { // 전화를 받는 사람 측 이벤트만 push 한다
 			
 			if(event.getMetaCode() != CALLSTATE.META_CALL_STARTING){
+				
 				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", ">>>>>>>>>>>>>>>>>>>>>>>> " + event.toString());
 				
 				// 내선 콜 상태 정보 SET
 //				CallStateMgr.getInstance().addDeviceState(event.getCallingDn() , CALLSTATE.ALERTING_ING);
 				CallStateMgr.getInstance().addDeviceState(event.getCalledDn() , CALLSTATE.ALERTING_ING);
-				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", ">>>>>>>>>>>>>>>>>>>>>>>> " + event.getCalledDn() + " , Status : " + CALLSTATE.ALERTING_ING);
 				List employeeList = Employees.getInstance().getEmployeeListByExtension(event.getDevice(), callID);
 				if(employeeList != null && employeeList.size() > 0) {
 					for (int i = 0; i < employeeList.size(); i++) {
@@ -289,7 +289,6 @@ public class CallEvtHandler {
 								if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
 									return RESULT.ERROR;
 								}
-								
 								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
 								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
 								xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
@@ -348,7 +347,7 @@ public class CallEvtHandler {
 					
 					/* 전화기 현재 상태 업데이트 */
 					CallStateMgr.getInstance().addDeviceState(calledDn , CALLSTATE.IDLE);
-					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.IDLE);
+					CallStateMgr.getInstance().addDeviceState(callingDn , CALLSTATE.IDLE);
 					
 					
 					List employeeList = employees.getEmployeeListByExtension(calledDn, callID);
