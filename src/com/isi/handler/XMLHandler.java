@@ -20,6 +20,7 @@ import com.isi.file.ILog;
 import com.isi.file.LogMgr;
 import com.isi.file.LogWriter;
 import com.isi.file.PropertyRead;
+import com.isi.process.DBQueueMgr;
 import com.isi.vo.*;
 
 /**
@@ -35,11 +36,9 @@ public class XMLHandler {
     
 	private Employees 		employees;
 	private PropertyRead 	pr;
-//	private ILog 			m_Log;
 	private LogMgr 			m_Log;
 	private PushHandler 	pushHandler;
 	private XMLData 		xmlData;
-//	private JDatabase		dataBase;
 	private String 			custInfoPopupYN;
 	private String			threadID;
 	
@@ -48,7 +47,6 @@ public class XMLHandler {
 		pr = PropertyRead.getInstance();
 		m_Log = LogMgr.getInstance();
 		xmlData = new XMLData();
-		this.threadID = threadID;
 		custInfoPopupYN = XmlInfoMgr.getInstance().getCustinfoPopupYN();
 	}
 	
@@ -228,7 +226,7 @@ public class XMLHandler {
 		}
 		return customerVO;
 	}
-
+	
 	private CustomerVO getCustomerInfo(String callingDN) {
 		// TODO Auto-generated method stub
 		HostWebtIO hostIO = new HostWebtIO();
@@ -475,40 +473,46 @@ public class XMLHandler {
 	
 	public int evtDisconnect(XmlVO xmlInfo , String callID){	// 전화를 끊었을 경우
 		pushHandler = new PushHandler(callID);
-		int returnCode = pushHandler.push(xmlData.getMenuInit(), xmlInfo, false);
+		PushResultVO resultVO = new PushResultVO();
+		resultVO = pushHandler.push(xmlData.getMenuInit(), xmlInfo, false);
 		
-		return returnCode;
+		return resultVO.getReturnCode();
 	}
 	
 	public int evtDisconnectV2(XmlVO xmlInfo , String callID){	// 전화를 끊었을 경우
 		pushHandler = new PushHandler(callID);
-		int returnCode = pushHandler.push(xmlData.getInitMessages(), xmlInfo, false);
+		PushResultVO resultVO = new PushResultVO();
+		resultVO = pushHandler.push(xmlData.getInitMessages(), xmlInfo, false);
 		
-		return returnCode;
+		return resultVO.getReturnCode();
 	}
 	
-	private int pushImage(EmployeeVO employee, XmlVO xmlInfo , String callID) { 
+	private int pushImage(EmployeeVO employee, XmlVO xmlInfo , String callID)  { 
 		// TODO Auto-generated method stub
 		
-		int returnCode = -1;
+		PushResultVO resultVO = new PushResultVO();
 		ImageHandler imgHandler = new ImageHandler();
 		if(imgHandler.createImageFile(employee ,xmlInfo.getCallingDn(), xmlInfo.getTargetModel() , callID)) {
 			// 이미지 생성
 			pushHandler = new PushHandler(callID);
-			returnCode = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing" , employee , CALL_RING , xmlInfo.getTargetModel()), xmlInfo, false);
-			
+			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing" , employee , CALL_RING , xmlInfo.getTargetModel()), xmlInfo, false);
+			DBQueueMgr.getInstance().addQData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(), employee , resultVO.getResultMsg());
 		} else {
+			DBQueueMgr.getInstance().addQData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), "N", employee , "cannot make image file of calling employee info");
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushRing", "Cannot make Image !!");
+			return -1;
 		}
 		
-		return returnCode;
+		return resultVO.getReturnCode();
 	}
 	
 	
-	private int pushText(IPerson person, XmlVO xmlInfo , String callID ){
-//		pushHandler = new PushHandler(threadID);
+	private int pushText(EmployeeVO employee, XmlVO xmlInfo , String callID ){
 		pushHandler = new PushHandler(callID);
-		return pushHandler.push(xmlData.getCiscoIPPhoneText("Calling !!", person), xmlInfo, false);
+		PushResultVO resultVO = new PushResultVO();
+		resultVO = pushHandler.push(xmlData.getCiscoIPPhoneText("Calling !!", employee), xmlInfo, false);
+		DBQueueMgr.getInstance().addQData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(), employee , resultVO.getResultMsg());
+		return resultVO.getReturnCode();
 	}
 	
 }

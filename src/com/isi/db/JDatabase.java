@@ -45,6 +45,11 @@ public class JDatabase  {
     private PrintWriter				pw			= null;
     private String		invokeName;
     
+    public JDatabase () {
+    	sw = new StringWriter();
+    	pw = new PrintWriter(sw);
+    }
+    
     public JDatabase (String invokeName){
     	sw = new StringWriter();
     	pw = new PrintWriter(sw);

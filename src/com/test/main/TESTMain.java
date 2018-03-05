@@ -44,12 +44,8 @@ public class TESTMain {
 //		System.out.println(jsonP);
 		
 		
-		String temp = "00000001";
-		String [] arr = temp.split(",");
-		
-		for (int i = 0; i < arr.length; i++) {
-			System.out.println(arr[i]);
-		}
+		TESTSuper supervo = new TESTChild();
+		TESTChild childvo = (TESTChild) supervo;
 		
 	}
 

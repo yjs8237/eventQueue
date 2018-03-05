@@ -14,6 +14,7 @@ import com.isi.data.*;
 import com.isi.db.JDatabase;
 import com.isi.event.*;
 import com.isi.file.*;
+import com.isi.process.DBQueueMgr;
 import com.isi.utils.CodeToString;
 import com.isi.utils.Utils;
 import com.isi.vo.*;
@@ -27,20 +28,16 @@ public class CallEvtHandler {
 	private LogMgr 			m_Log;
 	private XMLHandler 		xmlHandler;
 	private XmlVO 			xmlVO;
-//	private JDatabase		dataBase;
-	private CallStateMgr	callMgr;
 	private String			threadID;
 	
 	public CallEvtHandler(JDatabase dataBase, String threadID){
-//		this.dataBase = dataBase;
 		this.threadID = threadID;
 		m_Log = LogMgr.getInstance();
 		xmlHandler = new XMLHandler(dataBase , threadID);
-		
 	}
 	
-	 
-	public int callRingEvt (Evt evt, String callID)  throws Exception{	// Ring 이 울릴 경우
+	
+	public int callRingEvt (Evt evt, String callID)  throws Exception {	// Ring 이 울릴 경우
 		
 		if(evt == null){
 			return RESULT.RTN_EXCEPTION;
@@ -64,6 +61,8 @@ public class CallEvtHandler {
 					for (int i = 0; i < employeeList.size(); i++) {
 						EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
 						if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
+//							System.out.println("call DBQueueMgr.getInstance().addQData");
+							DBQueueMgr.getInstance().addQData(event.getCallingDn(), event.getCalledDn(), "N", employeeVO , "CM or Device information is not specified");
 							return RESULT.ERROR;
 						}
 						
@@ -106,6 +105,10 @@ public class CallEvtHandler {
 		}
 		
 		if(employeeVO.getDevice_type() == null || employeeVO.getDevice_type().isEmpty() || employeeVO.getDevice_type().equalsIgnoreCase("null")) {
+			result = -1;
+		}
+		
+		if(employeeVO.getDevice_ipaddr() == null || employeeVO.getDevice_ipaddr().isEmpty() || employeeVO.getDevice_ipaddr().equalsIgnoreCase("null")) {
 			result = -1;
 		}
 		
@@ -287,6 +290,7 @@ public class CallEvtHandler {
 							if(employeeVO != null){
 								
 								if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
+									DBQueueMgr.getInstance().addQData(callingDn, event.getDn(), "N", employeeVO , "cm_user or cm_pwd or device_type is not specified");
 									return RESULT.ERROR;
 								}
 								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO , callID) , callID);

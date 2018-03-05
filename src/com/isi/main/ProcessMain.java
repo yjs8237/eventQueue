@@ -8,10 +8,12 @@ import com.isi.duplex.DuplexMgr;
 import com.isi.file.ILog;
 import com.isi.file.LogMgr;
 import com.isi.file.LogWriter;
+import com.isi.process.DBQueue;
 import com.isi.process.IQueue;
 import com.isi.process.JQueue;
 import com.isi.service.JtapiService;
 import com.isi.service.UDPThread;
+import com.isi.thread.DBService;
 import com.isi.thread.UDPService;
 import com.isi.thread.XMLService;
 import com.test.thread.TestService;
@@ -38,16 +40,8 @@ public class ProcessMain {
 		 
 		System.out.println("Start receiving UDP Packet from ISPS !!");
 		
-		// ISPS 濡� 遺��꽣 UDP 諛쏅뒗 �냼耳� �뒪�젅�뱶 �떆�옉
 		UDPThread thread = new UDPThread(queue); //asdasd
 		thread.startService();
-		  
-		//asd sadf
-		/*
-		 * ///////////////////////////////////////////////
-		 * 
-		 * 3. UDP �뙣�궥 泥섎━
-		 */// ////////////////////////////////////////////
 		
 		UDPService udpService = new UDPService(queue);
 		udpService.startService();
@@ -59,28 +53,21 @@ public class ProcessMain {
 
 		System.out.println("Start Single Mode!!  Active Mode[" + DuplexMgr.getInstance().getActiveMode() + "]");
 		
+		
 		/*
-		String logPath = "";
-
-		EventGroup group = new EventGroup(logPath);
-
-		group.RegisterEvent(new EventHandlerTest());
-		JTapiManager jtapiMng = new JTapiManager(group, logPath);
-
-		JtapiConnInfo connInfo = new JtapiConnInfo();
-
-		connInfo.setCmID(args[0]);
-		connInfo.setCmPW(args[1]);
-		connInfo.addCmIPList(args[2]);
-		jtapiMng.ServiceStart(connInfo);
-		*/
+		 * XML 팝업 결과 데이터 적재를 위한 DataBase Thread Pool (Queue) 구현
+		 */
+		DBService dbService = new DBService();
+		dbService.startService();
+		
+		/*********************************************************************/
 		
 		
 		IQueue queue = new JQueue();
 
 		JtapiService service = JtapiService.getInstance();
 		service.startService(queue);
-
+		
 		System.out.println("## Success!! Jtapi Service Started ##");
 
 		XMLService xmlservice = new XMLService(queue);

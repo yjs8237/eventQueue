@@ -78,10 +78,18 @@ public class Employees {
 			return RESULT.RTN_EXCEPTION;
 		}
 		
+		String cell_no = employee.getCell_no();
+		cell_no = cell_no.replaceAll("-", "");
+		employee.setCell_no(cell_no);
+		
 		logoutEmployee(employee , requestID);
+		
 		
 		List list = new ArrayList<>();
 		list.add(employee);
+		
+		
+		
 		empMapByCellNum.put(employee.getCell_no() , list);
 		empMapByExtension.put(employee.getExtension() , list);
 		empMapByMac.put(employee.getMac_address() , list);
@@ -380,6 +388,9 @@ public class Employees {
                 			
                 			String extension = rs.getString("extension");
                 			String cell_num = rs.getString("cell_no");
+                			if(cell_num != null) {
+                				cell_num = cell_num.replaceAll("-", "");
+                			} 
                 			
                 			employeeInfo.setEmp_id(rs.getString("emp_id"));
                 			employeeInfo.setEmp_nm_kor(rs.getString("emp_nm_kor"));

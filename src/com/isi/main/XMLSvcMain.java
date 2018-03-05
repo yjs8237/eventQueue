@@ -19,10 +19,12 @@ import com.isi.file.ILog;
 import com.isi.file.PropertyRead;
 import com.isi.handler.HttpServerHandler;
 import com.isi.handler.HttpUrlHandler;
+import com.isi.process.DBQueue;
 import com.isi.process.IQueue;
 import com.isi.process.JQueue;
 import com.isi.service.JtapiService;
 import com.isi.service.UDPThread;
+import com.isi.thread.DBService;
 import com.isi.thread.ImageService;
 import com.isi.thread.UDPService;
 import com.isi.thread.XMLService;
@@ -52,8 +54,11 @@ public class XMLSvcMain {
 		// 오래된 로그파일 삭제
 		XMLSvcMain svcMain = new XMLSvcMain();
 		svcMain.delOldLogFiles();
-		
 		database.disconnectDB();
+		
+		
+		
+		
 		
 		
 		/*
@@ -151,6 +156,10 @@ public class XMLSvcMain {
 		
 	}
 	
+	private void startDataBasePoolService() {
+		
+	}
+	
 	private void delOldLogFiles() {
 		// TODO Auto-generated method stub
 		
@@ -201,5 +210,7 @@ public class XMLSvcMain {
 			
 		}
 	}
+	
+	
 	
 }

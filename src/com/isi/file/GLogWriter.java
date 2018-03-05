@@ -21,7 +21,7 @@ import com.isi.utils.Utils;
 *
 * @author greatyun
 */
-public class GLogWriter implements ILog{
+public class GLogWriter implements ILog {
 	
 	private Utils util;
     private PrintWriter pw = null;
@@ -263,6 +263,13 @@ public class GLogWriter implements ILog{
 	public void logInOutLog(String requestID , String methodName, String msg) {
 		// TODO Auto-generated method stub
 		write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.LOGINOUT, requestID, methodName, msg);
+	}
+
+
+	@Override
+	public void popupLog(String requestID, String methodName, String msg) {
+		// TODO Auto-generated method stub
+		write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.POPUP, requestID, methodName, msg);
 	}
 
 }

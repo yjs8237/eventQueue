@@ -19,7 +19,9 @@ import com.isi.file.ILog;
 import com.isi.file.LogMgr;
 import com.isi.file.LogWriter;
 import com.isi.file.PropertyRead;
+import com.isi.process.DBQueueMgr;
 import com.isi.utils.Utils;
+import com.isi.vo.PushResultVO;
 import com.isi.vo.XmlVO;
 
 /**
@@ -46,17 +48,20 @@ public class PushHandler {
 		readTimeout = XmlInfoMgr.getInstance().getReadTimeout();
 	}
 	
-	 public int push(String xml, XmlVO xmlInfo, boolean getResult) {
+	 public PushResultVO push(String xml, XmlVO xmlInfo, boolean getResult) {
 		 
 		 String phoneIP = xmlInfo.getTargetIP();
 		 HttpURLConnection conn = null;
 		 BufferedWriter bw = null;
 		 
+		 PushResultVO resultVO = new PushResultVO();
+		 
 		 int returnCode = RESULT.RTN_EXCEPTION;
 		 
 	        if (phoneIP == null || phoneIP.isEmpty()) {
 	            //System.out.println("PushXML.push() Null IP address");
-	            return RESULT.RTN_EXCEPTION;
+	        	resultVO.setReturnCode(RESULT.RTN_EXCEPTION);
+	            return resultVO;
 	        }
 	        
 	        m_Log.standLog(threadID, "push", "## Push !! CMUSER["+xmlInfo.getCmUser()+"]CMPW["+xmlInfo.getCmPassword()+"] DN ["+xmlInfo.getTargetdn()+"] phoneIP ["+phoneIP+"] xml["+xml+"]"); 
@@ -96,12 +101,15 @@ public class PushHandler {
 	          
 	          m_Log.standLog(threadID, "push", "## push response -> " + response.toString());
 	          
+	          resultVO.setResultMsg(response.toString());
+	          
 	          returnCode = conn.getResponseCode();
 	          
 	        } catch (Exception e) {
 	        	e.printStackTrace(ExceptionUtil.getPrintWriter());
 	        	m_Log.exceptionLog(threadID, "push", ExceptionUtil.getStringWriter().toString());
 	        	returnCode = RESULT.RTN_EXCEPTION;
+	        	resultVO.setResultMsg(e.toString());
 	        } finally {
 	        	conn.disconnect();
 	        	try {
@@ -113,10 +121,20 @@ public class PushHandler {
 					e.printStackTrace(ExceptionUtil.getPrintWriter());
 					m_Log.exceptionLog(threadID, "push", ExceptionUtil.getStringWriter().toString());
 					returnCode = RESULT.RTN_EXCEPTION;
+					resultVO.setResultMsg(e.toString());
 				}
 	        }
 	        
-	        return returnCode == HttpURLConnection.HTTP_OK ? returnCode : RESULT.RTN_EXCEPTION;
+	        if(returnCode != HttpURLConnection.HTTP_OK) {
+	        	resultVO.setPopup_yn("N");
+	        	returnCode = RESULT.RTN_EXCEPTION;
+	        } else {
+	        	resultVO.setPopup_yn("Y");
+	        }
+	        
+	        resultVO.setReturnCode(returnCode);
+	        
+	        return resultVO;
 	        
 	    }
 

@@ -15,4 +15,5 @@ public interface SVCTYPE {
 	public static final String HTTP				=	"HTTP";
 	public static final String IMAGE			=	"IMAGE";
 	public static final String LOGINOUT			=	"LOGINOUT";
+	public static final String POPUP			=	"POPUP";
 }

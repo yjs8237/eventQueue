@@ -15,9 +15,8 @@ public interface ILog {
 	public void testLog(String msg);
 	public void udpLog(String methodName, String msg);
 	public void httpLog(String requestID, String methodName, String msg);
-	
 	public void logInOutLog(String requestID , String methodName, String msg);
-	
+	public void popupLog(String requestID , String methodName, String msg);
 //	public void httpLog( String methodName, String msg);
 	public void duplexLog(boolean isActive, String methodName, String msg);
 	
