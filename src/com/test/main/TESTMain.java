@@ -43,9 +43,8 @@ public class TESTMain {
 //		String jsonP = jsonObj.toString(4);
 //		System.out.println(jsonP);
 		
-		
-		TESTSuper supervo = new TESTChild();
-		TESTChild childvo = (TESTChild) supervo;
+		int temp = new Integer(0x4000003);
+		System.out.println(temp);
 		
 	}
 

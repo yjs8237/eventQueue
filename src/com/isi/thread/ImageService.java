@@ -1,7 +1,12 @@
 package com.isi.thread;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import com.isi.constans.RESULT;
 import com.isi.data.Employees;
+import com.isi.data.ImageMgr;
 
 public class ImageService extends Thread {
 
@@ -22,7 +27,10 @@ public class ImageService extends Thread {
 			System.out.println("!! ERROR !! [deleteAllImages]");
 //			System.exit(0);
 		}
-
+//		
+		if(!ImageMgr.getInstance().createImageFolder()) {
+			System.out.println("!! ERROR !! [createImageSizeFolder]");
+		}
 		
 		
 		// 최초 직원 이미지 파일 생성

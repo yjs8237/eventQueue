@@ -8,7 +8,7 @@ import com.isi.duplex.DuplexMgr;
 import com.isi.file.ILog;
 import com.isi.file.LogMgr;
 import com.isi.file.LogWriter;
-import com.isi.process.DBQueue;
+import com.isi.process.*;
 import com.isi.process.IQueue;
 import com.isi.process.JQueue;
 import com.isi.service.JtapiService;

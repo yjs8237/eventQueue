@@ -191,6 +191,8 @@ public class ImageHandler {
 				return true;
 			}
             
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", "Background Image Search ["+XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png" + "]");
+			
             String basic_img_path = XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png";
             BufferedImage basic_img = ImageIO.read(new File(basic_img_path)); // 배경이미지
             

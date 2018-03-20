@@ -30,6 +30,7 @@ import com.isi.exception.ExceptionUtil;
 import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
 import com.isi.file.PropertyRead;
+import com.isi.process.DBQueueMgr;
 import com.isi.service.JtapiService;
 import com.isi.thread.DeviceCheck;
 import com.isi.utils.Common;
@@ -192,7 +193,7 @@ public class HttpServerHandler {
 				case "/callstatus":
 					resultJSONData = procCallStatus(parameter, requestID);
 					break;
-
+					
 				case "/pickup":
 					resultJSONData = procCallPickup(parameter, requestID);
 					break;
@@ -200,7 +201,7 @@ public class HttpServerHandler {
 				case "/employee":
 					resultJSONData = procEmployee(parameter, requestID);
 					break;
-
+				
 				default:
 					// returnCode = RESULT.HTTP_URL_ERROR;
 					break;
@@ -471,6 +472,8 @@ public class HttpServerHandler {
 			*/
 			EmployeeVO empVO = (EmployeeVO) baseVO;
 			
+			
+			
 //			System.out.println(empVO.toString());
 			
 			/*
@@ -489,7 +492,6 @@ public class HttpServerHandler {
 				return jsonObj.toString();
 			}
 			
-			
 			//////////////////////////////////////////////////////////////////////////////////////////
 			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(empVO.getExtension());
 			int loginResult = Employees.getInstance().loginEmployee(empVO , requestID);
@@ -497,9 +499,11 @@ public class HttpServerHandler {
 			logwrite.httpLog(requestID, "procLogin", "DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
 			logwrite.httpLog(requestID, "procLogin", "EMPLOYEE LOGIN RESULT CODE [" + loginResult + "]");
 			
-			
 			jsonObj.put("code", String.valueOf(resultVO.getCode()));
 			jsonObj.put("msg", resultVO.getMessage());
+			
+//			DBQueueMgr.getInstance().addHttpData(APITYPE.API_LOGIN, map , jsonObj.toString());
+			
 			return jsonObj.toString();
 		}
 		

@@ -141,6 +141,11 @@ public class JtapiService {
 			}
 		}
 		
+		if(resultVO != null) {
+			if(resultVO.getCode() == RESULT.RTN_SUCCESS) {
+				resultVO.setCode(200);
+			}
+		}
 		return resultVO;
 	}
 	

@@ -250,8 +250,10 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			if (addr.getState() == CiscoAddress.IN_SERVICE) {
 				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStart",
 						"[" + aDn + "] [ERROR] MonitorStart- already registered device ");
-				resultVO.setCode(RESULT.ERR_DEV_ALREADY_LOGIN);
-				resultVO.setMessage("Already Login");
+//				resultVO.setCode(RESULT.ERR_DEV_ALREADY_LOGIN);
+//				resultVO.setMessage("Already Login");
+				resultVO.setCode(200);
+				resultVO.setMessage("success");
 				return resultVO;
 			}
 			
@@ -263,8 +265,10 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 						"[" + aDn + "] [ERROR] MonitorStart - already addred device ");
 				// m_Log.server("[" + aDn + "] [ERROR] MonitorStart - already
 				// addred device ");
-				resultVO.setCode(RESULT.ERR_DEV_ALREADY_LOGIN);
-				resultVO.setMessage("Already Login");
+//				resultVO.setCode(RESULT.ERR_DEV_ALREADY_LOGIN);
+//				resultVO.setMessage("Already Login");
+				resultVO.setCode(200);
+				resultVO.setMessage("success");
 				return resultVO;
 			}
 

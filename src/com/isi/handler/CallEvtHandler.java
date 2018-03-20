@@ -61,12 +61,9 @@ public class CallEvtHandler {
 					for (int i = 0; i < employeeList.size(); i++) {
 						EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
 						if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
-//							System.out.println("call DBQueueMgr.getInstance().addQData");
-							DBQueueMgr.getInstance().addQData(event.getCallingDn(), event.getCalledDn(), "N", employeeVO , "CM or Device information is not specified");
+							DBQueueMgr.getInstance().addPopUpData(event.getCallingDn(), event.getCalledDn(), "N", employeeVO , "CM or Device information is not specified");
 							return RESULT.ERROR;
 						}
-						
-//						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "########### 2 ##########");
 						
 						xmlHandler.evtRing(makeAlertingXmlVO(event , employeeVO , callID) , callID);
 					}
@@ -165,7 +162,7 @@ public class CallEvtHandler {
 					
 					EmployeeVO emp = employeeMgr.getEmployeeByExtension(DN , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(DN);
-					if(emp!=null){
+					if(emp!=null) {
 //						xmlHandler.evtEstablished(makeEstablishXmlVO(event , emp, callID) , deviceDN , callID);
 					}
 					isEastblish = true;
@@ -290,7 +287,7 @@ public class CallEvtHandler {
 							if(employeeVO != null){
 								
 								if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
-									DBQueueMgr.getInstance().addQData(callingDn, event.getDn(), "N", employeeVO , "cm_user or cm_pwd or device_type is not specified");
+									DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , "cm_user or cm_pwd or device_type is not specified");
 									return RESULT.ERROR;
 								}
 								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO , callID) , callID);

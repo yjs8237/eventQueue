@@ -496,9 +496,9 @@ public class XMLHandler {
 			// 이미지 생성
 			pushHandler = new PushHandler(callID);
 			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing" , employee , CALL_RING , xmlInfo.getTargetModel()), xmlInfo, false);
-			DBQueueMgr.getInstance().addQData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(), employee , resultVO.getResultMsg());
+			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(), employee , resultVO.getResultMsg());
 		} else {
-			DBQueueMgr.getInstance().addQData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), "N", employee , "cannot make image file of calling employee info");
+			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), "N", employee , "cannot make image file of calling employee info");
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushRing", "Cannot make Image !!");
 			return -1;
 		}
@@ -511,7 +511,7 @@ public class XMLHandler {
 		pushHandler = new PushHandler(callID);
 		PushResultVO resultVO = new PushResultVO();
 		resultVO = pushHandler.push(xmlData.getCiscoIPPhoneText("Calling !!", employee), xmlInfo, false);
-		DBQueueMgr.getInstance().addQData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(), employee , resultVO.getResultMsg());
+		DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(), employee , resultVO.getResultMsg());
 		return resultVO.getReturnCode();
 	}
 	

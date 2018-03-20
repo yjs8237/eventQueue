@@ -62,10 +62,18 @@ public class DeviceStatusHandler {
 		
 		JSONObject jsonObj = jsonArr.getJSONObject(0);
 		
-//		System.out.println(jsonObj.toString(4));
+		//System.out.println(jsonObj.toString(4));
 		
 		JSONObject tempJson = (JSONObject) jsonObj.get("DirNumber");
 		if(tempJson == null) {
+			return false;
+		}
+		
+		if(!tempJson.has("content")) {
+			return false;
+		}
+		
+		if(tempJson.get("content") == null) {
 			return false;
 		}
 		

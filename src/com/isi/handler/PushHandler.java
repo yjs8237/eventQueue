@@ -125,11 +125,11 @@ public class PushHandler {
 				}
 	        }
 	        
-	        if(returnCode != HttpURLConnection.HTTP_OK) {
+	        if(resultVO.getResultMsg().contains("Data=\"Success\"") || resultVO.getResultMsg().contains("Data=\"SUCCESS\"")) {
+	        	resultVO.setPopup_yn("Y");
+	        } else {
 	        	resultVO.setPopup_yn("N");
 	        	returnCode = RESULT.RTN_EXCEPTION;
-	        } else {
-	        	resultVO.setPopup_yn("Y");
 	        }
 	        
 	        resultVO.setReturnCode(returnCode);

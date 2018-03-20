@@ -1,26 +1,16 @@
 package com.isi.thread;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.Callable;
 
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
-import com.isi.data.CallStateMgr;
 import com.isi.db.JDatabase;
-import com.isi.event.ConnEvt;
-import com.isi.event.IEvt;
-import com.isi.event.TermConnEvt;
-import com.isi.event.TermEvt;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.GLogWriter;
-import com.isi.file.LogMgr;
 import com.isi.file.PropertyRead;
-import com.isi.handler.CallEvtHandler;
-import com.isi.process.DBQueue;
+import com.isi.process.DBPopUpQueue;
 import com.isi.process.IQueue;
 import com.isi.vo.EmployeeVO;
-import com.isi.vo.PopupSvcVO;
 
 public class DBSvcCallable implements Callable<Integer>{
 
@@ -32,7 +22,7 @@ public class DBSvcCallable implements Callable<Integer>{
 	private PropertyRead	pr;
 	
 	public DBSvcCallable(String threadID) {
-		this.queue = DBQueue.getInstance();
+		this.queue = DBPopUpQueue.getInstance();
 		logwrite = new GLogWriter();
 		dbService = new JDatabase();
 		pr = PropertyRead.getInstance();

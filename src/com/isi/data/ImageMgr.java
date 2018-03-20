@@ -1,5 +1,6 @@
 package com.isi.data;
 
+import java.io.File;
 import java.util.*;
 
 import com.isi.constans.RESULT;
@@ -60,6 +61,27 @@ public class ImageMgr {
 	
 	public ImageVO getImageInfo(String modelID){
 		return imageMap.get(modelID);
+	}
+	
+	public boolean createImageFolder() {
+		Set keySet = imageMap.keySet();
+		Iterator iter = keySet.iterator();
+		while(iter.hasNext()) {
+			String modelID =  (String)iter.next();
+			ImageVO imageVO = imageMap.get(modelID);
+			
+			String imageSize = imageVO.getImageSize();
+			String path = XmlInfoMgr.getInstance().getEmpImgPath();
+			
+			String targetPath = path + "\\" + imageSize;
+			
+			File file = new File(targetPath);
+			if(!file.exists()) {
+				file.mkdirs();
+			}
+		}
+		
+		return true;
 	}
 	
 //	public Map getImageMap(){

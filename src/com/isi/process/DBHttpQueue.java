@@ -4,19 +4,19 @@ import java.util.LinkedList;
 
 import com.isi.file.PropertyRead;
 
-public class DBQueue implements IQueue{
+public class DBHttpQueue implements IQueue{
 
 	private LinkedList list = null;
 	private int count;
 	
-	private static DBQueue pr = new DBQueue(); 
-	private DBQueue () {
+	private static DBHttpQueue pr = new DBHttpQueue(); 
+	private DBHttpQueue () {
 		list = new LinkedList<>();
 		count = 0;
 	}
-    public static DBQueue getInstance () {
+    public static DBHttpQueue getInstance () {
 		if(pr == null){
-			pr = new DBQueue();
+			pr = new DBHttpQueue();
 		}
 		return pr;
     }
