@@ -180,7 +180,7 @@ public class ImageHandler {
         	EmployeeVO empVO = imageMgr.getImgEmpInfo(callingNum);
         	if(empVO == null || !Common.compareEmployee(employee , empVO)) {
         		// 직원정보가 변경되었을 경우 이미지파일 지우고 다시만들기
-        		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", callingNum + " UPDATE IMAGE FILE !! ");
+        		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", callingNum + " 이미지 변경 !! ");
         		logdir.delete();
         		imageMgr.addImgEmpInfo(callingNum, employee);
         	}

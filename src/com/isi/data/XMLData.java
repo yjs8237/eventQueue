@@ -4,6 +4,7 @@ import com.isi.constans.PROPERTIES;
 import com.isi.constans.PersonType;
 import com.isi.db.JDatabase;
 import com.isi.file.PropertyRead;
+import com.isi.utils.Utils;
 import com.isi.vo.*;
 /**
 *
@@ -28,7 +29,7 @@ public class XMLData {
         // 폰 모델별 이미지 사이즈가 다르기 때문에 각기 다른 사이즈의 이미지 폴더  URL 을 구한다.
 //        String path =     getPathByModel(model);
 //        String path = pr.getValue(PROPERTIES.ISXMLWEB_URL) + ImageMgr.getInstance().getImageInfo(model) + "/"; 
-        String path = XmlInfoMgr.getInstance().getXmlPushUrl() + ImageMgr.getInstance().getImageInfo(model).getImageSize() + "/";
+        String path = "http://" + Utils.getLocalServerIp() + XmlInfoMgr.getInstance().getXmlPushUrl() + ImageMgr.getInstance().getImageInfo(model).getImageSize() + "/";
         
         String aniNum = "";
         if(person instanceof EmployeeVO){

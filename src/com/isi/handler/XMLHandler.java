@@ -503,7 +503,7 @@ public class XMLHandler {
 			return -1;
 		}
 		
-		return resultVO.getReturnCode();
+		return resultVO.getReturnCode(); 
 	}
 	
 	

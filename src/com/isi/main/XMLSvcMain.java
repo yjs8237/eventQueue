@@ -56,11 +56,6 @@ public class XMLSvcMain {
 		svcMain.delOldLogFiles();
 		database.disconnectDB();
 		
-		
-		
-		
-		
-		
 		/*
 		CMInfo cmInfo = CMInfo.getInstance();
 		cmInfo.setCmUser(pr.getValue(PROPERTIES.CM1_USER));

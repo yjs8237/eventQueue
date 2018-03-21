@@ -1,6 +1,8 @@
 package com.isi.utils;
 import java.io.File;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.MessageDigest;
@@ -9,6 +11,7 @@ import java.security.SignatureException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -224,6 +227,27 @@ public class Utils {
 			return true;
 		else 
 			return false;
+	}
+	
+	public static String getLocalServerIp()
+	{
+		try
+		{
+		    for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();)
+		    {
+		        NetworkInterface intf = en.nextElement();
+		        for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();)
+		        {
+		            InetAddress inetAddress = enumIpAddr.nextElement();
+		            if (!inetAddress.isLoopbackAddress() && !inetAddress.isLinkLocalAddress() && inetAddress.isSiteLocalAddress())
+		            {
+		            	return inetAddress.getHostAddress().toString();
+		            }
+		        }
+		    }
+		}
+		catch (SocketException ex) {}
+		return null;
 	}
 	
 	
