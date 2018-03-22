@@ -18,6 +18,7 @@ import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
 import com.isi.file.PropertyRead;
 import com.isi.handler.HttpServerHandler;
+import com.isi.handler.HttpSyncServer;
 import com.isi.handler.HttpUrlHandler;
 import com.isi.process.*;
 import com.isi.process.IQueue;
@@ -76,11 +77,15 @@ public class XMLSvcMain {
 //			System.exit(0);
 		}
 		
+		// 로그인시 동기화 상대 서버에게 Http Get Request 받는 서버 (이미지 생성을 위하여)
+		HttpSyncServer httpSyncServer = new HttpSyncServer();
+		httpSyncServer.startService();
+		
+		
 		ImageService imgSvrThread = new ImageService();
 		imgSvrThread.start();
 		
 		ILog logwrite = new GLogWriter();
-		
 		ProcessMain main = new ProcessMain();
 		
 		
@@ -138,7 +143,6 @@ public class XMLSvcMain {
 					
 					HttpServerHandler httpHandler = new HttpServerHandler();
 					httpHandler.startService();
-					
 					logwrite.standLog("", "main", "Start HTTP Handler success !! ");
 					
 					break;

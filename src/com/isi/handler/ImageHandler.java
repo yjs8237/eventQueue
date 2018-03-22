@@ -147,7 +147,7 @@ public class ImageHandler {
 	}
 	
 	
-	public boolean createImageFile(EmployeeVO employee ,  String callingNum,  String model , String callID) {
+	public boolean createImageFile(EmployeeVO employee ,  String callingNum,  ImageVO imageVO , String callID) {
 		
 		imageMgr = ImageMgr.getInstance();
 		
@@ -161,9 +161,6 @@ public class ImageHandler {
 		
 		int type = -1;
 		
-		
-		ImageVO imageVO = ImageMgr.getInstance().getImageInfo(model);
-		
 		String imageSize = imageVO.getImageSize();
 		if(imageSize == null) {
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID , "CreateImageFile", imageSize + " 모델 이미지 사이즈 정보 없음 !! ");
@@ -176,6 +173,9 @@ public class ImageHandler {
         	
         	File logdir = new File(strDest);
         	
+        	/*
+        	 * 콜이벤트 발생할때마다 직원정보가 변경되었으면, 이미지를 다시 생성하도록 하였으나..
+        	 * 어차피 로그인할때 이미지를 지우고 다시 생성하기 때문에 아래 로직은 필요없을것으로 판단..
         	ImageMgr imageMgr = ImageMgr.getInstance();
         	EmployeeVO empVO = imageMgr.getImgEmpInfo(callingNum);
         	if(empVO == null || !Common.compareEmployee(employee , empVO)) {
@@ -184,16 +184,22 @@ public class ImageHandler {
         		logdir.delete();
         		imageMgr.addImgEmpInfo(callingNum, employee);
         	}
-
+        	*/
 			if (logdir.exists()) {
 				// 이미 팝업 이미지가 있다면 이미지를 생성하지 않는다. (직원 콜 의 경우만 해당)
 				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", callingNum + " 이미지 존재");
 				return true;
 			}
             
-			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", "Background Image Search ["+XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png" + "]");
+//			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", "Background Image Search ["+XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png" + "]");
 			
             String basic_img_path = XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png";
+            logdir = new File(basic_img_path);
+            if(!logdir.exists()) {
+            	m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", "### NO Basic Image " + basic_img_path + " ###");
+            	return false;
+            }
+            
             BufferedImage basic_img = ImageIO.read(new File(basic_img_path)); // 배경이미지
             
             int width = Integer.parseInt(imageVO.getImageSize().substring(0, 3));

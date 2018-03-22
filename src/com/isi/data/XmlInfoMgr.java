@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.isi.handler.HttpSyncServer;
+
 public class XmlInfoMgr {
 	
 	private static XmlInfoMgr xmlInfoMgr = new XmlInfoMgr();
@@ -33,7 +35,7 @@ public class XmlInfoMgr {
 	private String faceImgPath;
 	private String empImgPath;
 	private int logDelDays;
-	
+	private int http_sync_port;
 	
 	
 	private XmlInfoMgr(){}
@@ -43,6 +45,7 @@ public class XmlInfoMgr {
 		}
 		return xmlInfoMgr;
 	}
+	
 	public static XmlInfoMgr getXmlInfoMgr() {
 		return xmlInfoMgr;
 	}
@@ -53,6 +56,14 @@ public class XmlInfoMgr {
 	
 	
 	
+	
+	
+	public int getHttp_sync_port() {
+		return http_sync_port;
+	}
+	public void setHttp_sync_port(int http_sync_port) {
+		this.http_sync_port = http_sync_port;
+	}
 	public int getHttpPort() {
 		return httpPort;
 	}
@@ -232,7 +243,7 @@ public class XmlInfoMgr {
 		sb.append("faceImgPath : ").append(faceImgPath).append("\n");
 		sb.append("empImgPath : ").append(empImgPath).append("\n");
 		sb.append("logDelDays : ").append(logDelDays).append("\n");
-		
+		sb.append("http_sync_port : ").append(http_sync_port).append("\n");
 		
 		return sb.toString();
 	}

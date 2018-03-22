@@ -91,6 +91,15 @@ public class XMLHandler {
 			
 			switch (model) {
 			
+			
+			case IPPhone.PHONE_7902:
+				returnCode = pushText(employee, xmlInfo , callID);
+				break;
+			
+			case IPPhone.PHONE_7911:
+				returnCode = pushText(employee, xmlInfo , callID);
+				break;
+				
 			case IPPhone.PHONE_7921:
 				returnCode = pushImage(employee, xmlInfo , callID);
 				break;
@@ -101,6 +110,10 @@ public class XMLHandler {
 				
 			case IPPhone.PHONE_7926:
 				returnCode = pushImage(employee, xmlInfo , callID);
+				break;
+				
+			case IPPhone.PHONE_7931:
+				returnCode = pushText(employee, xmlInfo , callID);
 				break;
 				
 			case IPPhone.PHONE_7941:
@@ -492,7 +505,10 @@ public class XMLHandler {
 		
 		PushResultVO resultVO = new PushResultVO();
 		ImageHandler imgHandler = new ImageHandler();
-		if(imgHandler.createImageFile(employee ,xmlInfo.getCallingDn(), xmlInfo.getTargetModel() , callID)) {
+		
+		ImageVO imageVO = ImageMgr.getInstance().getImageInfo(xmlInfo.getTargetModel());
+		
+		if(imgHandler.createImageFile(employee ,xmlInfo.getCallingDn(),  imageVO, callID)) {
 			// 이미지 생성
 			pushHandler = new PushHandler(callID);
 			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing" , employee , CALL_RING , xmlInfo.getTargetModel()), xmlInfo, false);

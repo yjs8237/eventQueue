@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.*;
 
 import com.isi.constans.RESULT;
+import com.isi.handler.ImageHandler;
 import com.isi.vo.DeviceVO;
 import com.isi.vo.EmployeeVO;
 import com.isi.vo.ImageVO;
@@ -29,6 +30,42 @@ public class ImageMgr {
 			imageMgr = new ImageMgr();
 		}
 		return imageMgr;
+	}
+	
+	public void createImageFiles(EmployeeVO empVO) {
+		
+		Set keySet = imageMap.keySet();
+		Iterator iter = keySet.iterator();
+		ImageHandler imgHandler = new ImageHandler();
+		while(iter.hasNext()) {
+			
+			String key = (String) iter.next();
+			ImageVO imageVO = imageMap.get(key);
+			String extension = empVO.getExtension();
+			String cell_num = empVO.getCell_no();
+			
+			String strDest = XmlInfoMgr.getInstance().getEmpImgPath() + imageVO.getImageSize() + "\\"+ extension + ".png";
+			
+//			System.out.println("strDest1 : " + strDest);
+			File file = new File(strDest);
+			if(file.exists()) {
+				file.delete();
+			}
+			
+			imgHandler.createImageFile(empVO , extension , imageVO , "");
+			
+			strDest = XmlInfoMgr.getInstance().getEmpImgPath() + imageVO.getImageSize() + "\\"+ cell_num + ".png";
+//			System.out.println("strDest2 : " + strDest);
+			file = new File(strDest);
+			if(file.exists()) {
+				file.delete();
+			}
+			imgHandler.createImageFile(empVO , cell_num , imageVO , "");
+			
+			addImgEmpInfo(cell_num, empVO);
+			addImgEmpInfo(extension, empVO);
+		}
+	
 	}
 	
 	public void addImgEmpInfo (String callingNum , EmployeeVO employee) {

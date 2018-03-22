@@ -47,13 +47,13 @@ import com.sun.net.httpserver.HttpServer;
 *
 * @author greatyun
 */
-public class HttpServerHandler {
+public class HttpSyncServer {
 	
 	private int port;
 	private PropertyRead pr;
 	private ILog logwrite;
 	
-	public HttpServerHandler(){
+	public HttpSyncServer(){
 		pr = PropertyRead.getInstance();
 		logwrite = new GLogWriter();
 	}
@@ -62,7 +62,7 @@ public class HttpServerHandler {
 		
 		try {
 			
-			port = XmlInfoMgr.getInstance().getHttpPort();
+			port = XmlInfoMgr.getInstance().getHttp_sync_port();
 			
 			InetSocketAddress addr = new InetSocketAddress(port);
 			HttpServer server = HttpServer.create(addr, 0);
@@ -93,10 +93,11 @@ public class HttpServerHandler {
 			String responseDATA = "";
 			requestMethod = exchange.getRequestMethod().toUpperCase().trim();
 			
+			System.out.println("TEST requestMethod : " + requestMethod);
+			
 			switch (requestMethod) {
 			case "GET":
 				responseDATA = procGet(exchange , requestID);
-				
 				break;
 				
 			case "POST":
@@ -106,6 +107,7 @@ public class HttpServerHandler {
 				break;
 			}
 			
+			
 			exchange.sendResponseHeaders(200, responseDATA.length());
 			
 			OutputStream responseBody = exchange.getResponseBody();
@@ -113,9 +115,6 @@ public class HttpServerHandler {
 			
 			responseBody.write(responseDATA.getBytes());
 			responseBody.close();
-			
-			
-			
 			
 		}
 		
@@ -166,39 +165,15 @@ public class HttpServerHandler {
 				String url = uri.toString().trim();
 				String parameter = exchange.getRequestURI().getQuery();
 
-				// System.out.println("url -> " + url);
+//				System.out.println("url -> " + url);
 
 				url = getURL(url);
 
 				logwrite.httpLog(requestID, "procGet()", "REQUEST URL[" + url + "] PARAM[" + parameter + "]");
 
 				switch (url) {
-
-				case "/login":
-					resultJSONData = procLogin(parameter, requestID);
-					break;
-
-				case "/logout":
-					resultJSONData = procLogout(parameter, requestID);
-					break;
-
-				case "/resetdevice":
-					resultJSONData = procResetDevice(parameter, requestID);
-					break;
-
-				case "/callstatus":
-					resultJSONData = procCallStatus(parameter, requestID);
-					break;
-					
-				case "/pickup":
-					resultJSONData = procCallPickup(parameter, requestID);
-					break;
-					
-				case "/employee":
-					resultJSONData = procEmployee(parameter, requestID);
-					break;
 				
-				case "loginsync":
+				case "/loginsync":
 					resultJSONData = procCreateImage(parameter, requestID);
 					break;
 					

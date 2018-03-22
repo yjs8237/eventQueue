@@ -1,6 +1,9 @@
 package com.test.main;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -52,8 +55,66 @@ public class TESTMain {
 		
 		System.out.println(getLocalServerIp());
 		
+		System.out.println(System.getProperty("user.dir"));
+		
+		/*
+		String command = "C:\\Development\\SRC\\ISXML\\RUN_ISXML.bat";
+		Process proc = Runtime.getRuntime().exec(command);
+
+		int waitFor = proc.waitFor();
+		int result = proc.exitValue();
+		
+		System.out.println(waitFor + " , " + result);
+		*/
+		try {
+			
+			
+			// 실행시킬 jar 파일 존재 여부 체크
+			
+//			ProcessBuilder pb = new ProcessBuilder("C:\\Program Files\\Java\\jdk1.7.0_80\\bin\\ISXML.exe", "-jar", "ISXML1.jar");
+//			pb.directory(new File("C:\\Development\\SRC\\ISXML\\"));
+//			Process p = pb.start();
+//			
+//			Thread.sleep(30000);
+//			
+//			if(isProcessRunning("ISXML.exe")) {
+//				killProcess("ISXML.exe");
+//			}
+			
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		
 		
 	}
+	
+	
+	
+	public static boolean isProcessRunning(String serviceName) throws Exception {
+
+		 Process p = Runtime.getRuntime().exec("tasklist");
+		 BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		 String line;
+		 while ((line = reader.readLine()) != null) {
+		  //System.out.println(line);
+		  if (line.contains(serviceName)) {
+		   return true;
+		  }
+		 }
+
+		 return false;
+
+	}
+	
+	public static void killProcess(String serviceName) throws Exception {
+
+		  Runtime.getRuntime().exec("taskkill /F /IM " + serviceName);
+
+	}
+	
+	
 	
 	public static String getLocalServerIp()
 	{

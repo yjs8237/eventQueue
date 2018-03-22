@@ -380,6 +380,10 @@ public class JDatabase  {
         				
         				xmlInfoMgr.setLogDelDays(rs.getInt("config_value"));
         				logStr += "log_del_day : " + rs.getString("config_value") + " ";
+        			} else if(rs.getString("config_name").equals("http_sync_port") ) {
+        				
+        				xmlInfoMgr.setHttp_sync_port(rs.getInt("config_value"));
+        				logStr += "http_sync_port : " + rs.getString("config_value") + " ";
         			}
         			
             	}
