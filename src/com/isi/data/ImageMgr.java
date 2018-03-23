@@ -3,7 +3,11 @@ package com.isi.data;
 import java.io.File;
 import java.util.*;
 
+import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
+import com.isi.file.GLogWriter;
+import com.isi.file.ILog;
+import com.isi.file.PropertyRead;
 import com.isi.handler.ImageHandler;
 import com.isi.vo.DeviceVO;
 import com.isi.vo.EmployeeVO;
@@ -20,7 +24,6 @@ public class ImageMgr {
 	private Map <String, EmployeeVO> imageEmpMap = new HashMap<String, EmployeeVO>();
 	private static ImageMgr imageMgr = new ImageMgr();
 	
-	
 	private ImageMgr(){
 		imageMap = Collections.synchronizedMap(new HashMap<String, ImageVO>());
 	}
@@ -32,7 +35,7 @@ public class ImageMgr {
 		return imageMgr;
 	}
 	
-	public void createImageFiles(EmployeeVO empVO) {
+	public void createImageFiles(ILog logwrite ,EmployeeVO empVO , String requestID) {
 		
 		Set keySet = imageMap.keySet();
 		Iterator iter = keySet.iterator();
@@ -44,8 +47,14 @@ public class ImageMgr {
 			String extension = empVO.getExtension();
 			String cell_num = empVO.getCell_no();
 			
-			String strDest = XmlInfoMgr.getInstance().getEmpImgPath() + imageVO.getImageSize() + "\\"+ extension + ".png";
+			String strDest = "";
 			
+			if (PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+				strDest = XmlInfoMgr.getInstance().getEmp_img_path_A() + imageVO.getImageSize() + "\\"+ extension + ".png";
+			} else {
+				strDest = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ extension + ".png";
+			}
+
 //			System.out.println("strDest1 : " + strDest);
 			File file = new File(strDest);
 			if(file.exists()) {
@@ -54,7 +63,16 @@ public class ImageMgr {
 			
 			imgHandler.createImageFile(empVO , extension , imageVO , "");
 			
-			strDest = XmlInfoMgr.getInstance().getEmpImgPath() + imageVO.getImageSize() + "\\"+ cell_num + ".png";
+			logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
+			
+			strDest = "";
+			if (PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+				strDest = XmlInfoMgr.getInstance().getEmp_img_path_A() + imageVO.getImageSize() + "\\"+ cell_num + ".png";
+			} else {
+				strDest = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ cell_num + ".png";
+			}
+			
+			
 //			System.out.println("strDest2 : " + strDest);
 			file = new File(strDest);
 			if(file.exists()) {
@@ -62,8 +80,13 @@ public class ImageMgr {
 			}
 			imgHandler.createImageFile(empVO , cell_num , imageVO , "");
 			
+			logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
+			
 			addImgEmpInfo(cell_num, empVO);
 			addImgEmpInfo(extension, empVO);
+			
+			
+			
 		}
 	
 	}
@@ -108,7 +131,13 @@ public class ImageMgr {
 			ImageVO imageVO = imageMap.get(modelID);
 			
 			String imageSize = imageVO.getImageSize();
-			String path = XmlInfoMgr.getInstance().getEmpImgPath();
+			String path = "";
+			if (PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+				path = XmlInfoMgr.getInstance().getEmp_img_path_A();
+			} else {
+				path = XmlInfoMgr.getInstance().getEmp_img_path_B();
+			}
+			
 			
 			String targetPath = path + "\\" + imageSize;
 			

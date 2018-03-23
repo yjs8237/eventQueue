@@ -140,9 +140,12 @@ public class TestImageHandler {
 		
 		
 		// 배경 이미지
-		String basic_img_path = XmlInfoMgr.getInstance().getBaseImgPath() + "basic.jpg";
+		
+		String basic_img_path = "";
+		
+		
 		// 직원 사진 사번.jpg
-		String strCallerPicture = XmlInfoMgr.getInstance().getBaseImgPath() + ID + ".jpg";
+		String strCallerPicture = "";
         // 팝업 이미지 내선.png
 //		String strDest = getPathByModel(model) + aniNum + ".png";
 		
@@ -152,9 +155,9 @@ public class TestImageHandler {
 			return false;
 		}
 		
-		String strDest = XmlInfoMgr.getInstance().getEmpImgPath() + modelSize + "\\"+ aniNum + ".png";
+		String strDest = "";
         // 고로 이미지
-		String logoImagePath = XmlInfoMgr.getInstance().getBaseImgPath() + "logo.jpg";
+		String logoImagePath = "";
 		
         try {
         	

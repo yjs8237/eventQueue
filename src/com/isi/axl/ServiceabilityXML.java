@@ -23,7 +23,7 @@ public class ServiceabilityXML extends SoapXML{
         String strReqHttpHeader = "";
         String strSoapReqeust   = "";
         Document [] xmldom      =  new Document [1];
-
+        
         // jylee (New SOAP)
         strSoapReqeust +="<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" ";
         strSoapReqeust +="xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" ";

@@ -364,18 +364,30 @@ public class JDatabase  {
         				
         				xmlInfoMgr.setLogPath(rs.getString("config_value"));
         				logStr += "log_path : " + rs.getString("config_value") + " ";
-        			} else if(rs.getString("config_name").equals("base_img_path") ) {
+        			} else if(rs.getString("config_name").equals("base_img_path_A") ) {
         				
-        				xmlInfoMgr.setBaseImgPath(rs.getString("config_value"));
-        				logStr += "base_img_path : " + rs.getString("config_value") + " ";
-        			} else if(rs.getString("config_name").equals("face_img_path") ) {
+        				xmlInfoMgr.setBase_img_path_A(rs.getString("config_value"));
+        				logStr += "base_img_path_A : " + rs.getString("config_value") + " ";
+        			} else if(rs.getString("config_name").equals("base_img_path_B") ) {
         				
-        				xmlInfoMgr.setFaceImgPath(rs.getString("config_value"));
-        				logStr += "face_img_path : " + rs.getString("config_value") + " ";
-        			} else if(rs.getString("config_name").equals("emp_img_path") ) {
+        				xmlInfoMgr.setBase_img_path_B(rs.getString("config_value"));
+        				logStr += "base_img_path_B : " + rs.getString("config_value") + " ";
+        			} else if(rs.getString("config_name").equals("face_img_path_A") ) {
         				
-        				xmlInfoMgr.setEmpImgPath(rs.getString("config_value"));
-        				logStr += "emp_img_path : " + rs.getString("config_value") + " ";
+        				xmlInfoMgr.setFace_img_path_A(rs.getString("config_value"));
+        				logStr += "face_img_path_A : " + rs.getString("config_value") + " ";
+        			} else if(rs.getString("config_name").equals("face_img_path_B") ) {
+        				
+        				xmlInfoMgr.setFace_img_path_B(rs.getString("config_value"));
+        				logStr += "face_img_path_B : " + rs.getString("config_value") + " ";
+        			} else if(rs.getString("config_name").equals("emp_img_path_A") ) {
+        				
+        				xmlInfoMgr.setEmp_img_path_A(rs.getString("config_value"));
+        				logStr += "emp_img_path_A : " + rs.getString("config_value") + " ";
+        			} else if(rs.getString("config_name").equals("emp_img_path_B") ) {
+        				
+        				xmlInfoMgr.setEmp_img_path_B(rs.getString("config_value"));
+        				logStr += "emp_img_path_B : " + rs.getString("config_value") + " ";
         			} else if(rs.getString("config_name").equals("log_del_day") ) {
         				
         				xmlInfoMgr.setLogDelDays(rs.getInt("config_value"));
@@ -393,6 +405,20 @@ public class JDatabase  {
     	}
     	
     	System.out.println(xmlInfoMgr.toString());
+    	
+    	m_Log.standLog("", "selectXMLInfo", xmlInfoMgr.toString());
+    	
+    	
+    	if (PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+    		xmlInfoMgr.setBaseImgPath(xmlInfoMgr.getBase_img_path_A());
+    		xmlInfoMgr.setEmpImgPath(xmlInfoMgr.getEmp_img_path_A());
+    		xmlInfoMgr.setFaceImgPath(xmlInfoMgr.getFace_img_path_A());
+		} else {
+			xmlInfoMgr.setBaseImgPath(xmlInfoMgr.getBase_img_path_B());
+    		xmlInfoMgr.setEmpImgPath(xmlInfoMgr.getEmp_img_path_B());
+    		xmlInfoMgr.setFaceImgPath(xmlInfoMgr.getFace_img_path_B());
+		}
+    	
     	return RESULT.RTN_SUCCESS;
     }
     

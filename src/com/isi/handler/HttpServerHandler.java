@@ -245,13 +245,12 @@ public class HttpServerHandler {
 			
 			// 로그인 시도할때 이미지 삭제 -> 생성 
 			ImageMgr imageMgr = ImageMgr.getInstance();
-			imageMgr.createImageFiles(empVO);
+			imageMgr.createImageFiles(logwrite,empVO , requestID);
 			
 			logwrite.httpLog(requestID, "procCreateImage", "Create Login Image Sync Success!!");
 			
 			jsonObj.put("code", "200");
 			jsonObj.put("msg", "success");
-			
 			
 			return jsonObj.toString();
 			
@@ -513,10 +512,19 @@ public class HttpServerHandler {
 			EmployeeVO empVO = (EmployeeVO) baseVO;
 			empVO.setCell_no(empVO.getCell_no().replaceAll("-", ""));
 			
+			
+			// 로그인 요청이 오면 이미지 삭제 -> 생성 작업을 실행하고,
+			// Remote Side 서버에게 로그인 요청 동기화 실시
+			// 비동기 처리를 위해 스레드 처리
+			LoginProcess loginProc = new LoginProcess(logwrite , empVO , parameter , requestID);
+			loginProc.start();
+			/*////////////////////////////////////////////////////////*/
+			
+			
 			/*
 			 * 전화기 상태체크 (로그인 시도한 전화기와 내선번호가 정확하게 Regi 되었나 확인)
 			 */
-			if(!DeviceStatusHandler.getInstance().isRegisteredDevice(empVO.getExtension(), empVO.getMac_address())) {
+			if(!DeviceStatusHandler.getInstance().isRegisteredDevice(empVO)) {
 //				logwrite.httpLog(requestID, "procLogin", empVO.getMac_address() + " is not Registered!!");
 				logwrite.httpLog(requestID, "procLogin", empVO.getExtension() + " , " +  empVO.getMac_address() + " is not Registered!!");
 				
@@ -538,14 +546,6 @@ public class HttpServerHandler {
 			
 			jsonObj.put("code", String.valueOf(resultVO.getCode()));
 			jsonObj.put("msg", resultVO.getMessage());
-			
-			
-			// 로그인 요청이 오면 이미지 삭제 -> 생성 작업을 실행하고,
-			// Remote Side 서버에게 로그인 요청 동기화 실시
-			// 비동기 처리를 위해 스레드 처리
-			LoginProcess loginProc = new LoginProcess(empVO , parameter);
-			loginProc.start();
-			/*////////////////////////////////////////////////////////*/
 			
 			
 			return jsonObj.toString();

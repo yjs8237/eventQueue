@@ -60,7 +60,14 @@ public class ImageHandler {
 		boolean bResult = true;
 		// 팝업 이미지 내선.png
 		try{
-			String dirPath = XmlInfoMgr.getInstance().getEmpImgPath();
+			String dirPath = "";
+			
+			if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+				dirPath = XmlInfoMgr.getInstance().getEmp_img_path_A();
+			} else {
+				dirPath = XmlInfoMgr.getInstance().getEmp_img_path_B();
+			}
+			
 			File files = new File(dirPath);
 			bResult = deleteDirectory(files);
 		} catch(Exception e){
@@ -78,7 +85,14 @@ public class ImageHandler {
 		// 팝업 이미지 내선.png
 		try{
 //			String dirPath = pr.getValue(PROPERTIES.FACE_IMAGE);
-			String dirPath = XmlInfoMgr.getInstance().getFaceImgPath();
+			String dirPath = "";
+			if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+				dirPath = XmlInfoMgr.getInstance().getFace_img_path_A();
+			} else {
+				dirPath = XmlInfoMgr.getInstance().getFace_img_path_B();
+			}
+			
+			
 			File files = new File(dirPath);
 			bResult = deleteDirectory(files);
 			
@@ -128,7 +142,14 @@ public class ImageHandler {
 		// 팝업 이미지 내선.png
 		try{
 //			String dirPath = pr.getValue(PROPERTIES.EMPLOYEE_IMAGE);
-			String dirPath = XmlInfoMgr.getInstance().getEmpImgPath();
+			String dirPath = "";
+			if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+				dirPath = XmlInfoMgr.getInstance().getEmp_img_path_A();
+			} else {
+				dirPath = XmlInfoMgr.getInstance().getEmp_img_path_B();
+			}
+			
+			
 			File path = new File(dirPath);
 			File[] files = path.listFiles();
 			
@@ -167,7 +188,21 @@ public class ImageHandler {
 			return false;
 		}
 		
-		String strDest = XmlInfoMgr.getInstance().getEmpImgPath() + imageSize + "\\"+ callingNum + ".png";
+		
+		String folderPath = "";
+		if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+			folderPath = XmlInfoMgr.getInstance().getEmp_img_path_A()  + imageSize + "\\";
+		} else {
+			folderPath = XmlInfoMgr.getInstance().getEmp_img_path_B()  + imageSize + "\\";
+		}
+		
+		
+		File folder = new File(folderPath);
+		if(!folder.exists()) {
+			folder.mkdirs();
+		}
+		
+		String strDest = folderPath + callingNum + ".png";
 		
         try {
         	
@@ -193,7 +228,14 @@ public class ImageHandler {
             
 //			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", "Background Image Search ["+XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png" + "]");
 			
-            String basic_img_path = XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png";
+            String basic_img_path = "";
+            if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+            	basic_img_path = XmlInfoMgr.getInstance().getBase_img_path_A() + imageSize + "_basic.png";
+    		} else {
+    			basic_img_path = XmlInfoMgr.getInstance().getBase_img_path_B() + imageSize + "_basic.png";
+    		}
+            
+            
             logdir = new File(basic_img_path);
             if(!logdir.exists()) {
             	m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", "### NO Basic Image " + basic_img_path + " ###");

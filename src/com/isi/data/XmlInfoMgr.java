@@ -34,6 +34,14 @@ public class XmlInfoMgr {
 	private String baseImgPath;
 	private String faceImgPath;
 	private String empImgPath;
+	
+	private String base_img_path_A;
+	private String base_img_path_B;
+	private String face_img_path_A;
+	private String face_img_path_B;
+	private String emp_img_path_A;
+	private String emp_img_path_B;
+	
 	private int logDelDays;
 	private int http_sync_port;
 	
@@ -58,6 +66,60 @@ public class XmlInfoMgr {
 	
 	
 	
+	public String getBaseImgPath() {
+		return baseImgPath;
+	}
+	public void setBaseImgPath(String baseImgPath) {
+		this.baseImgPath = baseImgPath;
+	}
+	public String getFaceImgPath() {
+		return faceImgPath;
+	}
+	public void setFaceImgPath(String faceImgPath) {
+		this.faceImgPath = faceImgPath;
+	}
+	public String getEmpImgPath() {
+		return empImgPath;
+	}
+	public void setEmpImgPath(String empImgPath) {
+		this.empImgPath = empImgPath;
+	}
+	public String getBase_img_path_A() {
+		return base_img_path_A;
+	}
+	public void setBase_img_path_A(String base_img_path_A) {
+		this.base_img_path_A = base_img_path_A;
+	}
+	public String getBase_img_path_B() {
+		return base_img_path_B;
+	}
+	public void setBase_img_path_B(String base_img_path_B) {
+		this.base_img_path_B = base_img_path_B;
+	}
+	public String getFace_img_path_A() {
+		return face_img_path_A;
+	}
+	public void setFace_img_path_A(String face_img_path_A) {
+		this.face_img_path_A = face_img_path_A;
+	}
+	public String getFace_img_path_B() {
+		return face_img_path_B;
+	}
+	public void setFace_img_path_B(String face_img_path_B) {
+		this.face_img_path_B = face_img_path_B;
+	}
+	public String getEmp_img_path_A() {
+		return emp_img_path_A;
+	}
+	public void setEmp_img_path_A(String emp_img_path_A) {
+		this.emp_img_path_A = emp_img_path_A;
+	}
+	public String getEmp_img_path_B() {
+		return emp_img_path_B;
+	}
+	public void setEmp_img_path_B(String emp_img_path_B) {
+		this.emp_img_path_B = emp_img_path_B;
+	}
 	public int getHttp_sync_port() {
 		return http_sync_port;
 	}
@@ -191,24 +253,6 @@ public class XmlInfoMgr {
 	public void setLogPath(String logPath) {
 		this.logPath = logPath;
 	}
-	public String getBaseImgPath() {
-		return baseImgPath;
-	}
-	public void setBaseImgPath(String baseImgPath) {
-		this.baseImgPath = baseImgPath;
-	}
-	public String getFaceImgPath() {
-		return faceImgPath;
-	}
-	public void setFaceImgPath(String faceImgPath) {
-		this.faceImgPath = faceImgPath;
-	}
-	public String getEmpImgPath() {
-		return empImgPath;
-	}
-	public void setEmpImgPath(String empImgPath) {
-		this.empImgPath = empImgPath;
-	}
 	public int getLogDelDays() {
 		return logDelDays;
 	}
@@ -239,9 +283,12 @@ public class XmlInfoMgr {
 		sb.append("consoleDebugYN : ").append(consoleDebugYN).append("\n");
 		sb.append("logLevel : ").append(logLevel).append("\n");
 		sb.append("logPath : ").append(logPath).append("\n");
-		sb.append("baseImgPath : ").append(baseImgPath).append("\n");
-		sb.append("faceImgPath : ").append(faceImgPath).append("\n");
-		sb.append("empImgPath : ").append(empImgPath).append("\n");
+		sb.append("base_img_path_A : ").append(base_img_path_A).append("\n");
+		sb.append("base_img_path_B : ").append(base_img_path_B).append("\n");
+		sb.append("face_img_path_A : ").append(face_img_path_A).append("\n");
+		sb.append("face_img_path_B : ").append(face_img_path_B).append("\n");
+		sb.append("emp_img_path_A : ").append(emp_img_path_A).append("\n");
+		sb.append("emp_img_path_B : ").append(emp_img_path_B).append("\n");
 		sb.append("logDelDays : ").append(logDelDays).append("\n");
 		sb.append("http_sync_port : ").append(http_sync_port).append("\n");
 		

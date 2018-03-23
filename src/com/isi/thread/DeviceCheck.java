@@ -45,7 +45,7 @@ public class DeviceCheck extends Thread{
 					Thread.sleep(6000);
 				}
 				
-				if(!DeviceStatusHandler.getInstance().isRegisteredDevice(empVO.getExtension(), empVO.getMac_address())) {
+				if(!DeviceStatusHandler.getInstance().isRegisteredDevice(empVO)) {
 					logwrite.httpLog(requestID, "run", "--> Check Device Count [" + cnt + "] WAIT...");
 				} else {
 					logwrite.httpLog(requestID, "run", "--> Check Device Count [" + cnt + "] SUCCESS!! ");
