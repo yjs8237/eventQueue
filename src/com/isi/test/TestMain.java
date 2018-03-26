@@ -33,6 +33,7 @@ import com.isi.constans.SVCTYPE;
 import com.isi.handler.PushHandler;
 import com.isi.vo.EmployeeVO;
 import com.isi.vo.XmlVO;
+import com.test.axl.soap.Text2Base64;
 import com.test.soap.AxlHandler;
 import com.test.soap.Utils;
 import com.test.vo.CmAxlInfoModel;
@@ -42,111 +43,47 @@ public class TestMain {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		
-		EmployeeVO employeeVO = new EmployeeVO();
-		
-		employeeVO.setEmp_id("jisang");
-		
-		try {
-			
-			Class targetClass = Class.forName("com.isi.vo.EmployeeVO");
-			Method methods[] = targetClass.getDeclaredMethods();
-			
-			for (int i = 0; i < methods.length; i++) {
-				String name = methods[i].getName();
-				if(name.startsWith("get")) {
-					methods[i].invoke(employeeVO, "");
-				}
-			}
-			
-		} catch (Exception e) {
-			
-		}
+		String urlIP = "10.156.214.111";
+		int urlPort = 8443;
+		String ver = "8.5";
+		String id = "SAC_IPT";
+		String pwd = "dkdlvlxl123$";
+		String auth = id + ":" + pwd;
+		String m_auth = Text2Base64.getBase64(auth);
+		 
 		
 		
+		String xmlBody = "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> <SOAP-ENV:Body> \r\n" + 
+				"<axlapi:executeSQLQuery xmlns:axlapi=\"http://www.cisco.com/AXL/API/8.5\" sequence=\"1234\"> \r\n" + 
+				"<sql>\r\n" + 
+				"SELECT pkid, dnorpattern, cfnaduration, cfnavoicemailenabled, cfnaintdestination, iscallable, cfurintvoicemailenabled, cfurvoicemailenabled, alertingname, description, fkroutepartition FROM NUMPLAN WHERE tkpatternusage = 2 AND fkroutepartition IS NOT NULL AND dnorpattern = '1776'\r\n" + 
+				"</sql> \r\n" + 
+				"</axlapi:executeSQLQuery> \r\n" + 
+				"</SOAP-ENV:Body> \r\n" + 
+				"</SOAP-ENV:Envelope>";
 		
 		
-		
-		/*
-		PushHandler push = new PushHandler("1");
-		String backgroundurl = "http://192.168.20.17:8080/static/images/em/298144/1001.png";
-		StringBuffer sb = new StringBuffer();
-//		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\" ?><CiscoIPPhoneImageFile><Title>Ringing</Title><Prompt>1002</Prompt><LocationX>0</LocationX><LocationY>0</LocationY><URL>http://192.168.20.248:8080/static/images/em/298168/1002.png</URL></CiscoIPPhoneImageFile>");
-		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\" ?>").append("<setBackground>").append("<background><image>").append(backgroundurl).append("</image> </background></setBackground>");
-//		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\" ?><CiscoIPPhoneImageFile><Title>Ringing</Title><Prompt>1002</Prompt><LocationX>0</LocationX><LocationY>0</LocationY><URL>http://192.168.0.23:8080/static/images/back.png</URL></CiscoIPPhoneImageFile>");
-		
-
-		XmlVO xmlInfo = new XmlVO();
-		xmlInfo.setAlertingdn("1001");
-		xmlInfo.setCalledDn("1002");
-		xmlInfo.setCmPassword("!Insung2018#");
-		xmlInfo.setCmUser("xmluser");
-		xmlInfo.setTargetIP("192.168.20.247");
-		xmlInfo.setTargetModel("493");
-		
-		push.push(sb.toString(), xmlInfo, true);
-		*/
-		
-//		com.test.soap.SOAPHandler handler = new com.test.soap.SOAPHandler();
-//		try {
-//			handler.sendSoapMessage("SELECT * FROM device");
-//		} catch(Exception e) {
-//			
-//		}
+		StringBuffer soapHeader = new StringBuffer();
+		soapHeader.append("POST https://").append(urlIP).append(":").append(urlPort).append("/axl/ HTTP/1.1").append("\n");
+		soapHeader.append("Accept-Encoding: gzip,deflate").append("\n");
+		soapHeader.append("Content-Type: text/xml;charset=UTF-8").append("\n");
+//		soapHeader.append("SOAPAction: \"CUCM:DB ver=").append(ver).append(" executeSQLQuery\"").append("\n");
+		soapHeader.append("SOAPAction: \"CUCM:DB ver=").append(ver).append("\n");
+		soapHeader.append("Content-Length: ").append(xmlBody.length()).append("\n");	
+		soapHeader.append("Host: ").append(urlIP).append(":").append(urlPort).append("\n");
+		soapHeader.append("Connection: Keep-Alive").append("\n");
+		soapHeader.append("User-Agent: Apache-HttpClient/4.1.1 (java 1.5)").append("\n");
+		soapHeader.append("Authorization: Basic ").append(m_auth).append("\n").append("\n");
 		
 		
-		/*
-		CmAxlInfoModel model = new CmAxlInfoModel();
-		model.setCmID("xmluser");
-		model.setCmIP("192.168.230.120");
-		model.setCmPwd("!Insung2018#");
-		model.setCmPort(8443);
-		TestMain main = new TestMain();
-//		main.gogotest();
-		
-		ArrayList list = new ArrayList<>();
-		CmAxlInfoModel mo1 = new CmAxlInfoModel();
-		mo1.setCmID("1");
-		list.add(mo1);
-		mo1 = new CmAxlInfoModel();
-		mo1.setCmID("2");
-		list.add(mo1);
+		soapHeader.append(xmlBody);
 		
 		
-		for (int i = 0; i < list.size(); i++) {
-			CmAxlInfoModel mo = (CmAxlInfoModel) list.get(i);
-			System.out.println(mo.getCmID());
-			mo.setCmID("1-1");
-		}
+		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
+		String retMsg = axlTest.SendSoapMessage(soapHeader.toString(), 1000);
+		System.out.println("--- return ---");
+		System.out.println(retMsg);
 		
-		for (int i = 0; i < list.size(); i++) {
-			CmAxlInfoModel mo = (CmAxlInfoModel) list.get(i);
-			System.out.println(mo.getCmID());
-		}
-		
-		*/
-		
-//		fkroutepartition , description
-
-		
-		String query = "SELECT \r\n" + 
-				"			PICK.pkid AS pick_pkid, PICK.name AS pickup_grp_name, NUM.dnorpattern AS pickup_grp_num , NUM.pkid AS fknumplan_pickup , ROUTE.description    \r\n" + 
-				"		FROM\r\n" + 
-				"		(\r\n" + 
-				"				SELECT * \r\n" + 
-				"				FROM pickupgroup \r\n" + 
-				"		) PICK LEFT OUTER JOIN (\r\n" + 
-				"				SELECT pkid, fkroutepartition ,dnorpattern FROM numplan\r\n" + 
-				"		) NUM ON PICK.fknumplan_pickup = NUM.pkid "
-				+ "		LEFT OUTER JOIN ("
-				+ "		SELECT pkid , description FROM routepartition"
-				+ ") ROUTE ON NUM.fkroutepartition = ROUTE.pkid"
-				+ ""
-				+ "";
-//		 query = "SELECT * FROM routepartition";
-//		 query = "SELECT * FROM numplan";
-//		axl.testSoap(model, query);
-		//AxlHandler.testSoap(model);
 		
 	}
 	

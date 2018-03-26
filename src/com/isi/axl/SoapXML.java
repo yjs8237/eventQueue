@@ -90,43 +90,41 @@ public class SoapXML {
     public int SendSoapMessage(String aReqMsg, Document [] aResDom) {
 
         Socket socket = null;
-        
+        BufferedReader br = null;
+        OutputStream out = null;
         try {
         	
             String rcvMsg;
             aResDom[0] = null;
             SSLSocketFactory sslFact = (SSLSocketFactory) m_ctx.getSocketFactory();
             socket = (SSLSocket) sslFact.createSocket(m_ip, m_port);
-
-            InputStream in = socket.getInputStream();
-            OutputStream out = socket.getOutputStream();
-            
-//            System.out.println("SEND SOAP MESSAGE");
-//            System.out.println(aReqMsg);
-            
-            StringBuffer sb = new StringBuffer(8192);
-            byte[] bArray  = new byte[8192];
-            int ch = 0;
-            out.write(aReqMsg.getBytes("UTF-8"));
             
             m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.GLOBAL, "SendSoapMessage", "SEND SOAP -> " + aReqMsg);
-//            m_Log.fine(aReqMsg);
-            while ((ch = in.read(bArray)) != -1) {
-                String temp = new String(bArray, 0, ch);
-                sb.append(temp);
-              // 종료시점에 바로 소켓을 종료함.
-                if (sb.lastIndexOf("</soapenv:Envelope>") != -1 || sb.lastIndexOf("</SOAP-ENV:Envelope>") != -1) {
-                    break;
-                }
-            }
             
-//            System.out.println("RECV SOAP MSG : " + sb.toString());
+            out = socket.getOutputStream();
+			out.write(aReqMsg.getBytes("UTF-8"));
+			
+			
+			br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+			StringBuffer sb = new StringBuffer();
+			
+			int value = 0;
+			while((value = br.read()) != -1) {
+				char c = (char)value;
+				sb.append(c);
+				if (sb.toString().lastIndexOf("</soapenv:Envelope>") != -1 || sb.toString().lastIndexOf("</SOAP-ENV:Envelope>") != -1) {
+					break;
+				}
+			}
+            
             
             RemoveSizeInfo(sb);
             m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.GLOBAL, "SendSoapMessage", "RECV SOAP -> " + sb.toString());
 //            m_Log.fine(sb.toString());
-            in.close();
+            br.close();
             out.close();
+            br = null;
+            out = null;
             
             if (sb.indexOf("<") < sb.length()) {
                 rcvMsg = sb.substring(sb.indexOf("<"));
@@ -168,8 +166,9 @@ public class SoapXML {
             return -2 ;
         } finally{
             try {
-                if (socket != null)
-                socket.close();
+                if (socket != null) {socket.close();}
+                if(br != null) {br.close();}
+                if(out != null) {out.close();}
             } catch (Exception exc) {
             	exc.printStackTrace(pw);
             	m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, SVCTYPE.GLOBAL, "SendSoapMessage", sw.toString());

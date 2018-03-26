@@ -230,9 +230,8 @@ public class SoapXML {
 	 */
 	public String SendSoapMessage(String ReqMsg, int nDefaultTimeOutMilliSecond) {
 		Socket socket = null;
-		InputStream in = null;
 		OutputStream out = null;
-		
+		BufferedReader br = null;
 		try {
 			String rcvMsg;
 			SSLSocketFactory sslFact = (SSLSocketFactory) m_ctx.getSocketFactory();
@@ -242,30 +241,26 @@ public class SoapXML {
 //			socket.connect(new InetSocketAddress(m_ip, m_port), nDefaultTimeOutMilliSecond);
 //			socket.setSoTimeout(nDefaultTimeOutMilliSecond);
 
-			in = socket.getInputStream();
 			out = socket.getOutputStream();
-			
-			
-			
-			StringBuffer sb = new StringBuffer(20000);
-			byte[] bArray  = new byte[20000];
-			int ch = 0;
 			out.write(ReqMsg.getBytes("UTF-8"));
-			
-			
-			
-			while ((ch = in.read(bArray)) != -1) {
-				String temp = new String(bArray, 0, ch);
-				sb.append(temp);
-				if (sb.lastIndexOf("</soapenv:Envelope>") != -1 || sb.lastIndexOf("</SOAP-ENV:Envelope>") != -1) {
+
+			br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+			StringBuffer sb = new StringBuffer();
+
+			int value = 0;
+			while ((value = br.read()) != -1) {
+				char c = (char) value;
+				sb.append(c);
+				if (sb.toString().lastIndexOf("</soapenv:Envelope>") != -1
+						|| sb.toString().lastIndexOf("</SOAP-ENV:Envelope>") != -1) {
 					break;
 				}
 			}
 			RemoveSizeInfo(sb);
 			
-			in.close();
+			br.close();
 			out.close();
-			in = null;
+			br = null;
 			out = null;
 			
 			if (sb.indexOf("<") < sb.length()) {
@@ -298,7 +293,7 @@ public class SoapXML {
 			return "Error exception "  + ea.toString();
 		} finally{
 			try {
-				if ( in != null) { in.close(); }
+				if ( br != null) { br.close(); }
 				if ( out != null) { out.close(); }
 				if (socket != null) { socket.close(); }
 			} catch (final Exception exc) {

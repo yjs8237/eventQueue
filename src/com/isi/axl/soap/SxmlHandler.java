@@ -1,5 +1,8 @@
 package com.isi.axl.soap;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -125,7 +128,10 @@ public class SxmlHandler {
 			
 			//System.out.println(">>>> "+jsonArray.length());
 		} catch (JSONException e) {
-			System.out.println(e.toString());
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			System.out.println(sw.toString());
 		}
 		
 		return rtnObject;
