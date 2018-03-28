@@ -18,6 +18,7 @@ import com.isi.jtapi.IJTAPI;
 import com.isi.jtapi.JTAPI2;
 import com.isi.process.IQueue;
 import com.isi.process.JQueue;
+import com.isi.vo.EmployeeVO;
 import com.isi.vo.JTapiResultVO;
 /**
 *
@@ -120,6 +121,25 @@ public class JtapiService {
 		}
 		
 		resultVO = m_jtapi[0].pickupCall(myExtension, pickupExtension);
+		if(resultVO.getCode() != RESULT.RTN_SUCCESS) {
+			return resultVO;
+		}
+		
+		return resultVO;
+	}
+	
+	public JTapiResultVO makeCall(String myExtension , String callingNumber , EmployeeVO empVO) {
+		
+		JTapiResultVO resultVO = null;
+		if(myExtension == null || myExtension.isEmpty()) {
+			return resultVO;
+		}
+		
+		if(callingNumber == null || callingNumber.isEmpty()) {
+			return resultVO;
+		}
+		
+		resultVO = m_jtapi[0].makeCall(myExtension, callingNumber , empVO.getMac_address());
 		if(resultVO.getCode() != RESULT.RTN_SUCCESS) {
 			return resultVO;
 		}

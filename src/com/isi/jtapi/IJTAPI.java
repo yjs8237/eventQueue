@@ -14,6 +14,7 @@ public interface IJTAPI  {
 	public JTapiResultVO MonitorStart(String aDn);
 	public JTapiResultVO MonitorStop(String aDn);
 	public JTapiResultVO pickupCall(String myExtension , String pickupExtension);
+	public JTapiResultVO makeCall(String myExtension , String callingNumber, String mac_address);
 //	Provider getProvider();
 //	public Log getLog();
 	/*

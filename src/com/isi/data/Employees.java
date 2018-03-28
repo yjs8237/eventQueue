@@ -420,6 +420,7 @@ public class Employees {
                 			employeeInfo.setCm_user(rs.getString("cm_user"));
                 			employeeInfo.setCm_pwd(rs.getString("cm_pwd"));
                 			employeeInfo.setPopup_svc_yn(rs.getString("popup_svc_yn"));
+                			employeeInfo.setMac_address(rs.getString("mac_address"));
                 			employeeInfo.setDevice_type(rs.getString("device_type"));
                 			employeeInfo.setDevice_ipaddr(rs.getString("device_ipaddr"));
                 			

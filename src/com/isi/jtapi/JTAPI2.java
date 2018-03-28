@@ -101,6 +101,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		try {
 			m_Queue.put(evt);
 		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, SVCTYPE.JTAPI, "ReceiveEvent", sw.toString());
 			// m_Log.server("[****] ReceiveEvent Fail ", e);
@@ -125,6 +127,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 					"[****] start JTAPI provider success");
 
 		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, SVCTYPE.JTAPI, "serviceStart", sw.toString());
 			return RESULT.RTN_EXCEPTION;
@@ -156,6 +160,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			// m_Log.server("[****] stop JTAPI provider success ");
 
 		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			m_Log.server(LOGTYPE.ERR_LOG, "ServiceStop", sw.toString());
 			return RESULT.RTN_EXCEPTION;
@@ -198,6 +204,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			}
 
 		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			m_Log.server(LOGTYPE.ERR_LOG, "MonitorAllStart", sw.toString());
 			return RESULT.RTN_EXCEPTION;
@@ -218,6 +226,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				}
 			}
 		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			m_Log.server(LOGTYPE.ERR_LOG, "MonitorAllStop", sw.toString());
 			return RESULT.RTN_EXCEPTION;
@@ -313,6 +323,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			m_Log.config(LOGTYPE.STAND_LOG, "MonitorStart", "[" + aDn + "] monitor start success ");
 
 		} catch (PlatformExceptionImpl pe) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
 			pe.printStackTrace(pw);
 			m_Log.server(LOGTYPE.ERR_LOG, "MonitorStart", sw.toString());
 			
@@ -326,6 +338,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			resultVO.setMessage(pe.getLocalizedMessage());
 			return resultVO;
 		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			m_Log.server(LOGTYPE.ERR_LOG, "MonitorStart", sw.toString());
 			// m_Log.server("[" + aDn + "] monitor start fail ", e);
@@ -387,6 +401,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			// JCtiData.getData().removeDevice(aDn);
 
 		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			m_Log.server(LOGTYPE.ERR_LOG, "MonitorStop", sw.toString());
 			resultVO.setCode(RESULT.RTN_EXCEPTION);
@@ -447,13 +463,15 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
         }
 		*/
 		
+		int returnCode = RESULT.RTN_SUCCESS;
+		String returnMessage = "success";
 //		Terminal terminal = m_Provider.getTerminal(aDn);
 		JTapiResultVO resultVO = new JTapiResultVO();
 		Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(pickupExtension);
 		
 		if(terminalArr == null || terminalArr.length == 0) {
-			resultVO.setCode(RESULT.RTN_EXCEPTION);
-			resultVO.setMessage("NOT LOGIN " + pickupExtension);
+			returnCode = RESULT.RTN_EXCEPTION;
+			returnMessage = "NOT LOGIN " + pickupExtension;
 			return resultVO;
 		}
 		
@@ -474,16 +492,87 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 	            }
 			}
 		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			m_Log.server(LOGTYPE.ERR_LOG, "pickupCall", sw.toString());
-			resultVO.setCode(RESULT.RTN_EXCEPTION);
-			resultVO.setMessage(e.getLocalizedMessage());
-			return resultVO;
+			returnCode = RESULT.RTN_EXCEPTION;
+			returnMessage = e.getLocalizedMessage();
+		} finally {
+			resultVO.setCode(returnCode);
+			resultVO.setMessage(returnMessage);
 		}
-		resultVO.setCode(RESULT.RTN_SUCCESS);
-		resultVO.setMessage("success");
+		
 		return resultVO;
 	
+	}
+
+	@Override
+	public JTapiResultVO makeCall(String myExtension, String callingNumber , String mac_address) {
+		// TODO Auto-generated method stub
+		JTapiResultVO resultVO = new JTapiResultVO();
+		
+		int returnCode = RESULT.RTN_SUCCESS;
+		String returnMessage = "success";
+		
+		try {
+			
+			Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(myExtension);
+			
+			if(terminalArr == null || terminalArr.length == 0) {
+				returnCode = RESULT.RTN_EXCEPTION;
+				returnMessage = "NOT LOGIN " + myExtension;
+				return resultVO;
+			}
+			
+			if(mac_address == null || mac_address.isEmpty()) {
+				returnCode = RESULT.RTN_EXCEPTION;
+				returnMessage = "mac_address is null " + myExtension;
+				return resultVO;
+			}
+			
+			for (int i = 0; i < terminalArr.length; i++) {
+				Terminal terminal = terminalArr[i];
+				Call call = terminal.getProvider().createCall();
+				Address addresses[] = terminal.getAddresses();
+				Address targetAddress = null;
+				for (int j = 0; j < addresses.length; j++) {
+					
+					System.out.println("address : " + addresses[j].getName() + " , mac_address : " + mac_address);
+					
+					if (!addresses[j].getName().equals(myExtension)) {
+						continue;
+					}
+					targetAddress = addresses[j];
+					System.out.println("targetAddress : " + targetAddress.getName() + " , mac_address : " + mac_address);
+					break;
+				}
+				
+				if (targetAddress != null) {
+					System.out.println("call.connect 시도 "  );
+					call.connect(terminal, targetAddress, callingNumber);
+				} else {
+					System.out.println("targetAddress is null "  );
+					returnCode = RESULT.RTN_EXCEPTION;
+					returnMessage = "targetAddress is null " + myExtension;
+					return resultVO;
+				}
+				
+			}
+			
+			
+		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			m_Log.server(LOGTYPE.ERR_LOG, "makeCall", sw.toString());
+			returnCode = RESULT.RTN_EXCEPTION;
+			returnMessage = e.getLocalizedMessage();
+		} finally {
+			resultVO.setCode(returnCode);
+			resultVO.setMessage(returnMessage);
+		}
+		return resultVO;
 	}
 
 }

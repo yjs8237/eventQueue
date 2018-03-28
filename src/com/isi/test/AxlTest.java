@@ -60,6 +60,9 @@ public class AxlTest {
 	
 	
 	public String SendSoapMessage(String ReqMsg, int nDefaultTimeOutMilliSecond) {
+		
+//		System.out.println(this.getClass().getClassLoader().getResource("."));
+		
 		Socket socket = null;
 		InputStream in = null;
 		OutputStream out = null;
@@ -77,7 +80,7 @@ public class AxlTest {
 			out = socket.getOutputStream();
 			out.write(ReqMsg.getBytes("UTF-8"));
 			
-			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
+			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "ks_c_5601-1987"));
 			StringBuffer sb = new StringBuffer();
 			
 			int value = 0;

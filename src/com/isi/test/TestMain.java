@@ -85,6 +85,22 @@ public class TestMain {
 		System.out.println(retMsg);
 		
 		
+		
+		
+		
+		StringBuffer queryBuffer = new StringBuffer();
+		queryBuffer
+			.append("SELECT pkid, dnorpattern, cfnaduration, cfnavoicemailenabled, cfnaintdestination, iscallable, cfurintvoicemailenabled, cfurvoicemailenabled, alertingname, description, fkroutepartition ")
+			.append("FROM NUMPLAN WHERE tkpatternusage = 2 AND fkroutepartition IS NOT NULL ")	//AND iscallable = 't'
+			.append("AND dnorpattern = '").append("1234").append("'");
+		
+		System.out.println(queryBuffer.toString());
+		System.out.println(queryBuffer.toString().replaceAll("alertingname,", ""));
+		
+		
+		
+		
+		
 	}
 	
 	public static void gogotest() {

@@ -28,58 +28,21 @@ import com.isi.vo.XmlVO;
 import com.test.axl.model.CmAxlInfoModel;
 import com.test.axl.soap.AxlHandler;
 import com.test.axl.soap.SoapXML;
+import com.test.sync.Sync;
 
 public class TESTMain {
 
 	public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
 		// TODO Auto-generated method stub
 		
-		CmAxlInfoModel cmVO = new CmAxlInfoModel();
-		cmVO.setCmID("xmluser");
-		cmVO.setCmPwd("!Insung2018#");
-		cmVO.setCmIP("192.168.230.120");
-		cmVO.setCmPort(8443);
 		
-//		AxlHandler axlHandler = new AxlHandler(cmVO);
-//		String query = "SELECT * FROM numplan " ;
-//		axlHandler.testSoap(query);
 		
-//		SxmlHandler soap = new SxmlHandler();
-//		Object obj = soap.selectDeviceStatusJSON("10.156.114.203", "xmluser", "Samil@3131", "SEP00215554192A");
-//		JSONObject jsonObj = (JSONObject) obj;
-//		String jsonP = jsonObj.toString(4);
-//		System.out.println(jsonP);
 		
-		int temp = new Integer(0x4000003);
-		System.out.println(temp);
-		
-		System.out.println(getLocalServerIp());
-		
-		System.out.println(System.getProperty("user.dir"));
-		
-		/*
-		String command = "C:\\Development\\SRC\\ISXML\\RUN_ISXML.bat";
-		Process proc = Runtime.getRuntime().exec(command);
-
-		int waitFor = proc.waitFor();
-		int result = proc.exitValue();
-		
-		System.out.println(waitFor + " , " + result);
-		*/
+		Sync sync = new Sync();
+		sync.startPickUpGroupSync();
 		try {
 			
 			
-			// 실행시킬 jar 파일 존재 여부 체크
-			
-//			ProcessBuilder pb = new ProcessBuilder("C:\\Program Files\\Java\\jdk1.7.0_80\\bin\\ISXML.exe", "-jar", "ISXML1.jar");
-//			pb.directory(new File("C:\\Development\\SRC\\ISXML\\"));
-//			Process p = pb.start();
-//			
-//			Thread.sleep(30000);
-//			
-//			if(isProcessRunning("ISXML.exe")) {
-//				killProcess("ISXML.exe");
-//			}
 			
 			
 		} catch (Exception e) {

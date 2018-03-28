@@ -36,6 +36,7 @@ import com.isi.vo.DeviceResetVO;
 import com.isi.vo.DeviceStatusVO;
 import com.isi.vo.EmployeeVO;
 import com.isi.vo.JTapiResultVO;
+import com.isi.vo.MakeCallVO;
 import com.isi.vo.PickupVO;
 import com.isi.vo.XmlVO;
 import com.sun.net.httpserver.Headers;
@@ -202,6 +203,9 @@ public class HttpServerHandler {
 					resultJSONData = procCreateImage(parameter, requestID);
 					break;
 					
+				case "/makecall":
+					resultJSONData = procMakeCall(parameter, requestID);
+					break;
 				default:
 					// returnCode = RESULT.HTTP_URL_ERROR;
 					break;
@@ -298,7 +302,7 @@ public class HttpServerHandler {
 		private String procCallPickup(String parameter, String requestID) {
 			Map<String, String> map = new HashMap<String, String>();
 			map = queryToMap(parameter);
-
+			
 			JSONObject jsonObj = new JSONObject();
 
 			if (map == null || map.isEmpty()) {
@@ -323,17 +327,21 @@ public class HttpServerHandler {
 			
 			EmployeeVO pickupEmp = Employees.getInstance().getEmployeeByExtension(pickupVO.getPickupExtension(), "");
 			
-			XmlVO xmlVO = new XmlVO();
-			xmlVO.setTargetIP(pickupEmp.getDevice_ipaddr());
-			xmlVO.setCmUser(pickupEmp.getCm_user());
-			xmlVO.setCmPassword(pickupEmp.getCm_pwd());
-			xmlVO.setTargetdn(pickupEmp.getExtension());
-			
-			XMLHandler 		xmlHandler = new XMLHandler();
-			xmlHandler.evtDisconnect(xmlVO , "");
-			// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
-			xmlHandler.evtDisconnectV2(xmlVO , "");
-			
+			if(pickupEmp != null) {
+				XmlVO xmlVO = new XmlVO();
+				xmlVO.setTargetIP(pickupEmp.getDevice_ipaddr());
+				xmlVO.setCmUser(pickupEmp.getCm_user());
+				xmlVO.setCmPassword(pickupEmp.getCm_pwd());
+				xmlVO.setTargetdn(pickupEmp.getExtension());
+				
+				XMLHandler 		xmlHandler = new XMLHandler();
+				xmlHandler.evtDisconnect(xmlVO , "");
+				// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+				xmlHandler.evtDisconnectV2(xmlVO , "");
+			} else {
+				logwrite.httpLog(requestID, "procCallPickup",
+						"Pickup Employee is null maybe not login");
+			}
 			
 			logwrite.httpLog(requestID, "procCallPickup",
 					"DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
@@ -342,6 +350,47 @@ public class HttpServerHandler {
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 		}
+		
+		private String procMakeCall(String parameter, String requestID) {
+			Map<String, String> map = new HashMap<String, String>();
+			map = queryToMap(parameter);
+			
+			JSONObject jsonObj = new JSONObject();
+
+			if (map == null || map.isEmpty()) {
+				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", "all");
+				return jsonObj.toString();
+			}
+
+			MakeCallVO makeCallVO = getMakeCallInfo(map);
+			
+			EmployeeVO empVO = Employees.getInstance().getEmployeeByExtension(makeCallVO.getMyExtension(), "");
+			// JtapiService.getInstance().monitorStop(resetVO.getExtension());
+			
+			if(empVO == null) {
+				logwrite.httpLog(requestID, "procMakeCall",
+						"Extension " + makeCallVO.getMyExtension() + " not login");
+				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
+				jsonObj.put("msg", "Extension " + makeCallVO.getMyExtension() + " not login");
+				return jsonObj.toString();
+			}
+			
+			JTapiResultVO resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(),
+					makeCallVO.getCallingNumber() , empVO);
+			
+			
+			logwrite.httpLog(requestID, "procMakeCall",
+					"DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
+			//
+			jsonObj.put("code", "200");
+			jsonObj.put("msg", resultVO.getMessage());
+			return jsonObj.toString();
+		}
+		
+		
+		
 		
 		private String procCallStatus (String parameter , String requestID) {
 			Map <String, String> map = new HashMap<String, String>();
@@ -646,6 +695,27 @@ public class HttpServerHandler {
 			}
 
 			return pickupVO;
+		}
+		
+		private MakeCallVO getMakeCallInfo (Map<String, String> map) {
+			MakeCallVO makeCallVO = new MakeCallVO();
+			Set keySet = map.keySet();
+			Iterator iter = keySet.iterator();
+			while (iter.hasNext()) {
+				String key = (String) iter.next();
+				switch (key) {
+					case "myExtension" :
+						makeCallVO.setMyExtension(map.get("myExtension").toString());
+						break;
+					case "callingNumber" :
+						makeCallVO.setCallingNumber(map.get("callingNumber").toString());
+						break;
+					default : 
+						break;
+				}
+			}
+
+			return makeCallVO;
 		}
 		
 		private DeviceStatusVO getDeviceStatusInfo (Map<String, String> map) {
