@@ -128,7 +128,7 @@ public class JtapiService {
 		return resultVO;
 	}
 	
-	public JTapiResultVO makeCall(String myExtension , String callingNumber , EmployeeVO empVO) {
+	public JTapiResultVO makeCall(String myExtension , String callingNumber ) {
 		
 		JTapiResultVO resultVO = null;
 		if(myExtension == null || myExtension.isEmpty()) {
@@ -139,7 +139,7 @@ public class JtapiService {
 			return resultVO;
 		}
 		
-		resultVO = m_jtapi[0].makeCall(myExtension, callingNumber , empVO.getMac_address());
+		resultVO = m_jtapi[0].makeCall(myExtension, callingNumber );
 		if(resultVO.getCode() != RESULT.RTN_SUCCESS) {
 			return resultVO;
 		}

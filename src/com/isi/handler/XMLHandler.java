@@ -78,12 +78,14 @@ public class XMLHandler {
 		
 		if(xmlInfo.getCallingDn().length() > 6) {
 			// 휴대전화번호 
+			if(xmlInfo.getCallingDn().startsWith("#")) {
+				xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("#", ""));
+			}
 			employee = employees.getEmployeeByCellNum(xmlInfo.getCallingDn() , callID);
 		} else {
 			// 내선전화
 			employee = employees.getEmployeeByExtension(xmlInfo.getCallingDn() , callID);
 		}
-		
         
 		if(employee != null){
 			

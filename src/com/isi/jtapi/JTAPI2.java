@@ -247,7 +247,6 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			addr = (CiscoAddress) m_Provider.getAddress(aDn);
 			//Terminal terminal = m_Provider.getTerminal(aDn);
 			
-			
 			if (addr == null) {
 				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStart",
 						"[" + aDn + "] [ERROR] MonitorStart - unregistered device ");
@@ -508,7 +507,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 	}
 
 	@Override
-	public JTapiResultVO makeCall(String myExtension, String callingNumber , String mac_address) {
+	public JTapiResultVO makeCall(String myExtension, String callingNumber ) {
 		// TODO Auto-generated method stub
 		JTapiResultVO resultVO = new JTapiResultVO();
 		
@@ -525,9 +524,9 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				return resultVO;
 			}
 			
-			if(mac_address == null || mac_address.isEmpty()) {
+			if(myExtension == null || myExtension.isEmpty()) {
 				returnCode = RESULT.RTN_EXCEPTION;
-				returnMessage = "mac_address is null " + myExtension;
+				returnMessage = "myExtension is null " + myExtension;
 				return resultVO;
 			}
 			
@@ -538,18 +537,22 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				Address targetAddress = null;
 				for (int j = 0; j < addresses.length; j++) {
 					
-					System.out.println("address : " + addresses[j].getName() + " , mac_address : " + mac_address);
+					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "address : " + addresses[j].getName() + " , myExtension : " + myExtension);
 					
 					if (!addresses[j].getName().equals(myExtension)) {
 						continue;
 					}
 					targetAddress = addresses[j];
-					System.out.println("targetAddress : " + targetAddress.getName() + " , mac_address : " + mac_address);
+					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "targetAddress : " + targetAddress.getName() + " , myExtension : " + myExtension);
+					System.out.println();
 					break;
 				}
 				
 				if (targetAddress != null) {
-					System.out.println("call.connect 시도 "  );
+					if(callingNumber != null && callingNumber.length() > 6) {
+						callingNumber = "#" + callingNumber;
+					}
+					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "call Connect 시도 MyExtension[" + myExtension + "] callingNumber[" + callingNumber + "]");
 					call.connect(terminal, targetAddress, callingNumber);
 				} else {
 					System.out.println("targetAddress is null "  );
