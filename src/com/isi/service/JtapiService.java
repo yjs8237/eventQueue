@@ -147,6 +147,22 @@ public class JtapiService {
 		return resultVO;
 	}
 	
+	public JTapiResultVO stopCall(String myExtension ) {
+		
+		JTapiResultVO resultVO = null;
+		if(myExtension == null || myExtension.isEmpty()) {
+			return resultVO;
+		}
+		
+		
+		resultVO = m_jtapi[0].stopCall(myExtension );
+		if(resultVO.getCode() != RESULT.RTN_SUCCESS) {
+			return resultVO;
+		}
+		
+		return resultVO;
+	}
+	
 	public JTapiResultVO monitorStart(String extension) {
 		
 		JTapiResultVO resultVO = null;

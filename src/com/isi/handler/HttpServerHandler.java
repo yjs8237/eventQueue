@@ -199,13 +199,14 @@ public class HttpServerHandler {
 					resultJSONData = procEmployee(parameter, requestID);
 					break;
 				
-				case "loginsync":
-					resultJSONData = procCreateImage(parameter, requestID);
-					break;
-					
 				case "/makecall":
 					resultJSONData = procMakeCall(parameter, requestID);
 					break;
+					
+				case "/stopcall":
+					resultJSONData = procStopCall(parameter, requestID);
+					break;
+					
 				default:
 					// returnCode = RESULT.HTTP_URL_ERROR;
 					break;
@@ -249,7 +250,7 @@ public class HttpServerHandler {
 			
 			// 로그인 시도할때 이미지 삭제 -> 생성 
 			ImageMgr imageMgr = ImageMgr.getInstance();
-			imageMgr.createImageFiles(logwrite,empVO , requestID);
+			imageMgr.createImageFiles(empVO , requestID);
 			
 			logwrite.httpLog(requestID, "procCreateImage", "Create Login Image Sync Success!!");
 			
@@ -333,8 +334,6 @@ public class HttpServerHandler {
 						pickupVO.getPickupExtension());
 			}
 			
-			
-			
 			EmployeeVO pickupEmp = Employees.getInstance().getEmployeeByExtension(pickupVO.getPickupExtension(), "");
 			
 			if(pickupEmp != null) {
@@ -390,6 +389,39 @@ public class HttpServerHandler {
 			JTapiResultVO resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(),
 					makeCallVO.getCallingNumber() );
 			
+			logwrite.httpLog(requestID, "procMakeCall",
+					"DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
+
+			if(resultVO.getCode() == -900 && resultVO.getMessage().equalsIgnoreCase("Address is out of service")) {
+				// Device 상태가 Out of Service 일 경우 Monitor Stop & Start
+				JtapiService.getInstance().monitorStop(makeCallVO.getMyExtension());
+				JtapiService.getInstance().monitorStart(makeCallVO.getMyExtension());
+				resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(), makeCallVO.getCallingNumber() );
+			}
+			
+			//
+			jsonObj.put("code", "200");
+			jsonObj.put("msg", resultVO.getMessage());
+			return jsonObj.toString();
+		}
+		
+		private String procStopCall(String parameter, String requestID) {
+			Map<String, String> map = new HashMap<String, String>();
+			map = queryToMap(parameter);
+			
+			JSONObject jsonObj = new JSONObject();
+
+			if (map == null || map.isEmpty()) {
+				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", "all");
+				return jsonObj.toString();
+			}
+
+			MakeCallVO makeCallVO = getStopCallInfo(map);
+			
+			JTapiResultVO resultVO = JtapiService.getInstance().stopCall(makeCallVO.getMyExtension());
+			
 			
 			logwrite.httpLog(requestID, "procMakeCall",
 					"DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
@@ -406,6 +438,7 @@ public class HttpServerHandler {
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 		}
+		
 		
 		private String procCallStatus (String parameter , String requestID) {
 			Map <String, String> map = new HashMap<String, String>();
@@ -724,6 +757,24 @@ public class HttpServerHandler {
 						break;
 					case "callingNumber" :
 						makeCallVO.setCallingNumber(map.get("callingNumber").toString());
+						break;
+					default : 
+						break;
+				}
+			}
+
+			return makeCallVO;
+		}
+		
+		private MakeCallVO getStopCallInfo (Map<String, String> map) {
+			MakeCallVO makeCallVO = new MakeCallVO();
+			Set keySet = map.keySet();
+			Iterator iter = keySet.iterator();
+			while (iter.hasNext()) {
+				String key = (String) iter.next();
+				switch (key) {
+					case "myExtension" :
+						makeCallVO.setMyExtension(map.get("myExtension").toString());
 						break;
 					default : 
 						break;

@@ -511,6 +511,7 @@ public class Employees {
 			
 			for (int i = 0; i < list.size(); i++) {
 				EmployeeVO empVO = (EmployeeVO) list.get(i);
+				ImageMgr.getInstance().createImageFiles(empVO, "initial");
 //				imgHandler.createImageFile(employee, callingNum, model, callID);
 //				imgHandler.createImageFile(empVO, "010-3222-8237", "119", "");
 			}

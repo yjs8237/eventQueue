@@ -532,6 +532,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			
 			for (int i = 0; i < terminalArr.length; i++) {
 				Terminal terminal = terminalArr[i];
+				
 				Call call = terminal.getProvider().createCall();
 				Address addresses[] = terminal.getAddresses();
 				Address targetAddress = null;
@@ -569,6 +570,69 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			m_Log.server(LOGTYPE.ERR_LOG, "makeCall", sw.toString());
+			returnCode = RESULT.RTN_EXCEPTION;
+			returnMessage = e.getLocalizedMessage();
+		} finally {
+			resultVO.setCode(returnCode);
+			resultVO.setMessage(returnMessage);
+		}
+		return resultVO;
+	}
+
+	@Override
+	public JTapiResultVO stopCall(String myExtension) {
+		// TODO Auto-generated method stub
+		JTapiResultVO resultVO = new JTapiResultVO();
+		
+		int returnCode = RESULT.RTN_SUCCESS;
+		String returnMessage = "success";
+		
+		try {
+			
+			if(myExtension == null || myExtension.isEmpty()) {
+				returnCode = RESULT.RTN_EXCEPTION;
+				returnMessage = "myExtension is null " + myExtension;
+				return resultVO;
+			}
+			
+			Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(myExtension);
+			
+			if(terminalArr == null || terminalArr.length == 0) {
+				returnCode = RESULT.RTN_EXCEPTION;
+				returnMessage = "NOT LOGIN " + myExtension;
+				return resultVO;
+			}
+			
+			for (int i = 0; i < terminalArr.length; i++) {
+				Terminal terminal = terminalArr[i];
+				TerminalConnection tcs[] = terminal.getTerminalConnections();
+                if(tcs != null)
+                {
+                    for(int j = 0; j < tcs.length; j++)
+                    {
+                        CiscoCall call = (CiscoCall)tcs[j].getConnection().getCall();
+                        
+                        String callingAddress = call.getCallingAddress().toString();
+                        m_Log.server(LOGTYPE.STAND_LOG, "stopCall", "call Hanhup 시도 MyExtension[" + myExtension + "] callingAddress [" + callingAddress+"]");
+                        
+                        if(callingAddress.equals(myExtension))
+                        {
+                            tcs[j].getConnection().disconnect();
+                            m_Log.server(LOGTYPE.STAND_LOG, "stopCall", "call Hanhup Disconnection");
+                        }
+                    }
+
+                }
+				
+				
+			}
+			
+			
+		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			m_Log.server(LOGTYPE.ERR_LOG, "stopCall", sw.toString());
 			returnCode = RESULT.RTN_EXCEPTION;
 			returnMessage = e.getLocalizedMessage();
 		} finally {

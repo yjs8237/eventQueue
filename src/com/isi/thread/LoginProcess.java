@@ -32,14 +32,16 @@ public class LoginProcess extends Thread {
 	public void run() {
 		try {
 			
-			// 로그인 시도할때 이미지 삭제 -> 생성 
-//			System.out.println("## TEST createImageFiles");
-			createImageFiles(logwrite , empVO , requestID);
-//			imageMgr.createImageFiles(logwrite , empVO , requestID);
+//			createImageFiles(logwrite , empVO , requestID);
+			//로그인 시도할때 이미지 삭제 -> 생성 
+			ImageMgr.getInstance().createImageFiles(empVO, requestID);
 			
-//			System.out.println("## TEST HttpUrlHandler");
-			HttpUrlHandler urlHandler = new HttpUrlHandler(logwrite , parameter , requestID);
-			urlHandler.sendLoginUrl();
+			// 이중화 환경의 경우 remote 서버에게 로그인 시도 정보 전송 
+			if(XmlInfoMgr.getInstance().getDuplexYN().equalsIgnoreCase("Y")) {
+				HttpUrlHandler urlHandler = new HttpUrlHandler(logwrite , parameter , requestID);
+				urlHandler.sendLoginUrl();
+			}
+			
 			
 		} catch (Exception e) {
 			
@@ -48,7 +50,8 @@ public class LoginProcess extends Thread {
 		
 	}
 	
-	public void createImageFiles(ILog logwrite ,EmployeeVO empVO , String requestID) {
+	/*
+	public void createImageFiles (ILog logwrite ,EmployeeVO empVO , String requestID) {
 		ImageMgr imageMgr = ImageMgr.getInstance();
 		Map imageMap = imageMgr.getImageInfo();
 		
@@ -102,5 +105,6 @@ public class LoginProcess extends Thread {
 		}
 	
 	}
+	*/
 	
 }

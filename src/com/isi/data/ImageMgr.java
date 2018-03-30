@@ -23,9 +23,12 @@ public class ImageMgr {
 	final private Map <String, ImageVO> imageMap;
 	private Map <String, EmployeeVO> imageEmpMap = new HashMap<String, EmployeeVO>();
 	private static ImageMgr imageMgr = new ImageMgr();
+	private ILog logwrite;
+	
 	
 	private ImageMgr(){
 		imageMap = Collections.synchronizedMap(new HashMap<String, ImageVO>());
+		logwrite = new GLogWriter();
 	}
 	
 	public synchronized static ImageMgr getInstance(){
@@ -35,7 +38,7 @@ public class ImageMgr {
 		return imageMgr;
 	}
 	
-	public void createImageFiles(ILog logwrite ,EmployeeVO empVO , String requestID) {
+	public void createImageFiles(EmployeeVO empVO , String requestID) {
 		
 		Set keySet = imageMap.keySet();
 		Iterator iter = keySet.iterator();
@@ -55,7 +58,7 @@ public class ImageMgr {
 				strDest = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ extension + ".png";
 			}
 
-//			System.out.println("strDest1 : " + strDest);
+			// 이미 존재하는 이미지 파일은 삭제 후 다시 생성한다. 
 			File file = new File(strDest);
 			if(file.exists()) {
 				file.delete();
@@ -72,7 +75,6 @@ public class ImageMgr {
 				strDest = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ cell_num + ".png";
 			}
 			
-			
 //			System.out.println("strDest2 : " + strDest);
 			file = new File(strDest);
 			if(file.exists()) {
@@ -82,10 +84,9 @@ public class ImageMgr {
 			
 			logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
 			
+			// 이미 생성된 이미지 정보와 현재 시점 발신자의 정보를 비교하기 위한 객체 정보 add
 			addImgEmpInfo(cell_num, empVO);
 			addImgEmpInfo(extension, empVO);
-			
-			
 			
 		}
 	

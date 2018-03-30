@@ -220,7 +220,7 @@ public class HttpSyncServer {
 			
 			// 로그인 시도할때 이미지 삭제 -> 생성 
 			ImageMgr imageMgr = ImageMgr.getInstance();
-			imageMgr.createImageFiles(logwrite , empVO , requestID);
+			imageMgr.createImageFiles( empVO , requestID);
 			
 			logwrite.httpLog(requestID, "procCreateImage", "Create Login Image Sync Success!!");
 			

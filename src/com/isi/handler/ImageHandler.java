@@ -42,14 +42,14 @@ import com.isi.vo.ImageVO;
 public class ImageHandler {
 	
 	private PropertyRead pr;
-	private LogMgr m_Log;
+//	private LogMgr m_Log;
 	private ILog g_Log;
 	private ImageMgr imageMgr;
 	private String directtoryNm;
 	
 	public ImageHandler(){
 		pr = PropertyRead.getInstance();
-		m_Log = LogMgr.getInstance();
+//		m_Log = LogMgr.getInstance();
 		g_Log = new GLogWriter();
 	}
 	
@@ -124,7 +124,7 @@ public class ImageHandler {
 				if(file.delete()){
 					g_Log.imageLog("", "deleteImageFile", "DELETE SUCCESS : " + file.getAbsolutePath());
 //					System.out.println("DELETE SUCCESS : " + file.getAbsolutePath());
-					Thread.sleep(100);
+					Thread.sleep(30);
 				} else {
 					result = false;
 					g_Log.imageLog("", "deleteImageFile", "DELETE FAIL : " + file.getAbsolutePath());
@@ -184,10 +184,9 @@ public class ImageHandler {
 		
 		String imageSize = imageVO.getImageSize();
 		if(imageSize == null) {
-			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID , "CreateImageFile", imageSize + " 모델 이미지 사이즈 정보 없음 !! ");
+			g_Log.imageLog(callID , "CreateImageFile", imageSize + " 모델 이미지 사이즈 정보 없음 !! ");
 			return false;
 		}
-		
 		
 		String folderPath = "";
 		if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
@@ -222,7 +221,7 @@ public class ImageHandler {
         	*/
 			if (logdir.exists()) {
 				// 이미 팝업 이미지가 있다면 이미지를 생성하지 않는다. (직원 콜 의 경우만 해당)
-				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", callingNum + " 이미지 존재");
+				g_Log.imageLog(callID, "CreateImageFile", callingNum + " 이미지 존재");
 				return true;
 			}
             
@@ -238,7 +237,7 @@ public class ImageHandler {
             
             logdir = new File(basic_img_path);
             if(!logdir.exists()) {
-            	m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", "### NO Basic Image " + basic_img_path + " ###");
+            	g_Log.imageLog( callID, "CreateImageFile", "### NO Basic Image " + basic_img_path + " ###");
             	return false;
             }
             
@@ -314,11 +313,11 @@ public class ImageHandler {
 			
 			ImageIO.write(mergedImage, "png", new File(strDest));
 			
-			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID , "CreateImageFile", "CREATE SUCCESS : " + strDest);
+			g_Log.imageLog(callID , "CreateImageFile", "CREATE SUCCESS : " + strDest);
         } catch (Exception ioe) {
             bResult = false;
             ioe.printStackTrace(ExceptionUtil.getPrintWriter());
-            m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID , "CreateImageFile", ExceptionUtil.getStringWriter().toString());
+            g_Log.imageLog( callID , "CreateImageFile", ExceptionUtil.getStringWriter().toString());
         }
         return bResult;
     }

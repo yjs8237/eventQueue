@@ -32,7 +32,6 @@ public class ImageService extends Thread {
 			System.out.println("!! ERROR !! [createImageSizeFolder]");
 		}
 		
-		
 		// 최초 직원 이미지 파일 생성
 		if (employees.createAllImages() != RESULT.RTN_SUCCESS) {
 			System.out.println("!! ERROR !! [creatEmployeeImg]");

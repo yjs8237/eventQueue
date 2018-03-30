@@ -81,7 +81,7 @@ public class XMLSvcMain {
 		HttpSyncServer httpSyncServer = new HttpSyncServer();
 		httpSyncServer.startService();
 		
-		
+		// 구동시 이미지 파일 전체 삭제 & 생성
 		ImageService imgSvrThread = new ImageService();
 		imgSvrThread.start();
 		
