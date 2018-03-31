@@ -48,7 +48,7 @@ public class ImageMgr {
 			String key = (String) iter.next();
 			ImageVO imageVO = imageMap.get(key);
 			String extension = empVO.getExtension();
-			String cell_num = empVO.getCell_no();
+			String cell_num = empVO.getCell_no().replaceAll("-", "");
 			
 			String strDest = "";
 			

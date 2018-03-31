@@ -285,7 +285,7 @@ public class ImageHandler {
 			
 			if(division != null && !division.isEmpty()) {
 				// 부서
-				if(employee.getOrg_nm().length() > 9) {
+				if(employee.getOrg_nm().length() > 20) {
 					Font newfont = new Font("맑은고딕", Font.BOLD, fontsize - 2);
 					graphics.setFont(newfont);
 					graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

@@ -81,6 +81,7 @@ public class XMLHandler {
 			if(xmlInfo.getCallingDn().startsWith("#")) {
 				xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("#", ""));
 			}
+			xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("-", ""));
 			employee = employees.getEmployeeByCellNum(xmlInfo.getCallingDn() , callID);
 		} else {
 			// 내선전화
