@@ -9,7 +9,9 @@ import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.Vector;
 
 import javax.net.ssl.SSLContext;
@@ -29,7 +31,9 @@ import com.isi.axl.CiscoPhoneInfo;
 import com.isi.axl.SoapTrustManager;
 import com.isi.constans.LOGLEVEL;
 import com.isi.constans.LOGTYPE;
+import com.isi.constans.PROPERTIES;
 import com.isi.constans.SVCTYPE;
+import com.isi.db.DBConnMgr;
 import com.isi.handler.PushHandler;
 import com.isi.vo.EmployeeVO;
 import com.isi.vo.XmlVO;
@@ -79,10 +83,10 @@ public class TestMain {
 		soapHeader.append(xmlBody);
 		
 		
-		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
-		String retMsg = axlTest.SendSoapMessage(soapHeader.toString(), 1000);
-		System.out.println("--- return ---");
-		System.out.println(retMsg);
+//		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
+//		String retMsg = axlTest.SendSoapMessage(soapHeader.toString(), 1000);
+//		System.out.println("--- return ---");
+//		System.out.println(retMsg);
 		
 		
 		
@@ -96,6 +100,10 @@ public class TestMain {
 		
 		System.out.println(queryBuffer.toString());
 		System.out.println(queryBuffer.toString().replaceAll("alertingname,", ""));
+		
+		 
+		String extension = "12345";
+				extension= 		extension.substring(extension.length()-4, extension.length());
 		
 		
 		

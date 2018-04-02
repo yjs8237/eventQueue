@@ -12,6 +12,7 @@ import com.isi.constans.RESULT;
 import com.isi.data.Employees;
 import com.isi.data.ImageMgr;
 import com.isi.data.XmlInfoMgr;
+import com.isi.db.DBConnMgr;
 import com.isi.db.JDatabase;
 import com.isi.duplex.*;
 import com.isi.file.GLogWriter;
@@ -52,10 +53,24 @@ public class XMLSvcMain {
 		// XML 환경설정  SELECT
 		database.selectXMLInfo(pr.getValue(PROPERTIES.QUERY_XMLINFO));
 		
+		// XML 팝업로그 과거 2주 데이터  삭제
+		database.deletePopUpLog();
+		
+		
 		// 오래된 로그파일 삭제
 		XMLSvcMain svcMain = new XMLSvcMain();
 		svcMain.delOldLogFiles();
 		database.disconnectDB();
+		
+		
+		
+		// DB 커넥션 풀 생성
+		DBConnMgr.getInstance().setDb_class(pr.getValue(PROPERTIES.DB_CLASS));
+		DBConnMgr.getInstance().setDb_url(pr.getValue(PROPERTIES.DB_URL));
+		DBConnMgr.getInstance().setDb_user(pr.getValue(PROPERTIES.DB_USER));
+		DBConnMgr.getInstance().setDb_pwd(pr.getValue(PROPERTIES.DB_PASSWORD));
+		DBConnMgr.getInstance().initialConnection();
+		
 		
 		/*
 		CMInfo cmInfo = CMInfo.getInstance();
@@ -87,7 +102,6 @@ public class XMLSvcMain {
 		
 		ILog logwrite = new GLogWriter();
 		ProcessMain main = new ProcessMain();
-		
 		
 		if(!XmlInfoMgr.getInstance().getXmlMode().equalsIgnoreCase("Y")){
 			

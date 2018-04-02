@@ -272,4 +272,11 @@ public class GLogWriter implements ILog {
 		write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.POPUP, requestID, methodName, msg);
 	}
 
+
+	@Override
+	public void databaseLog(String requestID, String methodName, String msg) {
+		// TODO Auto-generated method stub
+		write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.DATABASE, requestID, methodName, msg);
+	}
+
 }

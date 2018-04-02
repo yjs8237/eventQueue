@@ -17,6 +17,7 @@ import java.util.List;
 
 import com.isi.constans.*;
 import com.isi.data.ImageMgr;
+import com.isi.data.MyAddressMgr;
 import com.isi.data.XmlInfoMgr;
 import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
@@ -108,7 +109,6 @@ public class JDatabase  {
             if (m_conn == null || m_conn.isClosed()) {            
                 connectDB();
             }
-
             m_stmt = m_conn.createStatement();
             
             if (m_stmt.executeUpdate(aQuery) == 0) {
@@ -230,6 +230,18 @@ public class JDatabase  {
     	return result;
     }
     
+    public void deletePopUpLog() {
+    	
+    	String sql = "DELETE FROM tb_popup_log where DATEDIFF(DD , datetime , GETDATE()) > 15" ;
+    	
+    	try {
+    		executeQuery(sql, false);
+    	} catch (Exception e) {
+    		
+    	}
+    	
+    }
+    
     public CustomerVO getCustInfo(String ani){
     	
     	System.out.println("************** DB Select *****************");
@@ -268,6 +280,9 @@ public class JDatabase  {
             return RESULT.RTN_EXCEPTION;
         }
     } 
+   
+    
+    
     
   public int selectXMLInfo(String query){
     	

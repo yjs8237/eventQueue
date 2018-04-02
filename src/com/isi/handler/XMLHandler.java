@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.sql.Connection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
@@ -15,6 +16,7 @@ import com.bestez.common.tr.HostWebtIO;
 import com.bestez.common.vo.CustInfoVO;
 import com.isi.constans.*;
 import com.isi.data.*;
+import com.isi.db.DBConnMgr;
 import com.isi.db.JDatabase;
 import com.isi.file.ILog;
 import com.isi.file.LogMgr;
@@ -76,16 +78,32 @@ public class XMLHandler {
 			return RESULT.ERROR;
 		}
 		
-		if(xmlInfo.getCallingDn().length() > 6) {
-			// 휴대전화번호 
-			if(xmlInfo.getCallingDn().startsWith("#")) {
-				xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("#", ""));
+		
+		// 개인 주소록 번호 조회 (개인 주소록 팝업이 우선순위가 높다) 
+		
+		EmployeeVO myAddressVO = employees.getEmployeeByExtension(xmlInfo.getTargetdn(), callID);
+		
+		// 커넥션 획득
+		Connection conn = DBConnMgr.getInstance().getConnection();
+		MyAddressMgr myAddress=  new MyAddressMgr(conn);
+		employee = myAddress.getMyAddressInfo(myAddressVO.getEmp_id(), xmlInfo.getCallingDn(), callID);
+		
+		// 커넥션 반납
+		DBConnMgr.getInstance().returnConnection(conn);
+		
+		if (employee == null) {
+			if(xmlInfo.getCallingDn().length() > 6) {
+				// 휴대전화번호 
+				if(xmlInfo.getCallingDn().startsWith("#")) {
+					xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("#", ""));
+				}
+				xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("-", ""));
+				
+				employee = employees.getEmployeeByCellNum(xmlInfo.getCallingDn(), callID);
+				
+			} else {
+				employee = employees.getEmployeeByExtension(xmlInfo.getCallingDn() , callID);
 			}
-			xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("-", ""));
-			employee = employees.getEmployeeByCellNum(xmlInfo.getCallingDn() , callID);
-		} else {
-			// 내선전화
-			employee = employees.getEmployeeByExtension(xmlInfo.getCallingDn() , callID);
 		}
         
 		if(employee != null){

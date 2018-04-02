@@ -59,6 +59,7 @@ public class DeviceCheck extends Thread{
 			if(isSuccess) {
 				JtapiService.getInstance().monitorStart(empVO.getExtension());
 				Employees.getInstance().loginEmployee(empVO , requestID);
+				logwrite.httpLog(requestID, "run", "--> Login 성공");
 			}
 			
 			logwrite.httpLog(requestID, "run", "--> Cheking device thread stop...");

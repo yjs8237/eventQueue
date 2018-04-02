@@ -19,6 +19,7 @@ public interface PROPERTIES {
 	public static final String QUERY_DEVICEINFO			= "DEVICEINFO";			// 전화기 정보 가져오는 쿼리 (디바이스타입 , 전화기 사이즈 등등..)
 	public static final String QUERY_XMLINFO			= "XMLINFO";			// XML 환경정보 가져오는 쿼리 (교환기정보, URL 등등)
 	public static final String QUERY_EMPINFO			= "SELECT_EMP_INFO";			// XML 환경정보 가져오는 쿼리 (교환기정보, URL 등등)
+	public static final String QUERY_MY_ADDRESS			= "SELECT_MY_ADDRESS";			// 개인주소록 정보 최초 로딩 쿼리
 	
 	/* ISXML WEB 서버 정보 */
 //	public static final String ISXMLWEB_URL			= "ISXMLWEB_URL";		// ISXML WEB 서버 정보

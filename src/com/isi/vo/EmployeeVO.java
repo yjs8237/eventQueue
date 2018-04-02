@@ -37,10 +37,20 @@ public class EmployeeVO  extends BaseVO implements IPerson {
 	private String called_num;
 	private String popup_yn;
 	private String description;
-	
+	private String tel_no;
 
 	public EmployeeVO (){
 		
+	}
+
+
+	public String getTel_no() {
+		return tel_no;
+	}
+
+
+	public void setTel_no(String tel_no) {
+		this.tel_no = tel_no;
 	}
 
 
@@ -358,16 +368,13 @@ public class EmployeeVO  extends BaseVO implements IPerson {
 		sb.append("emp_id [").append(emp_id).append("] ");
 		sb.append("emp_nm_kor [").append(emp_nm_kor).append("] ");
 		sb.append("emp_nm_eng [").append(emp_nm_eng).append("] ");
-		
 		sb.append("org_nm [").append(org_nm).append("] ");
 		sb.append("pos_nm [").append(pos_nm).append("] ");
 		sb.append("duty_nm [").append(duty_nm).append("] ");
 		sb.append("email [").append(email).append("] ");
-		
 		sb.append("cell_no [").append(cell_no).append("] ");
 		sb.append("emp_stat_nm [").append(emp_stat_nm).append("] ");
 		sb.append("emp_div_cd_nm [").append(emp_div_cd_nm).append("] ");
-		
 		sb.append("emp_lno [").append(emp_lno).append("] ");
 		sb.append("building [").append(building).append("] ");
 		sb.append("floor [").append(floor).append("] ");
@@ -380,6 +387,7 @@ public class EmployeeVO  extends BaseVO implements IPerson {
 		sb.append("device_type [").append(device_type).append("] ");
 		sb.append("device_ipaddr [").append(device_ipaddr).append("] ");
 		sb.append("extension [").append(extension).append("] ");
+		sb.append("tel_no [").append(tel_no).append("] ");
 		
 		return sb.toString();
 		
