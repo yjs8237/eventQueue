@@ -99,7 +99,12 @@ public class XMLHandler {
 		// 커넥션 반납
 		DBConnMgr.getInstance().returnConnection(conn , callID);
 		
-		if (employee == null) {
+		if(employee != null) {
+			// 개인주소록 인입콜 ( remote 서버 이미지 생성을 위해서 extension 컬럼에 calling  번호를 set 한다 )
+			// 여기를 세팅안하면.. 이미지 Push 할때 URL 이미지 파일명에 null.png 로 Push 하기 때문에
+			employee.setExtension(xmlInfo.getCallingDn());
+		} else {
+			// 이외 콜
 			if(xmlInfo.getCallingDn().length() > 6) {
 				employee = employees.getEmployeeByCellNum(xmlInfo.getCallingDn(), callID);
 			} else {
