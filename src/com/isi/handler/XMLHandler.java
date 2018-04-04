@@ -18,6 +18,7 @@ import com.isi.constans.*;
 import com.isi.data.*;
 import com.isi.db.DBConnMgr;
 import com.isi.db.JDatabase;
+import com.isi.exception.ExceptionUtil;
 import com.isi.file.ILog;
 import com.isi.file.LogMgr;
 import com.isi.file.LogWriter;
@@ -83,24 +84,24 @@ public class XMLHandler {
 		
 		EmployeeVO myAddressVO = employees.getEmployeeByExtension(xmlInfo.getTargetdn(), callID);
 		
+		// 휴대전화번호 
+		if(xmlInfo.getCallingDn().startsWith("#")) {
+			xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("#", ""));
+		}
+		xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("-", ""));
+		
+		
 		// 커넥션 획득
-		Connection conn = DBConnMgr.getInstance().getConnection();
+		Connection conn = DBConnMgr.getInstance().getConnection(callID);
 		MyAddressMgr myAddress=  new MyAddressMgr(conn);
 		employee = myAddress.getMyAddressInfo(myAddressVO.getEmp_id(), xmlInfo.getCallingDn(), callID);
 		
 		// 커넥션 반납
-		DBConnMgr.getInstance().returnConnection(conn);
+		DBConnMgr.getInstance().returnConnection(conn , callID);
 		
 		if (employee == null) {
 			if(xmlInfo.getCallingDn().length() > 6) {
-				// 휴대전화번호 
-				if(xmlInfo.getCallingDn().startsWith("#")) {
-					xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("#", ""));
-				}
-				xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("-", ""));
-				
 				employee = employees.getEmployeeByCellNum(xmlInfo.getCallingDn(), callID);
-				
 			} else {
 				employee = employees.getEmployeeByExtension(xmlInfo.getCallingDn() , callID);
 			}
@@ -529,14 +530,36 @@ public class XMLHandler {
 		
 		ImageVO imageVO = ImageMgr.getInstance().getImageInfo(xmlInfo.getTargetModel());
 		
-		if(imgHandler.createImageFile(employee ,xmlInfo.getCallingDn(),  imageVO, callID)) {
-			// 이미지 생성
+		int returnCode = imgHandler.createImageFile(employee ,xmlInfo.getCallingDn(),  imageVO, callID);
+		if (returnCode == 1) {
+			// 생성
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushImage", "이미지 생성 이후 이미지 생성 동기화 URL 호출");
+			// 이중화 환경의 경우 remote 서버에게 로그인 시도 정보 전송 
+			if (XmlInfoMgr.getInstance().getDuplexYN().equalsIgnoreCase("Y")) {
+				HttpUrlHandler urlHandler = new HttpUrlHandler(employee, callID);
+				try {
+					urlHandler.sendLoginUrl();
+				} catch (Exception e) {
+			            e.printStackTrace(ExceptionUtil.getPrintWriter());
+			            m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushImage", ExceptionUtil.getStringWriter().toString());
+				}
+			}
+			
 			pushHandler = new PushHandler(callID);
-			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing" , employee , CALL_RING , xmlInfo.getTargetModel()), xmlInfo, false);
-			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(), employee , resultVO.getResultMsg());
+			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel()), xmlInfo,false);
+			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(),
+					employee, resultVO.getResultMsg());
+		} else if (returnCode == 0) {
+			// 이미존재
+			pushHandler = new PushHandler(callID);
+			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel()), xmlInfo,false);
+			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(),
+					employee, resultVO.getResultMsg());
 		} else {
-			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), "N", employee , "cannot make image file of calling employee info");
-			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushRing", "Cannot make Image !!");
+			// 실패
+			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), "N", employee,
+					"cannot make image file of calling employee info");
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushImage", "Cannot make Image !!");
 			return -1;
 		}
 		

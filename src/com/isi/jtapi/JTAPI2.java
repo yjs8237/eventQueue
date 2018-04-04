@@ -256,11 +256,11 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				resultVO.setMessage("Device Unregistered");
 				return resultVO;
 			}
+			
 			if (addr.getState() == CiscoAddress.IN_SERVICE) {
 				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStart",
 						"[" + aDn + "] [ERROR] MonitorStart- already registered device ");
-//				resultVO.setCode(RESULT.ERR_DEV_ALREADY_LOGIN);
-//				resultVO.setMessage("Already Login");
+				
 				resultVO.setCode(200);
 				resultVO.setMessage("success");
 				return resultVO;
@@ -272,13 +272,21 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			if (dev != null) {
 				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStart",
 						"[" + aDn + "] [ERROR] MonitorStart - already addred device ");
-				// m_Log.server("[" + aDn + "] [ERROR] MonitorStart - already
-				// addred device ");
-//				resultVO.setCode(RESULT.ERR_DEV_ALREADY_LOGIN);
-//				resultVO.setMessage("Already Login");
-				resultVO.setCode(200);
-				resultVO.setMessage("success");
-				return resultVO;
+				
+				addr.removeCallObserver(dev);
+				addr.removeObserver(dev);
+
+				Terminal[] termarray = addr.getTerminals();
+				for (int i = 0; i < termarray.length; i++) {
+					CiscoTerminal term = (CiscoTerminal) termarray[i];
+					term.removeObserver(dev);
+				}
+				
+				m_DevMap.remove(aDn);
+				
+				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStart",
+						"[" + aDn + "] MonitorStart - Address remove observer ");
+				
 			}
 
 			// 모니터링이 성공하면 장치를 추가
@@ -471,6 +479,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		if(terminalArr == null || terminalArr.length == 0) {
 			returnCode = RESULT.RTN_EXCEPTION;
 			returnMessage = "NOT LOGIN " + pickupExtension;
+			resultVO.setCode(returnCode);
+			resultVO.setMessage(returnMessage);
 			return resultVO;
 		}
 		
@@ -521,12 +531,16 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			if(terminalArr == null || terminalArr.length == 0) {
 				returnCode = RESULT.RTN_EXCEPTION;
 				returnMessage = "NOT LOGIN " + myExtension;
+				resultVO.setCode(returnCode);
+				resultVO.setMessage(returnMessage);
 				return resultVO;
 			}
 			
 			if(myExtension == null || myExtension.isEmpty()) {
 				returnCode = RESULT.RTN_EXCEPTION;
 				returnMessage = "myExtension is null " + myExtension;
+				resultVO.setCode(returnCode);
+				resultVO.setMessage(returnMessage);
 				return resultVO;
 			}
 			
@@ -551,6 +565,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				
 				if (targetAddress != null) {
 					if(callingNumber != null && callingNumber.length() > 6) {
+						callingNumber = callingNumber.replaceAll("#", "");
+						callingNumber = callingNumber.replaceAll("-", "");
 						callingNumber = "#" + callingNumber;
 					}
 					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "call Connect 시도 MyExtension[" + myExtension + "] callingNumber[" + callingNumber + "]");
@@ -559,6 +575,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 					System.out.println("targetAddress is null "  );
 					returnCode = RESULT.RTN_EXCEPTION;
 					returnMessage = "targetAddress is null " + myExtension;
+					resultVO.setCode(returnCode);
+					resultVO.setMessage(returnMessage);
 					return resultVO;
 				}
 				
@@ -592,6 +610,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			if(myExtension == null || myExtension.isEmpty()) {
 				returnCode = RESULT.RTN_EXCEPTION;
 				returnMessage = "myExtension is null " + myExtension;
+				resultVO.setCode(returnCode);
+				resultVO.setMessage(returnMessage);
 				return resultVO;
 			}
 			
@@ -600,11 +620,14 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			if(terminalArr == null || terminalArr.length == 0) {
 				returnCode = RESULT.RTN_EXCEPTION;
 				returnMessage = "NOT LOGIN " + myExtension;
+				resultVO.setCode(returnCode);
+				resultVO.setMessage(returnMessage);
 				return resultVO;
 			}
 			
 			for (int i = 0; i < terminalArr.length; i++) {
 				Terminal terminal = terminalArr[i];
+				
 				TerminalConnection tcs[] = terminal.getTerminalConnections();
                 if(tcs != null)
                 {

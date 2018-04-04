@@ -41,7 +41,7 @@ public class DeviceStatusHandler {
 		
 		xmlInfo = XmlInfoMgr.getInstance();
 		
-		Object obj = soap.selectDeviceStatusJSON(empVO.getCm_ip(), empVO.getCm_user(), empVO.getCm_pwd(), empVO.getMac_address());
+		Object obj = soap.selectDeviceStatusJSON(empVO.getCm_ip(), empVO.getCm_user(), empVO.getCm_pwd(), empVO.getMac_address() , empVO.getRequestID());
 		JSONArray jsonArr = null;
 		if(obj instanceof JSONObject) {
 			JSONObject json = (JSONObject) obj;
@@ -78,25 +78,40 @@ public class DeviceStatusHandler {
 			return false;
 		}
 		
-		String [] arr = tempJson.get("content").toString().split("-");
-		String currentExtension = arr[0];
-		String deviceStatus = arr[1];
-		
-		
-//		System.out.println("deviceStatus : " + deviceStatus);
+//		{"content":"8925-Registered,8999-Registered,7099-Registered","xsi:type":"xsd:string"}
 		
 		if(empVO.getExtension() == null) {
 			return false;
 		}
-		if(!empVO.getExtension().equals(currentExtension)) {
+		
+		boolean returnBoolean = false;
+		
+		Object tempObj = tempJson.get("content");
+		if(tempObj == null) {
 			return false;
+		} else {
+			String content =tempJson.get("content").toString(); 
+			String []first_arr = content.split(",");
+			for (int i = 0; i < first_arr.length; i++) {
+				System.out.println(first_arr[i]);
+				String [] arr = first_arr[i].split("-");
+				String currentExtension = "";
+				String deviceStatus = "";
+				if(arr.length > 1) {
+					currentExtension = arr[0];
+					deviceStatus = arr[1];
+				}
+				if(empVO.getExtension().equals(currentExtension)) {
+					
+					if(deviceStatus.endsWith("Registered")) {
+						returnBoolean = true;
+					}					
+				}
+			}
 		}
 		
-		if(!deviceStatus.endsWith("Registered")) {
-			return false;
-		}
 		
-		return true;
+		return returnBoolean;
 		
 	}
 	

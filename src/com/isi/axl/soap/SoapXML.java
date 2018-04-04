@@ -34,6 +34,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import com.isi.file.GLogWriter;
+import com.isi.file.ILog;
+
 /**
  * @author skan
  */
@@ -45,7 +48,9 @@ public class SoapXML {
 	int             m_port;
 	String 			m_cmUser;
 	String			m_cmPwd;
-	 
+	
+	private ILog logwrite;
+	
 	public SoapXML(String ip, int port, String id, String pwd, SSLContext ctx) {
 		
 		try {
@@ -54,6 +59,7 @@ public class SoapXML {
 			m_port = port;
 			String auth = id + ":" + pwd;
 			m_auth = Text2Base64.getBase64(auth);
+			logwrite = new GLogWriter();
 		} catch(Exception e) {
 			
 		}
@@ -66,6 +72,7 @@ public class SoapXML {
 			m_port = port;
 			String auth = id + ":" + pwd;
 			m_auth = Text2Base64.getBase64(auth);
+			logwrite = new GLogWriter();
 		} catch(Exception e) {
 			
 		}
@@ -150,7 +157,7 @@ public class SoapXML {
 		}
 	}
 	
-	
+	/*
 	public String SendSoapMessageV2 (String ReqMsg, int nDefaultTimeOutMilliSecond) {
 		
 		Socket socket = null;
@@ -220,7 +227,7 @@ public class SoapXML {
 		
 		return "Error Unknwon!!";
 	}
-	
+	*/
 	
 	/**
 	 * SoapMessage
@@ -228,7 +235,13 @@ public class SoapXML {
 	 * @param nDefaultTimeOutMilliSecond
 	 * @return
 	 */
-	public String SendSoapMessage(String ReqMsg, int nDefaultTimeOutMilliSecond) {
+	
+	
+	public String SendSoapMessage(String ReqMsg, int nDefaultTimeOutMilliSecond ) {
+		return SendSoapMessage(ReqMsg , nDefaultTimeOutMilliSecond , "unknown");
+	}
+	
+	public String SendSoapMessage(String ReqMsg, int nDefaultTimeOutMilliSecond , String requestID) {
 		Socket socket = null;
 		OutputStream out = null;
 		BufferedReader br = null;
@@ -268,7 +281,15 @@ public class SoapXML {
 			} else {
 				return "Error Response is Not xml format!!";
 			}
-
+			
+//			System.out.println(rcvMsg);
+			
+			if(logwrite == null) {
+				logwrite = new GLogWriter();
+			}
+			logwrite.httpLog(requestID, "SendSoapMessage", "recv message [" + rcvMsg + "]");
+			
+			
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
 

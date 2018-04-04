@@ -201,7 +201,7 @@ public class Employees {
 			if(list != null && list.size() > 1){
 				for (int i = 0; i < list.size(); i++) {
 					employee = (EmployeeVO) list.get(i);
-					if(employee.getPopup_svc_yn().equalsIgnoreCase("Y")){
+					if(employee.getPopup_svc_yn() != null && employee.getPopup_svc_yn().equalsIgnoreCase("Y")) {
 						break;
 					}
 				}
@@ -503,6 +503,19 @@ public class Employees {
 	public int createAllImages() {
 		imgHandler = new ImageHandler();
 		
+		// 구동시 로그인 되어 있는 사람 이미지만 생성
+		for (int i = 0; i < initLoginExtlist.size(); i++) {
+			String extension = initLoginExtlist.get(i);
+			List list = (List) empMapByExtension.get(extension);
+			
+			for (int j = 0; j < list.size(); j++) {
+				EmployeeVO empVO = (EmployeeVO) list.get(j);
+				ImageMgr.getInstance().createImageFiles(empVO, "initial");
+			}
+		}
+		
+		
+		/*
 		Set keySet = empMapByExtension.keySet();
 		Iterator iter = keySet.iterator();
 		while(iter.hasNext()) {
@@ -511,12 +524,17 @@ public class Employees {
 			
 			for (int i = 0; i < list.size(); i++) {
 				EmployeeVO empVO = (EmployeeVO) list.get(i);
-				ImageMgr.getInstance().createImageFiles(empVO, "initial");
+				if(empVO.getExtension().equals("1764")) {
+//					ImageMgr.getInstance().createImageFiles(empVO, "initial");
+				} else {
+//					ImageMgr.getInstance().createImageFiles(empVO, "initial");
+				}
+				
 //				imgHandler.createImageFile(employee, callingNum, model, callID);
 //				imgHandler.createImageFile(empVO, "010-3222-8237", "119", "");
 			}
 		}
-		
+		*/
 		return 0;
 	}
 	

@@ -613,28 +613,34 @@ public class HttpServerHandler {
 			// 로그인 요청이 오면 이미지 삭제 -> 생성 작업을 실행하고,
 			// Remote Side 서버에게 로그인 요청 동기화 실시
 			// 비동기 처리를 위해 스레드 처리
-			LoginProcess loginProc = new LoginProcess(logwrite , empVO , parameter , requestID);
+			LoginProcess loginProc = new LoginProcess(empVO , parameter , requestID);
 			loginProc.start();
 			/*////////////////////////////////////////////////////////*/
-			
 			
 			/*
 			 * 전화기 상태체크 (로그인 시도한 전화기와 내선번호가 정확하게 Regi 되었나 확인)
 			 */
-			if(!DeviceStatusHandler.getInstance().isRegisteredDevice(empVO)) {
-//				logwrite.httpLog(requestID, "procLogin", empVO.getMac_address() + " is not Registered!!");
-				logwrite.httpLog(requestID, "procLogin", empVO.getExtension() + " , " +  empVO.getMac_address() + " is not Registered!!");
-				
-				// 전화기 내선번호가 아직 등록되지 않은 상태이면, 백그라운드 스레드로 전화기 상태 체크 시작
-				DeviceCheck deviceCheck = new DeviceCheck(logwrite , requestID, empVO);
-				deviceCheck.start();
-				
-				jsonObj.put("code", "200");
-				jsonObj.put("msg", "success");
-				return jsonObj.toString();
+			empVO.setRequestID(requestID);
+			
+			if(empVO.getCm_ip() == null || empVO.getCm_ip().isEmpty()) {
+				logwrite.httpLog(requestID, "procLogin", empVO.getEmp_id() + " 교환기 유저 정보가 없습니다!! 교환기 정보 강제 세팅 IP [10.156.214.111] USER [SAC_IPT] PW [dkdlvlxl123$]");
+				empVO.setCm_ip("10.156.214.111");
+				empVO.setCm_user("SAC_IPT");
+				empVO.setCm_pwd("dkdlvlxl123$");
 			}
 			
+			// 전화기가 깜박거리는 시간동안 백그라운드 스레드에서 일정시간 기다리고 Monitor 시작한다
+			DeviceCheck deviceCheck = new DeviceCheck(requestID, empVO);
+			deviceCheck.start();
+			
+			
+			jsonObj.put("code", "200");
+			jsonObj.put("msg", "success");
+			return jsonObj.toString();
+			
+			
 			//////////////////////////////////////////////////////////////////////////////////////////
+			/*
 			JTapiResultVO resultVO = JtapiService.getInstance().monitorStart(empVO.getExtension());
 			int loginResult = Employees.getInstance().loginEmployee(empVO , requestID);
 			
@@ -644,8 +650,8 @@ public class HttpServerHandler {
 			jsonObj.put("code", String.valueOf(resultVO.getCode()));
 			jsonObj.put("msg", resultVO.getMessage());
 			
-			
 			return jsonObj.toString();
+			*/
 		}
 		
 		private String checkParameter(BaseVO baseVO, int apiType) {

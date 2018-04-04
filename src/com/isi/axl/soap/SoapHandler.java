@@ -105,11 +105,11 @@ public class SoapHandler {
 	
 	////////////////////////////////////////////////////////////////
 	// SXML
-	public static String RequestSoapSXML(String id, String pw, String urlIP, String urlPort, String xmlBody) {
+	public static String RequestSoapSXML(String id, String pw, String urlIP, String urlPort, String xmlBody , String requestID) {
 		// TimeOut Default 3 second
-		return RequestSoapSXML(id, pw, urlIP, urlPort, xmlBody, 3000);
+		return RequestSoapSXML(id, pw, urlIP, urlPort, xmlBody, 3000 , requestID);
 	}
-	public static String RequestSoapSXML(String id, String pw, String urlIP, String urlPort, String xmlBody, int timeOutMilliSecond) {
+	public static String RequestSoapSXML(String id, String pw, String urlIP, String urlPort, String xmlBody, int timeOutMilliSecond , String requestID) {
 		SSLContext ctx = null;
 		X509TrustManager xtm = new SoapTrustManager();
 		TrustManager[] mytm = { xtm };
@@ -139,7 +139,7 @@ public class SoapHandler {
 		String strXml = strHttpHeader + xmlBody;
 		//System.out.println("Request >>>>>> \n" + strXml);
 		
-		String strResult = xml.SendSoapMessage(strXml, timeOutMilliSecond);
+		String strResult = xml.SendSoapMessage(strXml, timeOutMilliSecond , requestID);
 		
 		return strResult;
 	}

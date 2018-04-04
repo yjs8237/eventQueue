@@ -57,6 +57,137 @@ public class AxlTest {
 		}
 		
 	}
+	public String SendSoapMessageV2(String ReqMsg, int nDefaultTimeOutMilliSecond) {
+		Socket socket = null;
+		InputStream in = null;
+		OutputStream out = null;
+		
+		try {
+			String rcvMsg;
+			SSLSocketFactory sslFact = (SSLSocketFactory) m_ctx.getSocketFactory();
+			socket = (SSLSocket) sslFact.createSocket(m_ip, m_port);
+			
+//			socket =  sslFact.createSocket();
+//			socket.connect(new InetSocketAddress(m_ip, m_port), nDefaultTimeOutMilliSecond);
+//			socket.setSoTimeout(nDefaultTimeOutMilliSecond);
+			
+			out = socket.getOutputStream();
+			out.write(ReqMsg.getBytes("UTF-8"));
+			
+			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+			StringBuffer tempBuffer = new StringBuffer();
+			StringBuffer sb = new StringBuffer();
+			
+			boolean isXmlStart = false;
+			int value = 0;
+			while((value = br.read()) != -1) {
+				char c = (char)value;
+				sb.append(c);
+				
+				if(c == '\r') {
+					
+					if(sb.toString().startsWith("<?xml")) {
+						// xml 시작
+						tempBuffer.append(sb.toString());
+						isXmlStart = true;
+					} else if(sb.toString().indexOf(">") > 0 && isXmlStart) {
+						tempBuffer.append(sb.toString());
+					}
+					
+					sb = new StringBuffer();
+					System.out.println(tempBuffer.toString());
+				}
+				
+				
+				if (tempBuffer.toString().lastIndexOf("</soapenv:Envelope>") != -1 || tempBuffer.toString().lastIndexOf("</SOAP-ENV:Envelope>") != -1) {
+					break;
+				}
+			}
+			
+			System.out.println(tempBuffer.toString());
+			
+			
+//			if(WebServerLoadRunner.SOAP_AXL_LOG_YN) {
+//				logger.debug("## SOAP Recv Message ## [" + sb.toString() + "]");
+//			}
+			
+			
+			/*
+			in = socket.getInputStream();
+			out = socket.getOutputStream();
+			
+			StringBuffer sb = new StringBuffer(20000);
+			byte[] bArray  = new byte[20000];
+			int ch = 0;
+			out.write(ReqMsg.getBytes("UTF-8"));
+			
+			while ((ch = in.read(bArray)) != -1) {
+				String temp = new String(bArray, 0, ch);
+				sb.append(temp);
+				if (sb.lastIndexOf("</soapenv:Envelope>") != -1 || sb.lastIndexOf("</SOAP-ENV:Envelope>") != -1) {
+					break;
+				}
+			}
+			*/
+			
+			System.out.println("before : " + sb.toString());
+			
+			RemoveSizeInfo(sb);
+			
+			System.out.println("after : " + sb.toString());
+			
+			//logger.debug("StringBuffer [" + sb.toString() + "]");
+			
+			br.close();
+			out.close();
+			br = null;
+			out = null;
+			
+			if (sb.indexOf("<") < sb.length()) {
+				rcvMsg = sb.substring(sb.indexOf("<"));
+			} else {
+				return "Error Response is Not xml format!!";
+			}
+			
+//			if(WebServerLoadRunner.SOAP_AXL_LOG_YN) {
+//				logger.debug("## SOAP Recv XML Message ## [" + rcvMsg + "]");
+//			}
+			
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+
+			StringReader  rs        = new StringReader(rcvMsg);
+			InputSource inputSource = new InputSource(rs);
+			Document reply = db.parse(inputSource);
+			
+			if (reply != null) {
+				// Success
+				String strResult = DocumentToString(reply);
+				//logger.debug("strResult [" + strResult + "]");
+				return strResult;
+			}
+		} 
+		catch (SocketException se) {
+			return "Error socket timeout: " + se.toString();
+		}
+		catch (UnknownHostException ue) {
+			return "Error connecting to host: " + ue.toString();
+		} catch (IOException ioe) {
+			return "Error sending/receiving from server: " + ioe.toString();
+		} catch (Exception ea) {
+			return "Error exception "  + ea.toString();
+		} finally{
+			try {
+				if ( in != null) { in.close(); }
+				if ( out != null) { out.close(); }
+				if (socket != null) { socket.close(); }
+			} catch (final Exception exc) {
+				return "Error closing connection to server: "+ exc.getMessage();
+			}
+		}
+		return "Error Unknwon!!";
+	}
+	
 	
 	
 	public String SendSoapMessage(String ReqMsg, int nDefaultTimeOutMilliSecond) {
@@ -80,7 +211,7 @@ public class AxlTest {
 			out = socket.getOutputStream();
 			out.write(ReqMsg.getBytes("UTF-8"));
 			
-			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "ks_c_5601-1987"));
+			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 			StringBuffer sb = new StringBuffer();
 			
 			int value = 0;

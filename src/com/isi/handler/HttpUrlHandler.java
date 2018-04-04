@@ -23,6 +23,7 @@ import com.isi.file.ILog;
 import com.isi.file.LogMgr;
 import com.isi.file.PropertyRead;
 import com.isi.utils.Utils;
+import com.isi.vo.EmployeeVO;
 
 /**
  * 
@@ -39,17 +40,60 @@ public class HttpUrlHandler {
 	private ILog logwrite;
 	private String parameter;
 	private String requestID;
+	private EmployeeVO empVO;
 	
-	public HttpUrlHandler (ILog logwrite , String parameter , String requestID){
+	
+	public HttpUrlHandler (String parameter , String requestID){
 		pr = PropertyRead.getInstance();
-		this.logwrite = logwrite;
 		this.parameter = parameter;
 		this.requestID = requestID;
+		this.logwrite = new GLogWriter();
+//		connTimeout = XmlInfoMgr.getInstance().getConnectTimeout();
+//		readTimeout = XmlInfoMgr.getInstance().getReadTimeout();
+	}
+	
+	public HttpUrlHandler (EmployeeVO empVO , String requestID){
+		this.empVO = empVO;
+		pr = PropertyRead.getInstance();
+		this.requestID = requestID;
+		this.logwrite = new GLogWriter();
+		this.parameter = setparameter(empVO);
+		
 //		connTimeout = XmlInfoMgr.getInstance().getConnectTimeout();
 //		readTimeout = XmlInfoMgr.getInstance().getReadTimeout();
 	}
 	
 	
+	private String setparameter(EmployeeVO empVO2) {
+		// TODO Auto-generated method stub
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("emp_id=").append(empVO2.getEmp_id()).append("&");
+		buffer.append("emp_lno=").append(empVO2.getEmp_lno()).append("&");
+		buffer.append("emp_nm_kor=").append(empVO2.getEmp_nm_kor()).append("&");
+		buffer.append("emp_nm_eng=").append(empVO2.getEmp_nm_eng()).append("&");
+		buffer.append("org_nm=").append(empVO2.getOrg_nm()).append("&");
+		buffer.append("pos_nm=").append(empVO2.getPos_nm()).append("&");
+		buffer.append("duty_nm=").append(empVO2.getDuty_nm()).append("&");
+		buffer.append("extension=").append(empVO2.getExtension()).append("&");
+		buffer.append("email=").append(empVO2.getEmail()).append("&");
+		buffer.append("cell_no=").append(empVO2.getCell_no()).append("&");
+		buffer.append("building=").append(empVO2.getBuilding()).append("&");
+		buffer.append("floor=").append(empVO2.getFloor()).append("&");
+		buffer.append("emp_stat_nm=").append(empVO2.getEmp_stat_nm()).append("&");
+		buffer.append("emp_div_cd_nm=").append(empVO2.getEmp_div_cd_nm()).append("&");
+		buffer.append("popup_svc_yn=").append(empVO2.getPopup_svc_yn()).append("&");
+		buffer.append("mac_address=").append(empVO2.getMac_address()).append("&");
+		buffer.append("device_ipaddr=").append(empVO2.getDevice_ipaddr()).append("&");
+		buffer.append("device_type=").append(empVO2.getDevice_type()).append("&");
+		buffer.append("cm_ver=").append(empVO2.getCm_ver()).append("&");
+		buffer.append("cm_ip=").append(empVO2.getCm_ip()).append("&");
+		buffer.append("cm_user=").append(empVO2.getCm_user()).append("&");
+		buffer.append("cm_pwd=").append(empVO2.getCm_pwd());
+		
+		
+		return buffer.toString();
+	}
+
 	public int invokeURL(String strurl){
 		 
 		HttpURLConnection conn = null;
@@ -97,9 +141,15 @@ public class HttpUrlHandler {
 		
 	}
 	
+	public void sendImageUrl() throws Exception{
+		String url = "http://" + XmlInfoMgr.getInstance().getRemoteIP() + ":" + XmlInfoMgr.getInstance().getHttp_sync_port()  + "/imagesync";
+		urlCallTypeOfGet(url , encode(parameter) , requestID);
+		
+	}
+	
 	
 	 public  String urlCallTypeOfGet(String url, String param , String requestID) {
-    	 int TIME_OUT = 1000;
+    	 int TIME_OUT = 5000;
     	 String rtn = "";
     	 try {
     		URL urlCon = new URL(url+"?"+param);
@@ -147,7 +197,6 @@ public class HttpUrlHandler {
 			System.out.println("It can't connect to the web page.");
 			logwrite.httpLog(requestID, "urlCallTypeOfGet", e.getMessage());
 		}
-    	
     	//System.out.println("urlCallTypeOfGet DATA >>>>>>>> "+rtn);
     	return rtn;
      }

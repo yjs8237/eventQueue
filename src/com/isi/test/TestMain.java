@@ -22,6 +22,7 @@ import javax.net.ssl.X509TrustManager;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -34,6 +35,7 @@ import com.isi.constans.LOGTYPE;
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.SVCTYPE;
 import com.isi.db.DBConnMgr;
+import com.isi.handler.DeviceStatusHandler;
 import com.isi.handler.PushHandler;
 import com.isi.vo.EmployeeVO;
 import com.isi.vo.XmlVO;
@@ -55,16 +57,29 @@ public class TestMain {
 		String auth = id + ":" + pwd;
 		String m_auth = Text2Base64.getBase64(auth);
 		 
+		StringBuffer queryBuffer = new StringBuffer();
+//		queryBuffer
+//		.append("select ")
+//		.append("	n.pkid fknumplan, n.dnorpattern, n.cfnaduration, n.cfnavoicemailenabled, n.cfnaintdestination, n.cfnaintvoicemailenabled, n.cfnadestination ")
+//		.append("	, cfd.cfavoicemailenabled, cfd.cfadestination ")
+//		.append("from ")
+//		.append("	numplan n, callforwarddynamic cfd ")
+//		.append("where ")
+//		.append("	n.tkpatternusage IN (1, 2) ")
+//		.append("	and n.pkid = cfd.fknumplan ");
 		
+		queryBuffer.append("select * from numplan where dnorpattern = '1772'");
 		
 		String xmlBody = "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> <SOAP-ENV:Body> \r\n" + 
 				"<axlapi:executeSQLQuery xmlns:axlapi=\"http://www.cisco.com/AXL/API/8.5\" sequence=\"1234\"> \r\n" + 
 				"<sql>\r\n" + 
-				"SELECT pkid, dnorpattern, cfnaduration, cfnavoicemailenabled, cfnaintdestination, iscallable, cfurintvoicemailenabled, cfurvoicemailenabled, alertingname, description, fkroutepartition FROM NUMPLAN WHERE tkpatternusage = 2 AND fkroutepartition IS NOT NULL AND dnorpattern = '1776'\r\n" + 
+				queryBuffer.toString() + 
 				"</sql> \r\n" + 
 				"</axlapi:executeSQLQuery> \r\n" + 
 				"</SOAP-ENV:Body> \r\n" + 
 				"</SOAP-ENV:Envelope>";
+		
+		
 		
 		
 		StringBuffer soapHeader = new StringBuffer();
@@ -82,31 +97,72 @@ public class TestMain {
 		
 		soapHeader.append(xmlBody);
 		
-		
+//		
 //		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
-//		String retMsg = axlTest.SendSoapMessage(soapHeader.toString(), 1000);
+//		String retMsg = axlTest.SendSoapMessageV2(soapHeader.toString(), 10000);
 //		System.out.println("--- return ---");
 //		System.out.println(retMsg);
 		
 		
+//		(empVO.getCm_ip(), empVO.getCm_user(), empVO.getCm_pwd(), empVO.getMac_address() , empVO.getRequestID());
+		EmployeeVO empVO = new EmployeeVO();
+		empVO.setCm_ip("10.156.114.111");
+		empVO.setCm_user("SAC_IPT");
+		empVO.setCm_pwd("dkdlvlxl123$");
+		empVO.setMac_address("SEP001AA2660E8A");
+		empVO.setRequestID("");
+		empVO.setExtension("1764");
+		
+		for (int i = 0; i < 16; i++) {
+			DeviceStatusHandler.getInstance().isRegisteredDevice(empVO);
+		}
+		
+		
+//		String test = "{\"content\":\"8925-Registered,8999-Registered,7099-Registered\",\"xsi:type\":\"xsd:string\"}";
+		String test = "{\"content\":\"8925-Registered\",\"xsi:type\":\"xsd:string\"}";
+		JSONObject tempJson = new JSONObject(test);
+		
+		Object obj = tempJson.get("content");
+		if(obj == null) {
+			
+		} else {
+			String content =tempJson.get("content").toString(); 
+			String []first_arr = content.split(",");
+			for (int i = 0; i < first_arr.length; i++) {
+				System.out.println(first_arr[i]);
+				String [] arr = first_arr[i].split("-");
+				String currentExtension = "";
+				String deviceStatus = "";
+				if(arr.length>1) {
+					currentExtension = arr[0];
+					deviceStatus = arr[1];
+				}
+//				System.out.println(currentExtension + " , " + deviceStatus);
+			}
+		}
 		
 		
 		
-		StringBuffer queryBuffer = new StringBuffer();
-		queryBuffer
-			.append("SELECT pkid, dnorpattern, cfnaduration, cfnavoicemailenabled, cfnaintdestination, iscallable, cfurintvoicemailenabled, cfurvoicemailenabled, alertingname, description, fkroutepartition ")
-			.append("FROM NUMPLAN WHERE tkpatternusage = 2 AND fkroutepartition IS NOT NULL ")	//AND iscallable = 't'
-			.append("AND dnorpattern = '").append("1234").append("'");
 		
-		System.out.println(queryBuffer.toString());
-		System.out.println(queryBuffer.toString().replaceAll("alertingname,", ""));
+		
+//		StringBuffer queryBuffer = new StringBuffer();
+//		queryBuffer
+//			.append("SELECT pkid, dnorpattern, cfnaduration, cfnavoicemailenabled, cfnaintdestination, iscallable, cfurintvoicemailenabled, cfurvoicemailenabled, alertingname, description, fkroutepartition ")
+//			.append("FROM NUMPLAN WHERE tkpatternusage = 2 AND fkroutepartition IS NOT NULL ")	//AND iscallable = 't'
+//			.append("AND dnorpattern = '").append("1234").append("'");
+//		
+//		System.out.println(queryBuffer.toString());
+//		System.out.println(queryBuffer.toString().replaceAll("alertingname,", ""));
 		
 		 
-		String extension = "12345";
-				extension= 		extension.substring(extension.length()-4, extension.length());
+		String extension = "8925";
+
+		
+		System.out.println(CommonUtil.getPhoneMask(extension));
 		
 		
-		
+			
+				
 		
 		
 	}

@@ -51,25 +51,23 @@ public class MyAddressMgr {
 	            
 			
 			if(m_rs != null) {
-				
-				m_rs.next();
-				
 				String aniNum 	= "";
 				String name		= "";
 				String position	= "";
 				String division = "";
 				String floor	= "";
+				while(m_rs.next()) {
+					name = m_rs.getString("addr_name");
+					position = m_rs.getString("addr_position");
+					division = m_rs.getString("addr_company");
+					floor = "";
+					empVO = new EmployeeVO();
+					empVO.setEmp_nm_kor(name);
+					empVO.setPos_nm(position);
+					empVO.setOrg_nm(division);
+					empVO.setFloor(floor);
+				}
 				
-				name = m_rs.getString("addr_name");
-				position = m_rs.getString("addr_position");
-				division = m_rs.getString("addr_company");
-				floor = "";
-				
-				empVO = new EmployeeVO();
-				empVO.setEmp_nm_kor(name);
-				empVO.setPos_nm(position);
-				empVO.setOrg_nm(division);
-				empVO.setFloor(floor);
 				
 				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "getMyAddressInfo", "My Address Book Info name[" + name + "] position[" + position + "] division[" + division +"]");
 				

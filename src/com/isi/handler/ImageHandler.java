@@ -168,7 +168,7 @@ public class ImageHandler {
 	}
 	
 	
-	public boolean createImageFile(EmployeeVO employee ,  String callingNum,  ImageVO imageVO , String callID) {
+	public int createImageFile(EmployeeVO employee ,  String callingNum,  ImageVO imageVO , String callID) {
 		
 		imageMgr = ImageMgr.getInstance();
 		
@@ -185,7 +185,7 @@ public class ImageHandler {
 		String imageSize = imageVO.getImageSize();
 		if(imageSize == null) {
 			g_Log.imageLog(callID , "CreateImageFile", imageSize + " 모델 이미지 사이즈 정보 없음 !! ");
-			return false;
+			return -1;
 		}
 		
 		String folderPath = "";
@@ -222,7 +222,7 @@ public class ImageHandler {
 			if (logdir.exists()) {
 				// 이미 팝업 이미지가 있다면 이미지를 생성하지 않는다. (직원 콜 의 경우만 해당)
 				g_Log.imageLog(callID, "CreateImageFile", callingNum + " 이미지 존재");
-				return true;
+				return 0;
 			}
             
 //			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", "Background Image Search ["+XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png" + "]");
@@ -238,7 +238,7 @@ public class ImageHandler {
             logdir = new File(basic_img_path);
             if(!logdir.exists()) {
             	g_Log.imageLog( callID, "CreateImageFile", "### NO Basic Image " + basic_img_path + " ###");
-            	return false;
+            	return -1;
             }
             
             BufferedImage basic_img = ImageIO.read(new File(basic_img_path)); // 배경이미지
@@ -314,12 +314,15 @@ public class ImageHandler {
 			ImageIO.write(mergedImage, "png", new File(strDest));
 			
 			g_Log.imageLog(callID , "CreateImageFile", "CREATE SUCCESS : " + strDest);
+			
+			
+			
         } catch (Exception ioe) {
             bResult = false;
             ioe.printStackTrace(ExceptionUtil.getPrintWriter());
             g_Log.imageLog( callID , "CreateImageFile", ExceptionUtil.getStringWriter().toString());
         }
-        return bResult;
+        return  1;
     }
 	
 	/*

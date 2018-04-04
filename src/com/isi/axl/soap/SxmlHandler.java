@@ -49,7 +49,7 @@ public class SxmlHandler {
 //	}
 //	
 //	
-	public static Object selectDeviceStatusJSON(String cmIp, String cmId, String cmPwd, String mac){
+	public static Object selectDeviceStatusJSON(String cmIp, String cmId, String cmPwd, String mac , String requestID){
 		
 		int maxReturnedDevices = 10;
 		String deviceClass = "Phone";
@@ -84,7 +84,7 @@ public class SxmlHandler {
 		strXML += "</soapenv:Envelope>\n";
 		//System.out.println(strXML);
 		
-		String strResult = SoapHandler.RequestSoapSXML(cmId, cmPwd, cmIp, "8443", strXML);
+		String strResult = SoapHandler.RequestSoapSXML(cmId, cmPwd, cmIp, "8443", strXML , requestID);
 		//System.out.println(strResult);
 		try {
 			JSONObject xmlJson = XML.toJSONObject(strResult);

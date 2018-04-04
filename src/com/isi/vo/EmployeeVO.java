@@ -38,17 +38,23 @@ public class EmployeeVO  extends BaseVO implements IPerson {
 	private String popup_yn;
 	private String description;
 	private String tel_no;
-
+	private String requestID;
+	
+	
 	public EmployeeVO (){
 		
 	}
-
-
 	public String getTel_no() {
 		return tel_no;
 	}
 
 
+	public String getRequestID() {
+		return requestID;
+	}
+	public void setRequestID(String requestID) {
+		this.requestID = requestID;
+	}
 	public void setTel_no(String tel_no) {
 		this.tel_no = tel_no;
 	}

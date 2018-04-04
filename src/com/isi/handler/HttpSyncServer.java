@@ -177,6 +177,10 @@ public class HttpSyncServer {
 					resultJSONData = procCreateImage(parameter, requestID);
 					break;
 					
+				case "/imagesync":
+					resultJSONData = procCreateImage(parameter, requestID);
+					break;
+					
 				default:
 					// returnCode = RESULT.HTTP_URL_ERROR;
 					break;

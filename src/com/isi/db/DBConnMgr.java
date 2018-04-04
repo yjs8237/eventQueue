@@ -57,7 +57,7 @@ public class DBConnMgr {
 		logwrite.databaseLog("", "initialConnection", "최초 Connection Size : " + idle_conn_list.size());
 	}
 	
-	public  Connection getConnection() {
+	public  Connection getConnection(String callID) {
 		Connection conn = null;
 		synchronized (idle_conn_list) {
 			if(idle_conn_list.size() == 0) {
@@ -70,12 +70,12 @@ public class DBConnMgr {
 			}
 			conn = idle_conn_list.remove(0);
 		}
-		logwrite.databaseLog("", "getConnection", "Connection 획득 현재 Connection size : " + idle_conn_list.size());
+		logwrite.databaseLog(callID, "getConnection", "Connection 획득 현재 Connection size : " + idle_conn_list.size());
 //		System.out.println("Connection 획득 현재 Connection size : " + idle_conn_list.size());
 		return  conn;
 	}
 	
-	public void returnConnection(Connection conn) {
+	public void returnConnection(Connection conn , String callID) {
 		
 		try {
 			if(conn == null || conn.isClosed()) {
@@ -83,7 +83,6 @@ public class DBConnMgr {
 //				System.out.println("Connection 반납 객체 null 또는 closed");
 				return;
 			}
-			
 			
 			synchronized (idle_conn_list) {
 				if(idle_conn_list.contains(conn)) {
@@ -93,12 +92,12 @@ public class DBConnMgr {
 				idle_conn_list.add(conn);
 			}
 //			System.out.println("Connection 반납 현재 Connection size : " + idle_conn_list.size());
-			logwrite.databaseLog("", "returnConnection", "Connection 반납 현재 Connection size : " + idle_conn_list.size());
+			logwrite.databaseLog(callID, "returnConnection", "Connection 반납 현재 Connection size : " + idle_conn_list.size());
 		} catch(Exception e) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
-			logwrite.databaseLog("", "returnConnection", sw.toString());
+			logwrite.databaseLog(callID, "returnConnection", sw.toString());
 		}
 		
 	}

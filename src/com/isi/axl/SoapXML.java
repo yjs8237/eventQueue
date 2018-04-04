@@ -104,7 +104,6 @@ public class SoapXML {
             out = socket.getOutputStream();
 			out.write(aReqMsg.getBytes("UTF-8"));
 			
-			
 			br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 			StringBuffer sb = new StringBuffer();
 			

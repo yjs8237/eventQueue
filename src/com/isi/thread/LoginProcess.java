@@ -20,13 +20,11 @@ public class LoginProcess extends Thread {
 	private EmployeeVO empVO;
 	private String parameter;
 	private String requestID;
-	private ILog logwrite;
 	
-	public LoginProcess(ILog logwrite , EmployeeVO empVO, String parameter , String requestID) {
+	public LoginProcess( EmployeeVO empVO, String parameter , String requestID) {
 		this.empVO = empVO;
 		this.parameter = parameter;
 		this.requestID = requestID;
-		this.logwrite = logwrite;
 	}
 	
 	public void run() {
@@ -38,7 +36,7 @@ public class LoginProcess extends Thread {
 			
 			// 이중화 환경의 경우 remote 서버에게 로그인 시도 정보 전송 
 			if(XmlInfoMgr.getInstance().getDuplexYN().equalsIgnoreCase("Y")) {
-				HttpUrlHandler urlHandler = new HttpUrlHandler(logwrite , parameter , requestID);
+				HttpUrlHandler urlHandler = new HttpUrlHandler(parameter , requestID);
 				urlHandler.sendLoginUrl();
 			}
 			

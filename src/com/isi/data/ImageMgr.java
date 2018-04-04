@@ -43,46 +43,66 @@ public class ImageMgr {
 		Set keySet = imageMap.keySet();
 		Iterator iter = keySet.iterator();
 		ImageHandler imgHandler = new ImageHandler();
+		
+		if(logwrite == null) {
+			logwrite = new GLogWriter();
+		}
+		
 		while(iter.hasNext()) {
 			
 			String key = (String) iter.next();
 			ImageVO imageVO = imageMap.get(key);
-			String extension = empVO.getExtension();
-			String cell_num = empVO.getCell_no().replaceAll("-", "");
 			
 			String strDest = "";
+			File file = null;
 			
-			if (PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
-				strDest = XmlInfoMgr.getInstance().getEmp_img_path_A() + imageVO.getImageSize() + "\\"+ extension + ".png";
+			String extension="";
+			String cell_num="";
+			
+			if(empVO.getExtension() == null || empVO.getExtension().equalsIgnoreCase("null")) {
+				logwrite.httpLog(requestID, "createImageFiles", "## Extension is null ## " + empVO.getEmp_id());
 			} else {
-				strDest = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ extension + ".png";
-			}
+				 extension = empVO.getExtension();
+				
+				if (PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+					strDest = XmlInfoMgr.getInstance().getEmp_img_path_A() + imageVO.getImageSize() + "\\"+ extension + ".png";
+				} else {
+					strDest = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ extension + ".png";
+				}
 
-			// 이미 존재하는 이미지 파일은 삭제 후 다시 생성한다. 
-			File file = new File(strDest);
-			if(file.exists()) {
-				file.delete();
+				// 이미 존재하는 이미지 파일은 삭제 후 다시 생성한다. 
+				file= new File(strDest);
+				if(file.exists()) {
+					file.delete();
+				}
+				
+				imgHandler.createImageFile(empVO , extension , imageVO , "");
+				
+				logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
 			}
 			
-			imgHandler.createImageFile(empVO , extension , imageVO , "");
-			
-			logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
-			
-			strDest = "";
-			if (PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
-				strDest = XmlInfoMgr.getInstance().getEmp_img_path_A() + imageVO.getImageSize() + "\\"+ cell_num + ".png";
+			if(empVO.getCell_no() == null || empVO.getCell_no().equalsIgnoreCase("null")) {
+				logwrite.httpLog(requestID, "createImageFiles", "## Cell Number is null ## " + empVO.getEmp_id());
 			} else {
-				strDest = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ cell_num + ".png";
+				 cell_num = empVO.getCell_no().replaceAll("-", "");
+				
+				strDest = "";
+				if (PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+					strDest = XmlInfoMgr.getInstance().getEmp_img_path_A() + imageVO.getImageSize() + "\\"+ cell_num + ".png";
+				} else {
+					strDest = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ cell_num + ".png";
+				}
+				
+//				System.out.println("strDest2 : " + strDest);
+				file = new File(strDest);
+				if(file.exists()) {
+					file.delete();
+				}
+				imgHandler.createImageFile(empVO , cell_num , imageVO , "");
+				
+				logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
 			}
 			
-//			System.out.println("strDest2 : " + strDest);
-			file = new File(strDest);
-			if(file.exists()) {
-				file.delete();
-			}
-			imgHandler.createImageFile(empVO , cell_num , imageVO , "");
-			
-			logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
 			
 			// 이미 생성된 이미지 정보와 현재 시점 발신자의 정보를 비교하기 위한 객체 정보 add
 			addImgEmpInfo(cell_num, empVO);
