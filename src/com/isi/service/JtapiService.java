@@ -84,8 +84,8 @@ public class JtapiService {
 	                	isJtapiRun = true;
 	                	logWriter.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.JTAPI, "startService", "Start JTAPI Service!");
 	                	
-	                	CiscoPhoneInfo phoneinfo = new CiscoPhoneInfo();
-	                	CiscoPhoneInfo.GetAllPhoneInfo(cmIP, 8443, cmUser, cmPassword, phoneinfo);
+//	                	CiscoPhoneInfo phoneinfo = new CiscoPhoneInfo();
+//	                	CiscoPhoneInfo.GetAllPhoneInfo(cmIP, 8443, cmUser, cmPassword, phoneinfo);
 	                	// ## 주석
 //	                	JCtiData.getData().updateDeviceIP(phoneinfo);
 	                	
@@ -128,7 +128,7 @@ public class JtapiService {
 		return resultVO;
 	}
 	
-	public JTapiResultVO makeCall(String myExtension , String callingNumber ) {
+	public JTapiResultVO makeCall(String myExtension , String callingNumber , String mac_address ) {
 		
 		JTapiResultVO resultVO = null;
 		if(myExtension == null || myExtension.isEmpty()) {
@@ -139,7 +139,7 @@ public class JtapiService {
 			return resultVO;
 		}
 		
-		resultVO = m_jtapi[0].makeCall(myExtension, callingNumber );
+		resultVO = m_jtapi[0].makeCall(myExtension, callingNumber , mac_address );
 		if(resultVO.getCode() != RESULT.RTN_SUCCESS) {
 			return resultVO;
 		}

@@ -26,12 +26,14 @@ import com.isi.process.IQueue;
 import com.isi.process.JQueue;
 import com.isi.service.JtapiService;
 import com.isi.service.UDPThread;
+import com.isi.test.AxlTest;
 import com.isi.thread.DBService;
 import com.isi.thread.ImageService;
 import com.isi.thread.UDPService;
 import com.isi.thread.XMLService;
 import com.isi.utils.Utils;
 import com.isi.vo.CMInfo;
+import com.test.axl.soap.Text2Base64;
 import com.test.thread.TestThread;
 
 /**
@@ -63,7 +65,6 @@ public class XMLSvcMain {
 		database.disconnectDB();
 		
 		
-		
 		// DB 커넥션 풀 생성
 		DBConnMgr.getInstance().setDb_class(pr.getValue(PROPERTIES.DB_CLASS));
 		DBConnMgr.getInstance().setDb_url(pr.getValue(PROPERTIES.DB_URL));
@@ -71,6 +72,7 @@ public class XMLSvcMain {
 		DBConnMgr.getInstance().setDb_pwd(pr.getValue(PROPERTIES.DB_PASSWORD));
 		DBConnMgr.getInstance().initialConnection();
 		
+		//svcMain.test();
 		
 		/*
 		CMInfo cmInfo = CMInfo.getInstance();
@@ -169,10 +171,6 @@ public class XMLSvcMain {
 		
 	}
 	
-	private void startDataBasePoolService() {
-		
-	}
-	
 	private void delOldLogFiles() {
 		// TODO Auto-generated method stub
 		
@@ -224,6 +222,73 @@ public class XMLSvcMain {
 		}
 	}
 	
+	
+	
+	private void test() {
+		String urlIP = "10.156.214.111";
+		int urlPort = 8443;
+		String ver = "8.5";
+		String id = "SAC_IPT";
+		String pwd = "dkdlvlxl123$";
+		String auth = id + ":" + pwd;
+		String m_auth = Text2Base64.getBase64(auth);
+		 
+		StringBuffer queryBuffer = new StringBuffer();
+		queryBuffer
+		.append("select ")
+		.append("	n.pkid fknumplan, n.dnorpattern, n.cfnaduration, n.cfnavoicemailenabled, n.cfnaintdestination, n.cfnaintvoicemailenabled, n.cfnadestination ")
+		.append("	, cfd.cfavoicemailenabled, cfd.cfadestination ")
+		.append("from ")
+		.append("	numplan n, callforwarddynamic cfd ")
+		.append("where ")
+		.append("	n.tkpatternusage IN (1, 2) ")
+		.append("	and n.pkid = cfd.fknumplan ");
+		
+		
+//		queryBuffer
+//		.append("select ")
+//		.append("	d.pkid fkdevice, d.name, d.tkuserlocale, d.tkcountry, d.description ")
+//		.append("	, dnm.busytrigger, dnm.e164mask, n.dnorpattern ")
+//		.append("	, d.fkdevicepool, d.fksoftkeytemplate, n.fkroutepartition, n.fkcallingsearchspace_sharedlineappear ")
+//		.append("	, PICK.pkid as pick_pkid ")
+//		.append("from")
+//		.append("	device d, devicenumplanmap dnm, numplan n , pickupgrouplinemap PM , pickupgroup PICK ")
+//		.append("where ")
+//		.append("	d.pkid = dnm.fkdevice and dnm.fknumplan = n.pkid and n.pkid = PM.fknumplan_line and PM.fkpickupgroup = PICK.pkid ");
+		
+//		queryBuffer.append("select * from numplan where dnorpattern = '1772'");
+		
+		String xmlBody = "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> <SOAP-ENV:Body> \r\n" + 
+				"<axlapi:executeSQLQuery xmlns:axlapi=\"http://www.cisco.com/AXL/API/8.5\" sequence=\"1234\"> \r\n" + 
+				"<sql>\r\n" + 
+				queryBuffer.toString() + 
+				"</sql> \r\n" + 
+				"</axlapi:executeSQLQuery> \r\n" + 
+				"</SOAP-ENV:Body> \r\n" + 
+				"</SOAP-ENV:Envelope>";
+		
+		
+		
+		
+		StringBuffer soapHeader = new StringBuffer();
+		soapHeader.append("POST https://").append(urlIP).append(":").append(urlPort).append("/axl/ HTTP/1.1").append("\n");
+		soapHeader.append("Accept-Encoding: gzip,deflate").append("\n");
+		soapHeader.append("Content-Type: text/xml;charset=UTF-8").append("\n");
+//		soapHeader.append("SOAPAction: \"CUCM:DB ver=").append(ver).append(" executeSQLQuery\"").append("\n");
+		soapHeader.append("SOAPAction: \"CUCM:DB ver=").append(ver).append("\n");
+		soapHeader.append("Content-Length: ").append(xmlBody.length()).append("\n");	
+		soapHeader.append("Host: ").append(urlIP).append(":").append(urlPort).append("\n");
+		soapHeader.append("Connection: Keep-Alive").append("\n");
+		soapHeader.append("User-Agent: Apache-HttpClient/4.1.1 (java 1.5)").append("\n");
+		soapHeader.append("Authorization: Basic ").append(m_auth).append("\n").append("\n");
+		
+		
+		soapHeader.append(xmlBody);
+		
+//		
+		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
+		String retMsg = axlTest.SendSoapMessageV2(soapHeader.toString(), 10000);
+	}
 	
 	
 }

@@ -245,6 +245,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		try {
 
 			addr = (CiscoAddress) m_Provider.getAddress(aDn);
+			
 			//Terminal terminal = m_Provider.getTerminal(aDn);
 			
 			if (addr == null) {
@@ -517,7 +518,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 	}
 
 	@Override
-	public JTapiResultVO makeCall(String myExtension, String callingNumber ) {
+	public JTapiResultVO makeCall(String myExtension, String callingNumber ,String mac_address) {
 		// TODO Auto-generated method stub
 		JTapiResultVO resultVO = new JTapiResultVO();
 		
@@ -547,9 +548,24 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			for (int i = 0; i < terminalArr.length; i++) {
 				Terminal terminal = terminalArr[i];
 				
+				m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "terminal name : " + terminal.getName() + " , mac_address : " + mac_address);
+				
+				if(mac_address != null && !mac_address.isEmpty()) {
+					// mac_address 까지 비교해야 한다면 
+					if(!mac_address.equals(terminal.getName())){
+						returnCode = RESULT.RTN_EXCEPTION;
+						returnMessage = "mac_address is not same " + mac_address;
+						continue;
+					}	
+				} 
+				
 				Call call = terminal.getProvider().createCall();
 				Address addresses[] = terminal.getAddresses();
 				Address targetAddress = null;
+				
+				
+				// 내선 기준으로 make call ( 같은 내선의 n 개의 Device 일 경우 모든 Device가 makecall 될기야..)
+				
 				for (int j = 0; j < addresses.length; j++) {
 					
 					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "address : " + addresses[j].getName() + " , myExtension : " + myExtension);
@@ -558,8 +574,6 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 						continue;
 					}
 					targetAddress = addresses[j];
-					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "targetAddress : " + targetAddress.getName() + " , myExtension : " + myExtension);
-					System.out.println();
 					break;
 				}
 				

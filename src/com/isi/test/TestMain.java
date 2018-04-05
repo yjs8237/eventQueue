@@ -58,17 +58,32 @@ public class TestMain {
 		String m_auth = Text2Base64.getBase64(auth);
 		 
 		StringBuffer queryBuffer = new StringBuffer();
+		queryBuffer
+		.append("select ")
+		.append("	n.pkid fknumplan, n.dnorpattern, n.cfnaduration, n.cfnavoicemailenabled, n.cfnaintdestination, n.cfnaintvoicemailenabled, n.cfnadestination ")
+		.append("	, cfd.cfavoicemailenabled, cfd.cfadestination ")
+		.append("from ")
+		.append("	numplan n, callforwarddynamic cfd ")
+		.append("where ")
+		.append("	n.tkpatternusage IN (1, 2) ")
+		.append("	and n.pkid = cfd.fknumplan ");
+		
+		
 //		queryBuffer
 //		.append("select ")
-//		.append("	n.pkid fknumplan, n.dnorpattern, n.cfnaduration, n.cfnavoicemailenabled, n.cfnaintdestination, n.cfnaintvoicemailenabled, n.cfnadestination ")
-//		.append("	, cfd.cfavoicemailenabled, cfd.cfadestination ")
-//		.append("from ")
-//		.append("	numplan n, callforwarddynamic cfd ")
+//		.append("	d.pkid fkdevice, d.name, d.tkuserlocale, d.tkcountry, d.description ")
+//		.append("	, dnm.busytrigger, dnm.e164mask, n.dnorpattern ")
+//		.append("	, d.fkdevicepool, d.fksoftkeytemplate, n.fkroutepartition, n.fkcallingsearchspace_sharedlineappear ")
+//		.append("	, PICK.pkid as pick_pkid ")
+//		.append("from")
+//		.append("	device d, devicenumplanmap dnm, numplan n , pickupgrouplinemap PM , pickupgroup PICK ")
 //		.append("where ")
-//		.append("	n.tkpatternusage IN (1, 2) ")
-//		.append("	and n.pkid = cfd.fknumplan ");
+//		.append("	d.pkid = dnm.fkdevice and dnm.fknumplan = n.pkid and n.pkid = PM.fknumplan_line and PM.fkpickupgroup = PICK.pkid ");
 		
-		queryBuffer.append("select * from numplan where dnorpattern = '1772'");
+		
+		
+		
+//		queryBuffer.append("select * from numplan where dnorpattern = '1772'");
 		
 		String xmlBody = "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> <SOAP-ENV:Body> \r\n" + 
 				"<axlapi:executeSQLQuery xmlns:axlapi=\"http://www.cisco.com/AXL/API/8.5\" sequence=\"1234\"> \r\n" + 
@@ -97,9 +112,24 @@ public class TestMain {
 		
 		soapHeader.append(xmlBody);
 		
+		
+		String testStr = "adsfgadsfg";
+		
+		String [] testarr = testStr.split("\n");
+		System.out.println(testarr.length);
+		
+		 long v = Long.parseLong("2000", 16);   
+		 System.out.println(String.valueOf(v));
+		
+//		 System.out.println(CommonUtil.convertHex("fbce648</fknumplan><dnorpatter"));
+		 
 //		
 //		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
 //		String retMsg = axlTest.SendSoapMessageV2(soapHeader.toString(), 10000);
+		
+
+		
+		
 //		System.out.println("--- return ---");
 //		System.out.println(retMsg);
 		
@@ -114,7 +144,7 @@ public class TestMain {
 		empVO.setExtension("1764");
 		
 		for (int i = 0; i < 16; i++) {
-			DeviceStatusHandler.getInstance().isRegisteredDevice(empVO);
+//			DeviceStatusHandler.getInstance().isRegisteredDevice(empVO);
 		}
 		
 		
@@ -129,7 +159,7 @@ public class TestMain {
 			String content =tempJson.get("content").toString(); 
 			String []first_arr = content.split(",");
 			for (int i = 0; i < first_arr.length; i++) {
-				System.out.println(first_arr[i]);
+//				System.out.println(first_arr[i]);
 				String [] arr = first_arr[i].split("-");
 				String currentExtension = "";
 				String deviceStatus = "";
@@ -158,7 +188,7 @@ public class TestMain {
 		String extension = "8925";
 
 		
-		System.out.println(CommonUtil.getPhoneMask(extension));
+//		System.out.println(CommonUtil.getPhoneMask(extension));
 		
 		
 			
@@ -166,6 +196,13 @@ public class TestMain {
 		
 		
 	}
+	
+	
+	private String getHexToDec(String hex) {
+		   long v = Long.parseLong(hex, 16);   
+		   return String.valueOf(v);
+		}
+	
 	
 	public static void gogotest() {
 		
@@ -231,8 +268,8 @@ public class TestMain {
             InputStream in = socket.getInputStream();
             OutputStream out = socket.getOutputStream();
             
-            System.out.println("SEND SOAP MESSAGE");
-            System.out.println(aReqMsg);
+//            System.out.println("SEND SOAP MESSAGE");
+//            System.out.println(aReqMsg);
             
             StringBuffer sb = new StringBuffer(8192);
             byte[] bArray  = new byte[8192];
@@ -249,7 +286,7 @@ public class TestMain {
                 }
             }
             
-            System.out.println("RECV SOAP MSG : " + sb.toString());
+//            System.out.println("RECV SOAP MSG : " + sb.toString());
             
 //            RemoveSizeInfo(sb);
 //            m_Log.fine(sb.toString());
@@ -284,7 +321,7 @@ public class TestMain {
 		// temp_1 = recv_msg.substring(idx+1, recv_msg.length());
 		// C09을 제외하고 CallKey^TELNO만 추출
 		String temp_1 = recv_msg.substring(idx + 1, recv_msg.length());
-		System.out.println(temp_1);
+//		System.out.println(temp_1);
 		    
 	}
 	
@@ -314,15 +351,15 @@ public class TestMain {
 				}
 				
 				if(conn == null) {
-					System.out.println("cnt -> " +  cnt + " , null");
+//					System.out.println("cnt -> " +  cnt + " , null");
 				} else {
-					System.out.println("cnt -> " +  cnt + " , not");
+//					System.out.println("cnt -> " +  cnt + " , not");
 				}
 			}
 			
 			
 		} catch (Exception e) {
-			System.out.println(e.toString());
+//			System.out.println(e.toString());
 		}
 		
 		

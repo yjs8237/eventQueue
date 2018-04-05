@@ -246,7 +246,7 @@ public class ImageHandler {
             int width = Integer.parseInt(imageVO.getImageSize().substring(0, 3));
             int height = Integer.parseInt(imageVO.getImageSize().substring(3));
             
-			int fontsize = (int) (height / 12);
+			int fontsize = (int) (height / 10);
 			
 			BufferedImage mergedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 			Graphics2D graphics = (Graphics2D) mergedImage.getGraphics();
@@ -254,7 +254,13 @@ public class ImageHandler {
 			graphics.setBackground(Color.WHITE);
 			graphics.drawImage(basic_img, 0, 0, null);
 			
-			Font font = new Font("맑은고딕", Font.BOLD, fontsize);
+			Font font = new Font("굴림", Font.BOLD, fontsize);
+			if(callingNum.length() > 5) {
+				font = new Font("Gulim", Font.PLAIN, fontsize);
+			} else {
+				font = new Font("GulimChe", Font.PLAIN, fontsize);
+			}
+			
 			graphics.setFont(font);
 			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			

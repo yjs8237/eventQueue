@@ -80,15 +80,13 @@ public class Employees {
 		
 		String cell_no = employee.getCell_no();
 		cell_no = cell_no.replaceAll("-", "");
+		cell_no = cell_no.replaceAll("#", "");
 		employee.setCell_no(cell_no);
 		
 		logoutEmployee(employee , requestID);
 		
-		
 		List list = new ArrayList<>();
 		list.add(employee);
-		
-		
 		
 		empMapByCellNum.put(employee.getCell_no() , list);
 		empMapByExtension.put(employee.getExtension() , list);
@@ -160,8 +158,8 @@ public class Employees {
 		return (ArrayList) empMapByCellNum.get(cell_num);
 	}
 	
-	public EmployeeVO getEmployeeByCellNum (String... strs){
-		ArrayList list = (ArrayList) empMapByCellNum.get(strs[1]);
+	public EmployeeVO getEmployeeByCellNum (String cell_no , String callID){
+		ArrayList list = (ArrayList) empMapByCellNum.get(cell_no);
 		
 		EmployeeVO employee = null;
 		
@@ -179,9 +177,9 @@ public class Employees {
 		}
 		
 		if(employee != null){
-			logwrite.standLog(strs[1], "getEmployeeByCellNum", "GET Employee Information RESULT [" + employee.toString() + "]");
+			logwrite.standLog(callID, "getEmployeeByCellNum", "GET Employee Information RESULT [" + employee.toString() + "]");
 		} else {
-			logwrite.standLog(strs[1], "getEmployeeByCellNum", "GET Employee NULL !!! [" + strs[0] + "]");
+			logwrite.standLog(callID, "getEmployeeByCellNum", "GET Employee NULL !!! [" + cell_no + "]");
 		}
 		
 		return employee;

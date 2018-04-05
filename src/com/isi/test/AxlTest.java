@@ -1,5 +1,6 @@
 package com.isi.test;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,8 @@ import org.json.XML;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import com.isi.file.GLogWriter;
+import com.isi.file.ILog;
 import com.test.axl.soap.Text2Base64;
 
 
@@ -74,67 +77,62 @@ public class AxlTest {
 			out = socket.getOutputStream();
 			out.write(ReqMsg.getBytes("UTF-8"));
 			
-			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
-			StringBuffer tempBuffer = new StringBuffer();
-			StringBuffer sb = new StringBuffer();
+//			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+			BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(socket.getInputStream()), "UTF-8"));
+			StringBuffer tempBuffer = new StringBuffer(20000);
+			StringBuffer sb = new StringBuffer(20000);
 			
 			boolean isXmlStart = false;
 			int value = 0;
-			while((value = br.read()) != -1) {
-				char c = (char)value;
-				sb.append(c);
-				
-				if(c == '\r') {
-					
-					if(sb.toString().startsWith("<?xml")) {
-						// xml 시작
-						tempBuffer.append(sb.toString());
-						isXmlStart = true;
-					} else if(sb.toString().indexOf(">") > 0 && isXmlStart) {
-						tempBuffer.append(sb.toString());
-					}
-					
-					sb = new StringBuffer();
-					System.out.println(tempBuffer.toString());
-				}
-				
-				
-				if (tempBuffer.toString().lastIndexOf("</soapenv:Envelope>") != -1 || tempBuffer.toString().lastIndexOf("</SOAP-ENV:Envelope>") != -1) {
-					break;
-				}
-			}
-			
-			System.out.println(tempBuffer.toString());
-			
-			
-//			if(WebServerLoadRunner.SOAP_AXL_LOG_YN) {
-//				logger.debug("## SOAP Recv Message ## [" + sb.toString() + "]");
+			int cnt=0;
+			String line = "";
+//			while((line = br.readLine()) != null) {
+//				System.out.println(line);
 //			}
 			
+			ILog logwrite = new GLogWriter();
 			
-			/*
-			in = socket.getInputStream();
-			out = socket.getOutputStream();
+			int BUFFER_SIZE = 10000;
+			char[] inByte = new char[BUFFER_SIZE];
+			int offset = 0;
 			
-			StringBuffer sb = new StringBuffer(20000);
-			byte[] bArray  = new byte[20000];
-			int ch = 0;
-			out.write(ReqMsg.getBytes("UTF-8"));
 			
-			while ((ch = in.read(bArray)) != -1) {
-				String temp = new String(bArray, 0, ch);
-				sb.append(temp);
+			while((value = br.read(inByte , offset , BUFFER_SIZE)) != -1) {
+				String tempStr = new String(inByte);
+
+				
+				String[] strArr = tempStr.split("\n");
+				
+				for (int i = 0; i < strArr.length; i++) {
+					
+					String str = strArr[i].replaceAll("\r", "");
+					str = str.replaceAll("\n", "");
+					
+					logwrite.server("", "", str);
+					
+					if(CommonUtil.isHex(str)) {
+						String hexData = CommonUtil.convertHex(str); 
+						BUFFER_SIZE = Integer.parseInt(hexData);
+						
+					} else {
+						BUFFER_SIZE = 10000;
+						sb.append(str);
+					}
+				}
+				
+				inByte = new char[BUFFER_SIZE];
+				
+				if(sb.toString().trim().endsWith("</soapenv:Envelope>") || sb.toString().trim().endsWith("</SOAP-ENV:Envelope>")) {
+					break;
+				}
+				
 				if (sb.lastIndexOf("</soapenv:Envelope>") != -1 || sb.lastIndexOf("</SOAP-ENV:Envelope>") != -1) {
 					break;
 				}
 			}
-			*/
 			
-			System.out.println("before : " + sb.toString());
-			
-			RemoveSizeInfo(sb);
-			
-			System.out.println("after : " + sb.toString());
+			logwrite.server("", "", "#######################################");
+			logwrite.server("", "", sb.toString().trim());
 			
 			//logger.debug("StringBuffer [" + sb.toString() + "]");
 			
@@ -144,18 +142,24 @@ public class AxlTest {
 			out = null;
 			
 			if (sb.indexOf("<") < sb.length()) {
-				rcvMsg = sb.substring(sb.indexOf("<"));
+				rcvMsg = sb.substring(sb.indexOf("<?xml")).trim();
 			} else {
 				return "Error Response is Not xml format!!";
 			}
+			logwrite.server("", "", "");
+			logwrite.server("", "", "");
+//			logwrite.server("", "", rcvMsg);
 			
 //			if(WebServerLoadRunner.SOAP_AXL_LOG_YN) {
 //				logger.debug("## SOAP Recv XML Message ## [" + rcvMsg + "]");
 //			}
 			
+//			System.out.println(" -- RECV -- ");
+//			System.out.println(rcvMsg);
+			
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
-
+			
 			StringReader  rs        = new StringReader(rcvMsg);
 			InputSource inputSource = new InputSource(rs);
 			Document reply = db.parse(inputSource);
@@ -164,6 +168,26 @@ public class AxlTest {
 				// Success
 				String strResult = DocumentToString(reply);
 				//logger.debug("strResult [" + strResult + "]");
+				
+				JSONArray array = jsonQueryResParsing(strResult);
+				
+				System.out.println("json Size : " + array.length());
+				
+//				d.pkid fkdevice, d.name, d.tkuserlocale, d.tkcountry, d.description ")
+//				.append("	, dnm.busytrigger, dnm.e164mask, n.dnorpattern ")
+//				.append("	, d.fkdevicepool, d.fksoftkeytemplate, n.fkroutepartition, n.fkcallingsearchspace_sharedlineappear ")
+//				.append("	, PICK.pkid as pick_pkid ")
+				
+				
+				for (int i = 0; i < array.length(); i++) {
+					System.out.println(array.getJSONObject(i).get("fkdevice").toString());
+					System.out.println(array.getJSONObject(i).get("name").toString());
+					System.out.println(array.getJSONObject(i).get("tkuserlocale").toString());
+					System.out.println(array.getJSONObject(i).get("description").toString());
+				}
+				
+				
+				
 				return strResult;
 			}
 		} 

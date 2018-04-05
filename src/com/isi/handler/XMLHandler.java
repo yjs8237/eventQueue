@@ -551,13 +551,13 @@ public class XMLHandler {
 			}
 			
 			pushHandler = new PushHandler(callID);
-			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel()), xmlInfo,false);
+			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() , xmlInfo.getCallingDn()), xmlInfo,false);
 			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(),
 					employee, resultVO.getResultMsg());
 		} else if (returnCode == 0) {
 			// 이미존재
 			pushHandler = new PushHandler(callID);
-			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel()), xmlInfo,false);
+			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() , xmlInfo.getCallingDn()), xmlInfo,false);
 			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(),
 					employee, resultVO.getResultMsg());
 		} else {

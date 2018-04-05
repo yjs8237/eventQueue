@@ -387,7 +387,7 @@ public class HttpServerHandler {
 //			}
 			
 			JTapiResultVO resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(),
-					makeCallVO.getCallingNumber() );
+					makeCallVO.getCallingNumber() , makeCallVO.getMac_address());
 			
 			logwrite.httpLog(requestID, "procMakeCall",
 					"DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
@@ -396,7 +396,7 @@ public class HttpServerHandler {
 				// Device 상태가 Out of Service 일 경우 Monitor Stop & Start
 				JtapiService.getInstance().monitorStop(makeCallVO.getMyExtension());
 				JtapiService.getInstance().monitorStart(makeCallVO.getMyExtension());
-				resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(), makeCallVO.getCallingNumber() );
+				resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(), makeCallVO.getCallingNumber() ,makeCallVO.getMac_address());
 			}
 			
 			//
@@ -430,7 +430,7 @@ public class HttpServerHandler {
 				// Device 상태가 Out of Service 일 경우 Monitor Stop & Start
 				JtapiService.getInstance().monitorStop(makeCallVO.getMyExtension());
 				JtapiService.getInstance().monitorStart(makeCallVO.getMyExtension());
-				resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(), makeCallVO.getCallingNumber() );
+				resultVO = JtapiService.getInstance().stopCall(makeCallVO.getMyExtension() );
 			}
 			
 			//
@@ -623,15 +623,26 @@ public class HttpServerHandler {
 			empVO.setRequestID(requestID);
 			
 			if(empVO.getCm_ip() == null || empVO.getCm_ip().isEmpty()) {
-				logwrite.httpLog(requestID, "procLogin", empVO.getEmp_id() + " 교환기 유저 정보가 없습니다!! 교환기 정보 강제 세팅 IP [10.156.214.111] USER [SAC_IPT] PW [dkdlvlxl123$]");
+				logwrite.httpLog(requestID, "procLogin", empVO.getEmp_id() + " 교환기 IP 정보가 없습니다!! 교환기 정보 강제 세팅 IP [10.156.214.111]");
 				empVO.setCm_ip("10.156.214.111");
+			}
+			
+			if(empVO.getCm_user() == null || empVO.getCm_user().isEmpty()) {
+				logwrite.httpLog(requestID, "procLogin", empVO.getEmp_id() + " 교환기 USER 정보가 없습니다!! 교환기 정보 강제 세팅 USER [SAC_IPT]");
 				empVO.setCm_user("SAC_IPT");
+			}
+			
+			if(empVO.getCm_pwd() == null || empVO.getCm_pwd().isEmpty()) {
+				logwrite.httpLog(requestID, "procLogin", empVO.getEmp_id() + " 교환기 PASSWORD 정보가 없습니다!! 교환기 정보 강제 세팅 PW [dkdlvlxl123$]");
 				empVO.setCm_pwd("dkdlvlxl123$");
 			}
 			
 			// 전화기가 깜박거리는 시간동안 백그라운드 스레드에서 일정시간 기다리고 Monitor 시작한다
 			DeviceCheck deviceCheck = new DeviceCheck(requestID, empVO);
 			deviceCheck.start();
+			
+			
+			Employees.getInstance().loginEmployee(empVO , requestID);
 			
 			
 			jsonObj.put("code", "200");
@@ -763,6 +774,9 @@ public class HttpServerHandler {
 						break;
 					case "callingNumber" :
 						makeCallVO.setCallingNumber(map.get("callingNumber").toString());
+						break;
+					case "mac_address" :
+						makeCallVO.setMac_address(map.get("mac_address").toString());
 						break;
 					default : 
 						break;

@@ -60,7 +60,8 @@ public class TestXMLHandler {
 		if(imgHandler.createImageFile(person , xmlInfo.getTargetModel() , threadID)) {
 			// 이미지 생성
 			pushHandler = new TestPushHandler();
-			returnCode = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Calling !! " , person , CALL_RING , xmlInfo.getTargetModel()), xmlInfo, false);
+//			returnCode = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Calling !! " , person , CALL_RING , xmlInfo.getTargetModel()), xmlInfo, false);
+			returnCode = 0;
 		} else {
 			LogMgr.getInstance().write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, xmlInfo.getCallidByString(), "pushRing", "Cannot make Image !!");
 		}

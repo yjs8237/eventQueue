@@ -41,7 +41,7 @@ public class MyAddressMgr {
 		
 		StringBuffer query = new StringBuffer();
 		query.append("SELECT * FROM tb_address_book WHERE emp_id = '").append(emp_id).append("'");
-		query.append(" AND ( addr_tel = '").append(number).append("' OR addr_cell = '").append(number).append("')");
+		query.append(" AND ( REPLACE(addr_tel , '-' , '') = '").append(number).append("' OR REPLACE(addr_cell, '-' , '') = '").append(number).append("')");
 		
 		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "getMyAddressInfo", "Search My Address Book SQL [" + query.toString() + "]");
 		try {

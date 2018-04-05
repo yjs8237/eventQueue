@@ -49,6 +49,26 @@ import org.json.JSONArray;
 
 public class CommonUtil { 
 	
+	public static boolean isHex(String hex) {
+		try {
+			long v = Long.parseLong(hex, 16);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public static String convertHex(String hex) {
+		String retStr = "";
+		try {
+			long v = Long.parseLong(hex, 16);
+			retStr = String.valueOf(v);
+		} catch (Exception e) {
+			return null;
+		}
+		return retStr;
+	}
+	
 	  public static boolean isNumber(String str) {
 	        try {
 	            Integer.parseInt(str);
