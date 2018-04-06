@@ -115,17 +115,26 @@ public class TestMain {
 		
 		String testStr = "adsfgadsfg";
 		
-		String [] testarr = testStr.split("\n");
-		System.out.println(testarr.length);
+//		String [] testarr = testStr.split("\n");
+//		System.out.println(testarr.length);
+//		
+//		 long v = Long.parseLong("2000", 16);   
+//		 System.out.println(String.valueOf(v));
 		
-		 long v = Long.parseLong("2000", 16);   
-		 System.out.println(String.valueOf(v));
-		
+		 
+		 
 //		 System.out.println(CommonUtil.convertHex("fbce648</fknumplan><dnorpatter"));
 		 
 //		
-//		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
-//		String retMsg = axlTest.SendSoapMessageV2(soapHeader.toString(), 10000);
+		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
+		String retMsg = axlTest.SendSoapMessageV2(soapHeader.toString(), 10000);
+		
+		
+		
+		int value = 3;
+		String testString = "abc   ";
+		
+		System.out.println(testString.substring(0, value).length());
 		
 
 		

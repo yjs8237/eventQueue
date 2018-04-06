@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +23,9 @@ import com.isi.constans.RESULT;
 import com.isi.data.CallStateMgr;
 import com.isi.data.Employees;
 import com.isi.data.ImageMgr;
+import com.isi.data.MyAddressMgr;
 import com.isi.data.XmlInfoMgr;
+import com.isi.db.DBConnMgr;
 import com.isi.duplex.AliveProc;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.GLogWriter;
@@ -116,8 +119,6 @@ public class HttpServerHandler {
 			responseBody.close();
 			
 			
-			
-			
 		}
 		
 		private String procPost (HttpExchange exchange, String requestID) {
@@ -207,6 +208,9 @@ public class HttpServerHandler {
 					resultJSONData = procStopCall(parameter, requestID);
 					break;
 					
+				case "/checkuser":
+					resultJSONData = procCheckLoginUser(parameter, requestID);
+					break;
 				default:
 					// returnCode = RESULT.HTTP_URL_ERROR;
 					break;
@@ -223,6 +227,94 @@ public class HttpServerHandler {
 		}
 		
 		
+		private String procCheckLoginUser(String parameter, String requestID) {
+			// TODO Auto-generated method stub
+			Map <String, String> map = new HashMap<String, String>();
+			map = queryToMap(parameter);
+			
+			JSONObject jsonObj = new JSONObject();
+			
+			if(map == null || map.isEmpty()) {
+				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", "all");
+				return jsonObj.toString();
+			}
+			
+			JSONArray jsonArr = new JSONArray();
+			String cell_no = map.get("cell_no");
+			String extension = map.get("extension");
+			String mac_address = map.get("mac_address");
+			
+			List userList = Employees.getInstance().getEmployeeListByExtension(extension);
+			if(userList == null) {
+				
+			} else {
+				
+				for (int i = 0; i < userList.size(); i++) {
+					JSONObject obj = new JSONObject();
+					EmployeeVO empVO = (EmployeeVO) userList.get(i);
+					obj.put("emp_lno", empVO.getEmp_lno());
+					obj.put("emp_id", empVO.getEmp_id());
+					obj.put("extension", empVO.getExtension());
+					obj.put("cell_num", empVO.getCell_no());
+					obj.put("mac_address", empVO.getMac_address());
+					obj.put("device_type", empVO.getDevice_type());
+					obj.put("device_ipaddr", empVO.getDevice_ipaddr());
+					obj.put("cm_ip", empVO.getCm_ip());
+					obj.put("cm_user", empVO.getCm_user());
+					obj.put("emp_nm_kor", empVO.getEmp_nm_kor());
+					obj.put("emp_nm_eng", empVO.getEmp_nm_eng());
+					obj.put("org_nm", empVO.getOrg_nm());
+					obj.put("pos_nm", empVO.getPos_nm());
+					obj.put("duty_nm", empVO.getDuty_nm());
+					obj.put("email", empVO.getEmail());
+					obj.put("emp_stat_nm", empVO.getEmp_stat_nm());
+					obj.put("emp_div_cd_nm", empVO.getEmp_div_cd_nm());
+					obj.put("building", empVO.getBuilding());
+					obj.put("floor", empVO.getFloor());
+					obj.put("cm_pwd", empVO.getCm_pwd());
+					obj.put("popup_svc_yn", empVO.getPopup_svc_yn());
+					jsonArr.put(obj);
+				}
+				return jsonArr.toString();
+			}
+			userList = Employees.getInstance().getEmployeeListByCellNum(cell_no, "");
+			if(userList == null) {
+				
+			} else {
+				
+				for (int i = 0; i < userList.size(); i++) {
+					JSONObject obj = new JSONObject();
+					EmployeeVO empVO = (EmployeeVO) userList.get(i);
+					obj.put("emp_lno", empVO.getEmp_lno());
+					obj.put("emp_id", empVO.getEmp_id());
+					obj.put("extension", empVO.getExtension());
+					obj.put("cell_num", empVO.getCell_no());
+					obj.put("mac_address", empVO.getMac_address());
+					obj.put("device_type", empVO.getDevice_type());
+					obj.put("device_ipaddr", empVO.getDevice_ipaddr());
+					obj.put("cm_ip", empVO.getCm_ip());
+					obj.put("cm_user", empVO.getCm_user());
+					obj.put("emp_nm_kor", empVO.getEmp_nm_kor());
+					obj.put("emp_nm_eng", empVO.getEmp_nm_eng());
+					obj.put("org_nm", empVO.getOrg_nm());
+					obj.put("pos_nm", empVO.getPos_nm());
+					obj.put("duty_nm", empVO.getDuty_nm());
+					obj.put("email", empVO.getEmail());
+					obj.put("emp_stat_nm", empVO.getEmp_stat_nm());
+					obj.put("emp_div_cd_nm", empVO.getEmp_div_cd_nm());
+					obj.put("building", empVO.getBuilding());
+					obj.put("floor", empVO.getFloor());
+					obj.put("cm_pwd", empVO.getCm_pwd());
+					obj.put("popup_svc_yn", empVO.getPopup_svc_yn());
+					jsonArr.put(obj);
+				}
+				return jsonArr.toString();
+			}
+			return jsonArr.toString();
+		}
+
 		private String procCreateImage (String parameter , String requestID) {
 			Map <String, String> map = new HashMap<String, String>();
 			map = queryToMap(parameter);
@@ -610,12 +702,7 @@ public class HttpServerHandler {
 			empVO.setCell_no(empVO.getCell_no().replaceAll("-", ""));
 			
 			
-			// 로그인 요청이 오면 이미지 삭제 -> 생성 작업을 실행하고,
-			// Remote Side 서버에게 로그인 요청 동기화 실시
-			// 비동기 처리를 위해 스레드 처리
-			LoginProcess loginProc = new LoginProcess(empVO , parameter , requestID);
-			loginProc.start();
-			/*////////////////////////////////////////////////////////*/
+			
 			
 			/*
 			 * 전화기 상태체크 (로그인 시도한 전화기와 내선번호가 정확하게 Regi 되었나 확인)
@@ -642,7 +729,19 @@ public class HttpServerHandler {
 			deviceCheck.start();
 			
 			
-			Employees.getInstance().loginEmployee(empVO , requestID);
+			EmployeeVO tempVO = Employees.getInstance().loginEmployee(empVO , requestID);
+			if(tempVO != null) {
+				empVO.setOrg_nm(tempVO.getOrg_nm());
+				empVO.setPos_nm(tempVO.getPos_nm());
+			}
+			
+			// 로그인 요청이 오면 이미지 삭제 -> 생성 작업을 실행하고,
+			// Remote Side 서버에게 로그인 요청 동기화 실시
+			// 비동기 처리를 위해 스레드 처리
+			LoginProcess loginProc = new LoginProcess(empVO , parameter , requestID);
+			loginProc.start();
+			/*////////////////////////////////////////////////////////*/
+			
 			
 			
 			jsonObj.put("code", "200");
@@ -952,7 +1051,7 @@ public class HttpServerHandler {
 		    for (String param : query.split("&")) {
 		        String pair[] = param.split("=");
 		        if (pair.length>1) {
-		            result.put(pair[0], pair[1]);
+		            result.put(pair[0], pair[1].replaceAll("+", " "));
 		        }else{
 		            result.put(pair[0], "");
 		        }

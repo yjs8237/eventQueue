@@ -23,13 +23,13 @@ public class XMLData {
 	}
 	
 	
-	public String getCiscoIPPhoneImageFile(String strTitle, IPerson person, int nCallStep , String model , String pushPng) {
+	public String getCiscoIPPhoneImageFile(String strTitle, IPerson person, int nCallStep , String model , String caller_type , String pushPng) {
         StringBuffer xmlBuffer = new StringBuffer();
         
         // 폰 모델별 이미지 사이즈가 다르기 때문에 각기 다른 사이즈의 이미지 폴더  URL 을 구한다.
 //        String path =     getPathByModel(model);
 //        String path = pr.getValue(PROPERTIES.ISXMLWEB_URL) + ImageMgr.getInstance().getImageInfo(model) + "/"; 
-        String path = "http://" + XmlInfoMgr.getInstance().getXmlPushUrl() + ImageMgr.getInstance().getImageInfo(model).getImageSize() + "/";
+        String path = "http://" + XmlInfoMgr.getInstance().getXmlPushUrl() + ImageMgr.getInstance().getImageInfo(model).getImageSize() + "/" + caller_type + "/";
         
         String aniNum = "";
         if(person instanceof EmployeeVO){

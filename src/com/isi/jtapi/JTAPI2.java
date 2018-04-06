@@ -247,7 +247,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			addr = (CiscoAddress) m_Provider.getAddress(aDn);
 			
 			//Terminal terminal = m_Provider.getTerminal(aDn);
-			
+			/*
 			if (addr == null) {
 				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStart",
 						"[" + aDn + "] [ERROR] MonitorStart - unregistered device ");
@@ -261,12 +261,11 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			if (addr.getState() == CiscoAddress.IN_SERVICE) {
 				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStart",
 						"[" + aDn + "] [ERROR] MonitorStart- already registered device ");
-				
 				resultVO.setCode(200);
 				resultVO.setMessage("success");
 				return resultVO;
 			}
-			
+			*/
 			// 기존에 이미 모니터링이 걸려 있으면 계속하지 않는다.
 			dev = getLine(aDn);
 
@@ -581,8 +580,17 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 					if(callingNumber != null && callingNumber.length() > 6) {
 						callingNumber = callingNumber.replaceAll("#", "");
 						callingNumber = callingNumber.replaceAll("-", "");
-						callingNumber = "#" + callingNumber;
+						
+						if(callingNumber.startsWith("02709") || callingNumber.startsWith("023781")) {
+							
+							callingNumber = checkInternalNumber(callingNumber);
+							
+						} else {
+							callingNumber = "#" + callingNumber;
+						}
+						
 					}
+					returnMessage = "success";
 					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "call Connect 시도 MyExtension[" + myExtension + "] callingNumber[" + callingNumber + "]");
 					call.connect(terminal, targetAddress, callingNumber);
 				} else {
@@ -609,6 +617,36 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			resultVO.setMessage(returnMessage);
 		}
 		return resultVO;
+	}
+
+	private String checkInternalNumber(String callingNumber) {
+		// TODO Auto-generated method stub
+		if(callingNumber.startsWith("02709")) {
+			String lastNumber = callingNumber.substring(callingNumber.length()-4, callingNumber.length());
+			if(lastNumber.startsWith("02") || lastNumber.startsWith("03") || lastNumber.startsWith("04") ||
+					lastNumber.startsWith("05") || lastNumber.startsWith("06") || lastNumber.startsWith("07") ||
+					lastNumber.startsWith("08") || lastNumber.startsWith("09") || lastNumber.startsWith("33") ||
+					lastNumber.startsWith("40") || lastNumber.startsWith("47") || lastNumber.startsWith("64") ||
+					lastNumber.startsWith("70") || lastNumber.startsWith("79") || lastNumber.startsWith("80") ||
+					lastNumber.startsWith("81") || lastNumber.startsWith("82") || lastNumber.startsWith("83") ||
+					lastNumber.startsWith("84") || lastNumber.startsWith("85") || lastNumber.startsWith("87") ||
+					lastNumber.startsWith("88") || lastNumber.startsWith("89")) {
+				return lastNumber;
+			}
+		} else {
+			String lastNumber = callingNumber.substring(callingNumber.length()-4, callingNumber.length());
+			if(lastNumber.startsWith("00") || lastNumber.startsWith("01") || lastNumber.startsWith("14") ||
+					lastNumber.startsWith("15") || lastNumber.startsWith("16") || lastNumber.startsWith("17") ||
+					lastNumber.startsWith("23") || lastNumber.startsWith("25") || lastNumber.startsWith("30") ||
+					lastNumber.startsWith("31") || lastNumber.startsWith("32") || lastNumber.startsWith("34") ||
+					lastNumber.startsWith("90") || lastNumber.startsWith("91") || lastNumber.startsWith("92") ||
+					lastNumber.startsWith("93") || lastNumber.startsWith("94") || lastNumber.startsWith("95") ||
+					lastNumber.startsWith("96") || lastNumber.startsWith("97") || lastNumber.startsWith("98") ||
+					lastNumber.startsWith("99")) {
+				return lastNumber;
+			}
+		}
+		return callingNumber;
 	}
 
 	@Override

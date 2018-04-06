@@ -41,7 +41,8 @@ public class HttpUrlHandler {
 	private String parameter;
 	private String requestID;
 	private EmployeeVO empVO;
-	
+	private String callingNumber;
+	private String caller_type;
 	
 	public HttpUrlHandler (String parameter , String requestID){
 		pr = PropertyRead.getInstance();
@@ -63,6 +64,23 @@ public class HttpUrlHandler {
 //		readTimeout = XmlInfoMgr.getInstance().getReadTimeout();
 	}
 	
+	public HttpUrlHandler (EmployeeVO empVO , String requestID , String callingNumber , String caller_type){
+		this.empVO = empVO;
+		pr = PropertyRead.getInstance();
+		this.requestID = requestID;
+		this.logwrite = new GLogWriter();
+//		this.parameter = setparameter(empVO);
+		this.callingNumber = callingNumber;
+		this.caller_type = caller_type;
+	}
+	
+	
+	public void setImageParameter (EmployeeVO empVO , String caller_type , String callingNumber) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("caller_type=").append(caller_type).append("&");
+		buffer.append("callingNumber=").append(callingNumber).append("&");
+		this.parameter = buffer.toString() + setparameter(empVO);
+	}
 	
 	private String setparameter(EmployeeVO empVO2) {
 		// TODO Auto-generated method stub

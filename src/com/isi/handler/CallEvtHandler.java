@@ -45,7 +45,7 @@ public class CallEvtHandler {
 		
 		TermConnEvt event = (TermConnEvt) evt;
 		
-//		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "########################## " + event.toString());
+		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "########################## " + event.toString());
 		
 		if(event.getDevice().equals(event.getCalledDn())) { // 전화를 받는 사람 측 이벤트만 push 한다
 			
@@ -56,30 +56,52 @@ public class CallEvtHandler {
 				// 내선 콜 상태 정보 SET
 //				CallStateMgr.getInstance().addDeviceState(event.getCallingDn() , CALLSTATE.ALERTING_ING);
 				CallStateMgr.getInstance().addDeviceState(event.getCalledDn() , CALLSTATE.ALERTING_ING);
+				
+				
+				/*
 				List employeeList = Employees.getInstance().getEmployeeListByExtension(event.getDevice(), callID);
+				
+				int success = 0;
 				if(employeeList != null && employeeList.size() > 0) {
+					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", " >>>> " + event.getDevice() + " list size : " + employeeList.size());
 					for (int i = 0; i < employeeList.size(); i++) {
 						EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
 						if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
 							DBQueueMgr.getInstance().addPopUpData(event.getCallingDn(), event.getCalledDn(), "N", employeeVO , "CM or Device information is not specified");
-							return RESULT.ERROR;
+//							return RESULT.ERROR;
+							continue;
 						}
-						
+						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", employeeVO.getEmp_id() + " , " + employeeVO.getMac_address() + " , "  + employeeVO.getDevice_ipaddr() + " Push!!");
 						xmlHandler.evtRing(makeAlertingXmlVO(event , employeeVO , callID) , callID);
+						success++;
 					}
 				} else {
 					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", event.getDevice() + " 사용자 정보 없음" );
+					return RESULT.ERROR;
 				}
 				
-				/*
-				// Target Device 정보
-				EmployeeVO employeeVO = Employees.getInstance().getEmployee(event.getDevice() , callID);
-				if(employeeVO != null) {
-					if(!employeeVO.getPopupYN().equalsIgnoreCase("N")){
-						xmlHandler.evtRing(makeAlertingXmlVO(event , employeeVO , callID) , callID);
-					}
+				if(employeeList.size() == success) {
+					return RESULT.RTN_SUCCESS;
+				} else {
+					return RESULT.ERROR;
 				}
 				*/
+				
+				EmployeeVO employeeVO = Employees.getInstance().getEmployeeByMacAddress(event.getTerminal(), callID);
+				if(employeeVO != null) {
+					
+					if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
+						DBQueueMgr.getInstance().addPopUpData(event.getCallingDn(), event.getCalledDn(), "N", employeeVO , "CM or Device information is not specified");
+						return RESULT.ERROR;
+					}else {
+						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", employeeVO.getEmp_id() + " , " + employeeVO.getMac_address() + " , "  + employeeVO.getDevice_ipaddr() + " Push!!");
+						xmlHandler.evtRing(makeAlertingXmlVO(event , employeeVO , callID) , callID);
+					}
+					
+				}  else {
+					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", event.getDevice() + " 사용자 정보 없음" );
+				}
+				
 			}
 		} else {
 			
@@ -223,6 +245,15 @@ public class CallEvtHandler {
 					}
 					isEastblish = true;
 				}
+			} else {
+				// 삼일회계법인 한 내선으로 두개의 디바이스를 가진 사람이 발신을 걸면..
+				// ringing 이벤트가 오지않고 established 이벤트가 온다..
+				// 이때 이벤트에 포함된 터미널과 직원의 전화기  mac 이 같으면 
+				// 두 개의 전화기를 사용하는 사람이 발신하는것으로 간주한다.
+				if(event.getDevice().equals(event.getDn())){
+//					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvt", "두개의 Device 를 가지고 있는 직원이 발신할경우");
+					
+				}
 			}
 			break;
 		}
@@ -259,7 +290,7 @@ public class CallEvtHandler {
 		int disconType		=	-1;
 		boolean isDisconnect	= false;
 		
-//		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, event.get_GCallID(), "callDisconnectEvt", "+++++++++++++++++++++++++++ " + event.toString());
+		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, event.get_GCallID(), "callDisconnectEvt", "+++++++++++++++++++++++++++ " + event.toString());
 		
 		Employees employees = Employees.getInstance();
 		
@@ -394,19 +425,26 @@ public class CallEvtHandler {
 					CallStateMgr.getInstance().addDeviceState(dn , CALLSTATE.IDLE);
 					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.IDLE);
 					
-					EmployeeVO emp = employees.getEmployeeByExtension(dn , callID);
-//					DeviceVO dev = DeviceMgr.getInstance().getDevice(dn);
-					if(emp != null){
-						
-						if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
-							return RESULT.ERROR;
+					List userList = employees.getEmployeeListByExtension(calledDn);
+					if(userList != null) {
+						for (int i = 0; i < userList.size(); i++) {
+							EmployeeVO emp = (EmployeeVO) userList.get(i);
+							if(emp != null){
+								
+								if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
+									return RESULT.ERROR;
+								}
+								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp,callID) , callID);
+								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+								Thread.sleep(500);
+								xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , emp,callID) , callID);
+							}
+							
 						}
-						
-						xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp,callID) , callID);
-						// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
-						Thread.sleep(500);
-						xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , emp,callID) , callID);
 					}
+					
+					
+//					DeviceVO dev = DeviceMgr.getInstance().getDevice(dn);
 					isDisconnect = true;
 				} else if(metaCode == CALLSTATE.META_CALL_ENDING && Utils.isNumber(calledDn)){	// 전화회의 최종 통화 종료
 					
@@ -418,36 +456,72 @@ public class CallEvtHandler {
 					CallStateMgr.getInstance().addDeviceState(calledDn , CALLSTATE.IDLE);
 					CallStateMgr.getInstance().addDeviceState(callingDn , CALLSTATE.IDLE);
 					
-					EmployeeVO emp = employees.getEmployeeByExtension(calledDn , callID);
-//					DeviceVO dev = DeviceMgr.getInstance().getDevice(calledDn);
-					if(emp != null){
-						
-						if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
-							return RESULT.ERROR;
+					List userList = employees.getEmployeeListByExtension(calledDn);
+					if(userList != null) {
+						for (int i = 0; i < userList.size(); i++) {
+							EmployeeVO emp = (EmployeeVO) userList.get(i);
+							if(emp != null){
+								
+								if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
+									return RESULT.ERROR;
+								}
+								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp,callID) , callID);
+								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+								Thread.sleep(500);
+								xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , emp,callID) , callID);
+							}
+							
 						}
-						
-						xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp,callID) , callID);
-						// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
-						Thread.sleep(500);
-						xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , emp,callID) , callID);
 					}
 					
+					
+					
 					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", ">>>>>>>>>> CONFERENCE FINAL >>>>>>>>>>>>>> " + callingDn);
-					emp = employees.getEmployeeByExtension(callingDn , callID);
-//					dev = DeviceMgr.getInstance().getDevice(callingDn);
-					if(emp != null) {
+					userList = employees.getEmployeeListByExtension(callingDn , callID);
+					if(userList != null) {
+						for (int i = 0; i < userList.size(); i++) {
+							EmployeeVO emp = (EmployeeVO) userList.get(i);
+							if(emp != null) {
+								
+								if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
+									return RESULT.ERROR;
+								}
+								
+								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp, callID) , callID);
+								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+								Thread.sleep(500);
+								xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , emp, callID) , callID);
+							}
+						}
+					}
+					
+					
+					isDisconnect = true;
+				} else if(metaCode == CALLSTATE.META_CALL_REMOVING_PARTY && Utils.isNumber(calledDn)) {
+					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", ">>>>>>>>>> 부재중  종료 콜 >>>>>>>>>>>>>> " + calledDn);
+					
+					/* 전화기 현재 상태 업데이트 */
+					CallStateMgr.getInstance().addDeviceState(calledDn , CALLSTATE.IDLE);
+					CallStateMgr.getInstance().addDeviceState(callingDn , CALLSTATE.IDLE);
+					
+					EmployeeVO empVO = employees.getEmployeeByMacAddress(macaddress, callID);
+					if(empVO == null) {
+						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", "## 직원정보 없음 ##" + macaddress);
+						return RESULT.ERROR;
+					} else {
 						
-						if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
+						if(checkVaildPush(empVO,callID) != RESULT.RTN_SUCCESS) {
 							return RESULT.ERROR;
 						}
 						
-						xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp, callID) , callID);
+						xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , empVO, callID) , callID);
 						// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
 						Thread.sleep(500);
-						xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , emp, callID) , callID);
+						xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , empVO, callID) , callID);
 					}
-					isDisconnect = true;
-				} 
+					
+					
+				}
 				
 				break;
 			}

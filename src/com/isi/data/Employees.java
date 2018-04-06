@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.*;
 
@@ -15,6 +16,7 @@ import com.isi.constans.LOGLEVEL;
 import com.isi.constans.LOGTYPE;
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
+import com.isi.db.DBConnMgr;
 import com.isi.db.JDatabase;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.GLogWriter;
@@ -33,7 +35,7 @@ public class Employees {
 	
 	private Map <String, Object> empMapByExtension = new HashMap<String, Object>();
 	private Map <String, Object> empMapByCellNum = new HashMap<String, Object>();
-	private Map <String, Object> empMapByMac = new HashMap<String, Object>();
+	private Map <String, EmployeeVO> empMapByMac = new HashMap<String, EmployeeVO>();
 	private Map <String, Object> customerMap = new HashMap<String, Object>();
 	
 	private List<String> initLoginExtlist;
@@ -69,13 +71,13 @@ public class Employees {
 	}
 	
 	
-	public int loginEmployee ( EmployeeVO employee , String requestID) {
+	public EmployeeVO loginEmployee ( EmployeeVO employee , String requestID) {
 		if(employee == null) {
-			return RESULT.RTN_EXCEPTION;
+			return null;
 		}
 		
 		if(employee.getMac_address() == null || employee.getMac_address().isEmpty()) {
-			return RESULT.RTN_EXCEPTION;
+			return null;
 		}
 		
 		String cell_no = employee.getCell_no();
@@ -83,18 +85,33 @@ public class Employees {
 		cell_no = cell_no.replaceAll("#", "");
 		employee.setCell_no(cell_no);
 		
-		logoutEmployee(employee , requestID);
 		
-		List list = new ArrayList<>();
-		list.add(employee);
+		// 커넥션 획득
+		Connection conn = DBConnMgr.getInstance().getConnection(requestID);
+		MyAddressMgr myAddress=  new MyAddressMgr(conn);
+		ArrayList<EmployeeVO> loginUserlist = myAddress.getLoginUserList(employee.getEmp_id(), requestID);
+		// 커넥션 반납
+		DBConnMgr.getInstance().returnConnection(conn , requestID);
 		
-		empMapByCellNum.put(employee.getCell_no() , list);
-		empMapByExtension.put(employee.getExtension() , list);
-		empMapByMac.put(employee.getMac_address() , list);
+		
+		if(loginUserlist == null || loginUserlist.size() == 0) {
+			m_Log.httpLog(requestID , "loginEmployee", ">> LOGIN << FAIL 사용자 정보가 DB에 존재하지 않음!!");
+			return null;
+		}
+		
+		// 현재 DB 기준 로그인 유저 메모리에서 삭제하고 다시 put
+		for (int i = 0; i < loginUserlist.size(); i++) {
+			EmployeeVO tempVO = loginUserlist.get(i);
+			logoutEmployee(tempVO , requestID);
+			empMapByMac.put(tempVO.getMac_address() , tempVO);
+		}
+		
+		empMapByCellNum.put(employee.getCell_no() , loginUserlist);
+		empMapByExtension.put(employee.getExtension() , loginUserlist);
 		
 		m_Log.httpLog(requestID , "loginEmployee", ">> LOGIN << SUCCESS extension [" + employee.getExtension() + "] cell_no [" + employee.getCell_no() + "] mac_address [" + employee.getMac_address() + "]");
 		
-		return RESULT.RTN_SUCCESS;
+		return loginUserlist.get(0);
 	}
 	
 	
@@ -218,22 +235,8 @@ public class Employees {
 	}
 	
 	public EmployeeVO getEmployeeByMacAddress (String mac_address , String callID){
-		ArrayList list = (ArrayList) empMapByMac.get(mac_address);
 		
-		EmployeeVO employee = null;
-		
-		if(list != null) {
-			if(list != null && list.size() > 1){
-				for (int i = 0; i < list.size(); i++) {
-					employee = (EmployeeVO) list.get(i);
-					if(employee.getPopup_svc_yn().equalsIgnoreCase("Y")){
-						break;
-					}
-				}
-			} else {
-				employee = (EmployeeVO) list.get(0);
-			}
-		}
+		EmployeeVO employee = (EmployeeVO) empMapByMac.get(mac_address);
 		
 		if(employee != null){
 			logwrite.standLog(callID, "getEmployeeByMacAddress", "GET Employee Information RESULT [" + employee.toString() + "]");
@@ -418,7 +421,8 @@ public class Employees {
                 			employeeInfo.setCm_user(rs.getString("cm_user"));
                 			employeeInfo.setCm_pwd(rs.getString("cm_pwd"));
                 			employeeInfo.setPopup_svc_yn(rs.getString("popup_svc_yn"));
-                			employeeInfo.setMac_address(rs.getString("mac_address"));
+                			String mac_address=  rs.getString("mac_address");
+                			employeeInfo.setMac_address(mac_address);
                 			employeeInfo.setDevice_type(rs.getString("device_type"));
                 			employeeInfo.setDevice_ipaddr(rs.getString("device_ipaddr"));
                 			
@@ -444,6 +448,9 @@ public class Employees {
                 				list.add(employeeInfo);
                 				empMapByCellNum.put(cell_num, list);
                 			}
+                			
+                			empMapByMac.put(mac_address, employeeInfo);
+                			
 //                			System.out.println("## SUCCESS getEmployeeList!! ## TOTAL EMPLOYEE COUNT EXTENSION : " + empMapByExtension.size());
 //                	    	System.out.println("## SUCCESS getEmployeeList!! ## TOTAL EMPLOYEE COUNT CELLNUM : " + empMapByCellNum.size());
 //                			employeeMap.put(rs.getString("extension"), employeeInfo);
@@ -467,6 +474,7 @@ public class Employees {
         
     	System.out.println("## SUCCESS getEmployeeList!! ## TOTAL EMPLOYEE COUNT EXTENSION : " + empMapByExtension.size());
     	System.out.println("## SUCCESS getEmployeeList!! ## TOTAL EMPLOYEE COUNT CELLNUM : " + empMapByCellNum.size());
+    	System.out.println("## SUCCESS getEmployeeList!! ## TOTAL LOGIN EMPLOYEE COUNT CELLNUM : " + initLoginExtlist.size());
     	
         if(m_Conn.disconnectDB() == RESULT.RTN_SUCCESS){
         	m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, "", "getMemberInfo", "## SUCCESS DISCONNECT DATABASE ##");

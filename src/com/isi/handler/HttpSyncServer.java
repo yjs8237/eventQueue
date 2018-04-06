@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +24,9 @@ import com.isi.constans.RESULT;
 import com.isi.data.CallStateMgr;
 import com.isi.data.Employees;
 import com.isi.data.ImageMgr;
+import com.isi.data.MyAddressMgr;
 import com.isi.data.XmlInfoMgr;
+import com.isi.db.DBConnMgr;
 import com.isi.duplex.AliveProc;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.GLogWriter;
@@ -35,6 +39,7 @@ import com.isi.vo.BaseVO;
 import com.isi.vo.DeviceResetVO;
 import com.isi.vo.DeviceStatusVO;
 import com.isi.vo.EmployeeVO;
+import com.isi.vo.ImageSyncVO;
 import com.isi.vo.JTapiResultVO;
 import com.isi.vo.PickupVO;
 import com.isi.vo.XmlVO;
@@ -178,7 +183,7 @@ public class HttpSyncServer {
 					break;
 					
 				case "/imagesync":
-					resultJSONData = procCreateImage(parameter, requestID);
+					resultJSONData = procImageSync(parameter, requestID);
 					break;
 					
 				default:
@@ -194,6 +199,34 @@ public class HttpSyncServer {
 
 			return resultJSONData;
 
+		}
+		
+		
+		private String procImageSync (String parameter , String requestID) {
+			Map <String, String> map = new HashMap<String, String>();
+			map = queryToMap(parameter);
+			
+			JSONObject jsonObj = new JSONObject();
+			
+			if(map == null || map.isEmpty()) {
+				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
+				jsonObj.put("msg", "bad parameter data");
+				jsonObj.put("param", "all");
+				return jsonObj.toString();
+			}
+			ImageSyncVO imageSyncVO = getImageSyncInfo(map);
+			
+			// 로그인 시도할때 이미지 삭제 -> 생성 
+			ImageMgr imageMgr = ImageMgr.getInstance();
+			imageMgr.createImageSyncFiles( imageSyncVO , requestID);
+			
+			logwrite.httpLog(requestID, "procImageSync", "Create Image Sync Success!!");
+			
+			jsonObj.put("code", "200");
+			jsonObj.put("msg", "success");
+			
+			
+			return jsonObj.toString();
 		}
 		
 		
@@ -221,6 +254,24 @@ public class HttpSyncServer {
 			*/
 			EmployeeVO empVO = (EmployeeVO) baseVO;
 			empVO.setCell_no(empVO.getCell_no().replaceAll("-", ""));
+			
+			
+			// 커넥션 획득
+			Connection conn = DBConnMgr.getInstance().getConnection(requestID);
+			MyAddressMgr myAddress=  new MyAddressMgr(conn);
+			ArrayList<EmployeeVO> loginUserlist = myAddress.getLoginUserList(empVO.getEmp_id(), requestID);
+			// 커넥션 반납
+			DBConnMgr.getInstance().returnConnection(conn , requestID);
+			
+			if(loginUserlist == null || loginUserlist.size() == 0) {
+				logwrite.httpLog(requestID, "procCreateImage", empVO.getEmp_id() + " 정보가 DB에 존재하지 않습니다.");
+			} else {
+				EmployeeVO tempVO = loginUserlist.get(0);
+				empVO.setOrg_nm(tempVO.getOrg_nm());
+				empVO.setPos_nm(tempVO.getPos_nm());
+			}
+			
+			
 			
 			// 로그인 시도할때 이미지 삭제 -> 생성 
 			ImageMgr imageMgr = ImageMgr.getInstance();
@@ -352,6 +403,96 @@ public class HttpSyncServer {
 			}
 
 			return deviceStatus;
+		}
+		
+		
+		private ImageSyncVO getImageSyncInfo (Map<String, String> map) {
+			// TODO Auto-generated method stub
+			ImageSyncVO imageSyncVO = new ImageSyncVO();
+			
+			Set keySet = map.keySet();
+			Iterator iter = keySet.iterator();
+			while (iter.hasNext()) {
+				String key = (String) iter.next();
+				switch (key) {
+					case "caller_type" :
+						imageSyncVO.setCaller_type(map.get("caller_type").toString());
+						break;
+					case "callingNumber" :
+						imageSyncVO.setCallingNumber(map.get("callingNumber").toString());
+						break;
+					case "emp_id":
+						imageSyncVO.setEmp_id(getEmployeeInfo(map, key));
+						break;
+					case "emp_lno":
+						imageSyncVO.setEmp_lno(getEmployeeInfo(map, key));
+						break;
+					case "emp_nm_kor":
+						imageSyncVO.setEmp_nm_kor(getEmployeeInfo(map, key));
+						break;
+					case "emp_nm_eng":
+						imageSyncVO.setEmp_nm_eng(getEmployeeInfo(map, key));
+						break;
+					case "org_nm":
+						imageSyncVO.setOrg_nm(getEmployeeInfo(map, key));
+						break;
+					case "pos_nm":
+						imageSyncVO.setPos_nm(getEmployeeInfo(map, key));
+						break;
+					case "duty_nm":
+						imageSyncVO.setDuty_nm(getEmployeeInfo(map, key));
+						break;
+					case "extension":
+						imageSyncVO.setExtension(getEmployeeInfo(map, key));
+						break;
+					case "email":
+						imageSyncVO.setEmail(getEmployeeInfo(map, key));
+						break;
+					case "cell_no":
+						imageSyncVO.setCell_no(getEmployeeInfo(map, key));
+						break;
+					case "building":
+						imageSyncVO.setBuilding(getEmployeeInfo(map, key));
+						break;
+					case "floor":
+						imageSyncVO.setFloor(getEmployeeInfo(map, key));
+						break;
+					case "emp_stat_nm":
+						imageSyncVO.setEmp_stat_nm(getEmployeeInfo(map, key));
+						break;
+					case "emp_div_cd_nm":
+						imageSyncVO.setEmp_div_cd_nm(getEmployeeInfo(map, key));
+						break;
+					case "popup_svc_yn":
+						imageSyncVO.setPopup_svc_yn(getEmployeeInfo(map, key));
+						break;
+					case "mac_address":
+						imageSyncVO.setMac_address(getEmployeeInfo(map, key));
+						break;
+					case "device_ipaddr":
+						imageSyncVO.setDevice_ipaddr(getEmployeeInfo(map, key));
+						break;
+					case "device_type":
+						imageSyncVO.setDevice_type(getEmployeeInfo(map, key));
+						break;
+					case "cm_ver":
+						imageSyncVO.setCm_ver(getEmployeeInfo(map, key));
+						break;
+					case "cm_ip":
+						imageSyncVO.setCm_ip(getEmployeeInfo(map, key));
+						break;
+					case "cm_user":
+						imageSyncVO.setCm_user(getEmployeeInfo(map, key));
+						break;
+					case "cm_pwd":
+						imageSyncVO.setCm_pwd(getEmployeeInfo(map, key));
+						break;
+						
+					default : 
+						break;
+				}
+			}
+			return imageSyncVO;
 		}
 		
 		

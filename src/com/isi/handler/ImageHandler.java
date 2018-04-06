@@ -17,6 +17,7 @@ import java.util.*;
 import javax.imageio.ImageIO;
 
 import com.cisco.cti.util.ArrayList;
+import com.isi.constans.CALLER_TYPE;
 import com.isi.constans.IMAGESIZE;
 import com.isi.constans.LOGLEVEL;
 import com.isi.constans.LOGTYPE;
@@ -168,17 +169,17 @@ public class ImageHandler {
 	}
 	
 	
-	public int createImageFile(EmployeeVO employee ,  String callingNum,  ImageVO imageVO , String callID) {
+	public int createImageFile(EmployeeVO employee ,  String callingNum,  ImageVO imageVO , String callID , String folderPath , String fileName , String caller_type) {
 		
 		imageMgr = ImageMgr.getInstance();
 		
 		boolean bResult = true;
 		
-		String aniNum 	= "발    신   :   " + callingNum;
-		String name		= "이    름   :   " + employee.getEmp_nm_kor();
-		String position	= "직    급   :   " + employee.getPos_nm();
-		String division = "부    서   :   " + employee.getOrg_nm();
-		String floor	= "위    치   :   " + employee.getFloor();
+		String aniNum 	= "발   신  :  " + callingNum;
+		String name		= "이   름  :  " + employee.getEmp_nm_kor();
+		String position	= "직   급  :  " + employee.getPos_nm();
+		String division = "부   서  :  " + employee.getOrg_nm();
+		String floor	= "위   치  :  " + employee.getFloor();
 		
 		int type = -1;
 		
@@ -188,12 +189,38 @@ public class ImageHandler {
 			return -1;
 		}
 		
-		String folderPath = "";
-		if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
-			folderPath = XmlInfoMgr.getInstance().getEmp_img_path_A()  + imageSize + "\\";
-		} else {
-			folderPath = XmlInfoMgr.getInstance().getEmp_img_path_B()  + imageSize + "\\";
+		
+		if(imageSize.equals("298144")) {
+			aniNum 		= "발 신 : " + callingNum;
+			name		= "이 름 : " + employee.getEmp_nm_kor();
+			position	= "직 급 : " + employee.getPos_nm();
+			division 	= "부 서 : " + employee.getOrg_nm();
+			if(employee.getFloor() != null && !employee.getFloor().isEmpty()) {
+				floor		= "위 치 : " + employee.getFloor() + "층";
+			} else {
+				floor		= "위 치 : ";
+			}
+			
+		} else if(imageSize.equals("298168")) {
+			aniNum 		= "발  신 : " + callingNum;
+			name		= "이  름 : " + employee.getEmp_nm_kor();
+			position	= "직  급 : " + employee.getPos_nm();
+			division 	= "부  서 : " + employee.getOrg_nm();
+			if(employee.getFloor() != null && !employee.getFloor().isEmpty()) {
+				floor		= "위  치 : " + employee.getFloor() + "층";
+			} else {
+				floor		= "위 치 : ";
+			}
 		}
+		
+		
+		
+//		String folderPath = "";
+//		if(PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+//			folderPath = XmlInfoMgr.getInstance().getEmp_img_path_A()  + imageSize + "\\";
+//		} else {
+//			folderPath = XmlInfoMgr.getInstance().getEmp_img_path_B()  + imageSize + "\\";
+//		}
 		
 		
 		File folder = new File(folderPath);
@@ -201,7 +228,7 @@ public class ImageHandler {
 			folder.mkdirs();
 		}
 		
-		String strDest = folderPath + callingNum + ".png";
+		String strDest = folderPath + fileName;
 		
         try {
         	
@@ -220,9 +247,13 @@ public class ImageHandler {
         	}
         	*/
 			if (logdir.exists()) {
-				// 이미 팝업 이미지가 있다면 이미지를 생성하지 않는다. (직원 콜 의 경우만 해당)
-				g_Log.imageLog(callID, "CreateImageFile", callingNum + " 이미지 존재");
-				return 0;
+				if(caller_type.equals(CALLER_TYPE.MY_ADDRESS)) {
+					// 개인 주소록 콜의 경우 이미지가 존재하여도 삭제하고 다시 생성한다.
+					logdir.delete();
+				} else {
+					g_Log.imageLog(callID, "CreateImageFile", fileName + " 이미지 존재");
+					return 0;
+				}
 			}
             
 //			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "CreateImageFile", "Background Image Search ["+XmlInfoMgr.getInstance().getBaseImgPath() + imageSize + "_basic.png" + "]");
@@ -246,7 +277,7 @@ public class ImageHandler {
             int width = Integer.parseInt(imageVO.getImageSize().substring(0, 3));
             int height = Integer.parseInt(imageVO.getImageSize().substring(3));
             
-			int fontsize = (int) (height / 10);
+			int fontsize = (int) (height / 8);
 			
 			BufferedImage mergedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 			Graphics2D graphics = (Graphics2D) mergedImage.getGraphics();
@@ -255,10 +286,10 @@ public class ImageHandler {
 			graphics.drawImage(basic_img, 0, 0, null);
 			
 			Font font = new Font("굴림", Font.BOLD, fontsize);
-			if(callingNum.length() > 5) {
-				font = new Font("Gulim", Font.PLAIN, fontsize);
+			if(callingNum.length() > 6) {
+				font = new Font("GulimChe", Font.BOLD, fontsize);
 			} else {
-				font = new Font("GulimChe", Font.PLAIN, fontsize);
+				font = new Font("GulimChe", Font.BOLD, fontsize);
 			}
 			
 			graphics.setFont(font);

@@ -3,6 +3,7 @@ package com.isi.data;
 import java.io.File;
 import java.util.*;
 
+import com.isi.constans.CALLER_TYPE;
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
 import com.isi.file.GLogWriter;
@@ -11,6 +12,7 @@ import com.isi.file.PropertyRead;
 import com.isi.handler.ImageHandler;
 import com.isi.vo.DeviceVO;
 import com.isi.vo.EmployeeVO;
+import com.isi.vo.ImageSyncVO;
 import com.isi.vo.ImageVO;
 
 
@@ -53,6 +55,9 @@ public class ImageMgr {
 			String key = (String) iter.next();
 			ImageVO imageVO = imageMap.get(key);
 			
+			String folderpath = "";
+			String filename = "";
+			
 			String strDest = "";
 			File file = null;
 			
@@ -65,9 +70,13 @@ public class ImageMgr {
 				 extension = empVO.getExtension();
 				
 				if (PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
-					strDest = XmlInfoMgr.getInstance().getEmp_img_path_A() + imageVO.getImageSize() + "\\"+ extension + ".png";
+					folderpath = XmlInfoMgr.getInstance().getEmp_img_path_A() + imageVO.getImageSize() + "\\"+ CALLER_TYPE.EXTENSION +  "\\";
+					filename = extension + ".png";
+					strDest = folderpath + filename;
 				} else {
-					strDest = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ extension + ".png";
+					folderpath = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ CALLER_TYPE.EXTENSION +  "\\";
+					filename = extension + ".png";
+					strDest = folderpath + filename;
 				}
 
 				// 이미 존재하는 이미지 파일은 삭제 후 다시 생성한다. 
@@ -76,7 +85,7 @@ public class ImageMgr {
 					file.delete();
 				}
 				
-				imgHandler.createImageFile(empVO , extension , imageVO , "");
+				imgHandler.createImageFile(empVO , extension , imageVO , "" , folderpath , filename , CALLER_TYPE.EXTENSION);
 				
 				logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
 			}
@@ -85,12 +94,17 @@ public class ImageMgr {
 				logwrite.httpLog(requestID, "createImageFiles", "## Cell Number is null ## " + empVO.getEmp_id());
 			} else {
 				 cell_num = empVO.getCell_no().replaceAll("-", "");
+				 cell_num = cell_num.replaceAll("#", "");
 				
 				strDest = "";
 				if (PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
-					strDest = XmlInfoMgr.getInstance().getEmp_img_path_A() + imageVO.getImageSize() + "\\"+ cell_num + ".png";
+					folderpath = XmlInfoMgr.getInstance().getEmp_img_path_A() + imageVO.getImageSize() + "\\"+ CALLER_TYPE.CELL_PHONE +  "\\";
+					filename = cell_num + ".png";
+					strDest = folderpath + filename;
 				} else {
-					strDest = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ cell_num + ".png";
+					folderpath = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ CALLER_TYPE.CELL_PHONE +  "\\";
+					filename = cell_num + ".png";
+					strDest = folderpath + filename;
 				}
 				
 //				System.out.println("strDest2 : " + strDest);
@@ -98,7 +112,7 @@ public class ImageMgr {
 				if(file.exists()) {
 					file.delete();
 				}
-				imgHandler.createImageFile(empVO , cell_num , imageVO , "");
+				imgHandler.createImageFile(empVO , cell_num , imageVO , "" , folderpath , filename , CALLER_TYPE.CELL_PHONE);
 				
 				logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
 			}
@@ -111,6 +125,65 @@ public class ImageMgr {
 		}
 	
 	}
+	
+	
+	public void createImageSyncFiles(ImageSyncVO imgSyncVO , String requestID) {
+		
+		Set keySet = imageMap.keySet();
+		Iterator iter = keySet.iterator();
+		ImageHandler imgHandler = new ImageHandler();
+		
+		if(logwrite == null) {
+			logwrite = new GLogWriter();
+		}
+		
+		while(iter.hasNext()) {
+			
+			String key = (String) iter.next();
+			ImageVO imageVO = imageMap.get(key);
+			
+			String folderpath = "";
+			String filename = "";
+			
+			String strDest = "";
+			File file = null;
+			
+			String extension="";
+			String cell_num="";
+			
+			
+			
+			if(imgSyncVO.getCallingNumber() == null || imgSyncVO.getCallingNumber().isEmpty()) {
+				logwrite.httpLog(requestID, "createImageFiles", "## calling number is null ## " + imgSyncVO.getCallingNumber());
+			} else {
+				if (PropertyRead.getInstance().getValue(PROPERTIES.SIDE_INFO).equals("A")) {
+					folderpath = XmlInfoMgr.getInstance().getEmp_img_path_A() + imageVO.getImageSize() + "\\"+ imgSyncVO.getCaller_type() +  "\\";
+					filename = imgSyncVO.getCallingNumber() + ".png";
+					strDest = folderpath + filename;
+				} else {
+					folderpath = XmlInfoMgr.getInstance().getEmp_img_path_B() + imageVO.getImageSize() + "\\"+ imgSyncVO.getCaller_type() +  "\\";
+					filename = imgSyncVO.getCallingNumber() + ".png";
+					strDest = folderpath + filename;
+				}
+				
+				// 이미 존재하는 이미지 파일은 삭제 후 다시 생성한다. 
+				file= new File(strDest);
+				if(file.exists()) {
+					file.delete();
+				}
+				
+				imgHandler.createImageFile(imgSyncVO , imgSyncVO.getCallingNumber() , imageVO , "" , folderpath , filename , imgSyncVO.getCaller_type());
+				
+				logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
+			}
+			
+		}
+	
+	}
+	
+	
+	
+	
 	
 	public void addImgEmpInfo (String callingNum , EmployeeVO employee) {
 		this.imageEmpMap.put(callingNum, employee);

@@ -79,11 +79,10 @@ public class AxlTest {
 			
 //			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
 			BufferedReader br = new BufferedReader(new InputStreamReader(new BufferedInputStream(socket.getInputStream()), "UTF-8"));
-			StringBuffer tempBuffer = new StringBuffer(20000);
-			StringBuffer sb = new StringBuffer(20000);
+			StringBuffer sb = new StringBuffer();
 			
 			boolean isXmlStart = false;
-			int value = 0;
+			
 			int cnt=0;
 			String line = "";
 //			while((line = br.readLine()) != null) {
@@ -91,7 +90,7 @@ public class AxlTest {
 //			}
 			
 			ILog logwrite = new GLogWriter();
-			
+			int value = 0;
 			int BUFFER_SIZE = 10000;
 			char[] inByte = new char[BUFFER_SIZE];
 			int offset = 0;
@@ -99,7 +98,8 @@ public class AxlTest {
 			
 			while((value = br.read(inByte , offset , BUFFER_SIZE)) != -1) {
 				String tempStr = new String(inByte);
-
+				
+				tempStr = tempStr.substring(0, value);
 				
 				String[] strArr = tempStr.split("\n");
 				
@@ -110,6 +110,11 @@ public class AxlTest {
 					
 					logwrite.server("", "", str);
 					
+//					System.out.println(str);
+					
+					
+//					Thread.sleep(100);
+					
 					if(CommonUtil.isHex(str)) {
 						String hexData = CommonUtil.convertHex(str); 
 						BUFFER_SIZE = Integer.parseInt(hexData);
@@ -117,6 +122,8 @@ public class AxlTest {
 					} else {
 						BUFFER_SIZE = 10000;
 						sb.append(str);
+						System.out.println("BUFFER_SIZE : " + BUFFER_SIZE +" , value : " + value + " , length : " + str.length());
+//						System.out.println(sb.toString());
 					}
 				}
 				

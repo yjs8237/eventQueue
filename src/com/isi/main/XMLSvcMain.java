@@ -72,7 +72,7 @@ public class XMLSvcMain {
 		DBConnMgr.getInstance().setDb_pwd(pr.getValue(PROPERTIES.DB_PASSWORD));
 		DBConnMgr.getInstance().initialConnection();
 		
-		//svcMain.test();
+//		svcMain.test();
 		
 		/*
 		CMInfo cmInfo = CMInfo.getInstance();
