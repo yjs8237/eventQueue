@@ -478,6 +478,8 @@ public class HttpServerHandler {
 //				return jsonObj.toString();
 //			}
 			
+			
+			
 			JTapiResultVO resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(),
 					makeCallVO.getCallingNumber() , makeCallVO.getMac_address());
 			
@@ -1051,7 +1053,7 @@ public class HttpServerHandler {
 		    for (String param : query.split("&")) {
 		        String pair[] = param.split("=");
 		        if (pair.length>1) {
-		            result.put(pair[0], pair[1].replaceAll("+", " "));
+		            result.put(pair[0], pair[1]);
 		        }else{
 		            result.put(pair[0], "");
 		        }

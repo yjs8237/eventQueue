@@ -60,6 +60,7 @@ public class PushHandler {
 		 
 	        if (phoneIP == null || phoneIP.isEmpty()) {
 	            //System.out.println("PushXML.push() Null IP address");
+	        	resultVO.setResultMsg("There is no device ip address");
 	        	resultVO.setReturnCode(RESULT.RTN_EXCEPTION);
 	            return resultVO;
 	        }
