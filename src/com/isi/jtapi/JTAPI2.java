@@ -245,7 +245,6 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		try {
 
 			addr = (CiscoAddress) m_Provider.getAddress(aDn);
-			
 			//Terminal terminal = m_Provider.getTerminal(aDn);
 			/*
 			if (addr == null) {
@@ -288,7 +287,9 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 						"[" + aDn + "] MonitorStart - Address remove observer ");
 				
 			}
-
+			
+			addr = (CiscoAddress) m_Provider.getAddress(aDn);
+			
 			// 모니터링이 성공하면 장치를 추가
 			// device = JCtiData.getData().addDevice(m_CMID, aDn); // 2016-04-08
 			// 전화기 IP, Model 정보 Add 가능하도록 수정
@@ -300,8 +301,13 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			// 해당 Device에 모니터링을 시작한다.
 			addr.addCallObserver(dev);
 			addr.addObserver(dev);
-
+			
 			Terminal[] termarray = addr.getTerminals();
+			
+			for (int i = 0; i < termarray.length; i++) {
+				m_Log.server(LOGTYPE.STAND_LOG, "MonitorStart",
+						"[" + aDn + "] 터미널 등록 " + termarray[i].getName());
+			}
 			
 			m_TerminalMap.put(aDn, termarray);	// 내 당겨받기 그룹에 사용될 Terminal 객체 
 			
@@ -474,17 +480,25 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		String returnMessage = "success";
 //		Terminal terminal = m_Provider.getTerminal(aDn);
 		JTapiResultVO resultVO = new JTapiResultVO();
-		Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(pickupExtension);
 		
-		if(terminalArr == null || terminalArr.length == 0) {
-			returnCode = RESULT.RTN_EXCEPTION;
-			returnMessage = "NOT LOGIN " + pickupExtension;
-			resultVO.setCode(returnCode);
-			resultVO.setMessage(returnMessage);
-			return resultVO;
-		}
+//		addr = (CiscoAddress) m_Provider.getAddress(aDn);
 		
 		try {
+		
+			CiscoAddress addr = (CiscoAddress) m_Provider.getAddress(pickupExtension);
+			Terminal[] terminalArr = addr.getTerminals();
+			
+	//		Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(pickupExtension);
+			
+			if(terminalArr == null || terminalArr.length == 0) {
+				returnCode = RESULT.RTN_EXCEPTION;
+				returnMessage = "NOT LOGIN " + pickupExtension;
+				resultVO.setCode(returnCode);
+				resultVO.setMessage(returnMessage);
+				return resultVO;
+			}
+		
+		
 			for (int i = 0; i < terminalArr.length; i++) {
 				Terminal terminal = terminalArr[i];
 				CiscoTerminalConnection target = null;
@@ -526,7 +540,10 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		
 		try {
 			
-			Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(myExtension);
+//			Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(myExtension);
+			
+			CiscoAddress addr = (CiscoAddress) m_Provider.getAddress(myExtension);
+			Terminal[] terminalArr = addr.getTerminals();
 			
 			if(terminalArr == null || terminalArr.length == 0) {
 				returnCode = RESULT.RTN_EXCEPTION;
@@ -667,7 +684,11 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				return resultVO;
 			}
 			
-			Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(myExtension);
+			
+//			Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(myExtension);
+			CiscoAddress addr = (CiscoAddress) m_Provider.getAddress(myExtension);
+			Terminal[] terminalArr = addr.getTerminals();
+			
 			
 			if(terminalArr == null || terminalArr.length == 0) {
 				returnCode = RESULT.RTN_EXCEPTION;

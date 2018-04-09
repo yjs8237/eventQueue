@@ -485,7 +485,7 @@ public class HttpServerHandler {
 			
 			logwrite.httpLog(requestID, "procMakeCall",
 					"DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
-
+			
 			if(resultVO.getCode() == -900 && resultVO.getMessage().equalsIgnoreCase("Address is out of service")) {
 				// Device 상태가 Out of Service 일 경우 Monitor Stop & Start
 				JtapiService.getInstance().monitorStop(makeCallVO.getMyExtension());
@@ -705,7 +705,6 @@ public class HttpServerHandler {
 			
 			
 			
-			
 			/*
 			 * 전화기 상태체크 (로그인 시도한 전화기와 내선번호가 정확하게 Regi 되었나 확인)
 			 */
@@ -731,11 +730,11 @@ public class HttpServerHandler {
 			deviceCheck.start();
 			
 			
-			EmployeeVO tempVO = Employees.getInstance().loginEmployee(empVO , requestID);
-			if(tempVO != null) {
-				empVO.setOrg_nm(tempVO.getOrg_nm());
-				empVO.setPos_nm(tempVO.getPos_nm());
-			}
+//			EmployeeVO tempVO = Employees.getInstance().loginEmployee(empVO , requestID);
+//			if(tempVO != null) {
+//				empVO.setOrg_nm(tempVO.getOrg_nm());
+//				empVO.setPos_nm(tempVO.getPos_nm());
+//			}
 			
 			// 로그인 요청이 오면 이미지 삭제 -> 생성 작업을 실행하고,
 			// Remote Side 서버에게 로그인 요청 동기화 실시
@@ -743,7 +742,6 @@ public class HttpServerHandler {
 			LoginProcess loginProc = new LoginProcess(empVO , parameter , requestID);
 			loginProc.start();
 			/*////////////////////////////////////////////////////////*/
-			
 			
 			
 			jsonObj.put("code", "200");

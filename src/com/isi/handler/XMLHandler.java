@@ -568,17 +568,17 @@ public class XMLHandler {
 			pushHandler = new PushHandler(callID);
 			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,  caller_type ,   xmlInfo.getCallingDn()), xmlInfo,false);
 			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(),
-					employee, resultVO.getResultMsg());
+					employee, xmlInfo.getTargetIP(),  resultVO.getResultMsg());
 		} else if (returnCode == 0) {
 			// 이미존재
 			pushHandler = new PushHandler(callID);
 			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,caller_type, xmlInfo.getCallingDn()), xmlInfo,false);
 			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(),
-					employee, resultVO.getResultMsg());
+					employee, xmlInfo.getTargetIP(),resultVO.getResultMsg());
 		} else {
 			// 실패
 			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), "N", employee,
-					"cannot make image file of calling employee info");
+					xmlInfo.getTargetIP(), "cannot make image file of calling employee info");
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushImage", "Cannot make Image !!");
 			return -1;
 		}
@@ -591,7 +591,7 @@ public class XMLHandler {
 		pushHandler = new PushHandler(callID);
 		PushResultVO resultVO = new PushResultVO();
 		resultVO = pushHandler.push(xmlData.getCiscoIPPhoneText("Calling !!", employee), xmlInfo, false);
-		DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(), employee , resultVO.getResultMsg());
+		DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(), employee ,xmlInfo.getTargetIP(), resultVO.getResultMsg());
 		return resultVO.getReturnCode();
 	}
 	

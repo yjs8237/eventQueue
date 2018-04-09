@@ -87,7 +87,7 @@ public class ImageMgr {
 				
 				imgHandler.createImageFile(empVO , extension , imageVO , "" , folderpath , filename , CALLER_TYPE.EXTENSION);
 				
-				logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
+//				logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
 			}
 			
 			if(empVO.getCell_no() == null || empVO.getCell_no().equalsIgnoreCase("null")) {
@@ -114,7 +114,7 @@ public class ImageMgr {
 				}
 				imgHandler.createImageFile(empVO , cell_num , imageVO , "" , folderpath , filename , CALLER_TYPE.CELL_PHONE);
 				
-				logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
+//				logwrite.httpLog(requestID, "createImageFiles", "Create Image Success!! ["+ strDest + "]");
 			}
 			
 			

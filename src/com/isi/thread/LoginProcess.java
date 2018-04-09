@@ -32,7 +32,7 @@ public class LoginProcess extends Thread {
 			
 //			createImageFiles(logwrite , empVO , requestID);
 			//로그인 시도할때 이미지 삭제 -> 생성 
-			ImageMgr.getInstance().createImageFiles(empVO, requestID);
+//			ImageMgr.getInstance().createImageFiles(empVO, requestID);
 			
 			// 이중화 환경의 경우 remote 서버에게 로그인 시도 정보 전송 
 			if(XmlInfoMgr.getInstance().getDuplexYN().equalsIgnoreCase("Y")) {

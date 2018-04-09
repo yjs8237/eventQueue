@@ -91,7 +91,7 @@ public class CallEvtHandler {
 				if(employeeVO != null) {
 					
 					if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
-						DBQueueMgr.getInstance().addPopUpData(event.getCallingDn(), event.getCalledDn(), "N", employeeVO , "CM or Device information is not specified");
+						DBQueueMgr.getInstance().addPopUpData(event.getCallingDn(), event.getCalledDn(), "N", employeeVO , employeeVO.getDevice_ipaddr() ,"CM or Device information is not specified");
 						return RESULT.ERROR;
 					}else {
 						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", employeeVO.getEmp_id() + " , " + employeeVO.getMac_address() + " , "  + employeeVO.getDevice_ipaddr() + " Push!!");
@@ -318,7 +318,7 @@ public class CallEvtHandler {
 							if(employeeVO != null){
 								
 								if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
-									DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , "cm_user or cm_pwd or device_type is not specified");
+									DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , employeeVO.getDevice_ipaddr(), "cm_user or cm_pwd or device_type is not specified");
 									return RESULT.ERROR;
 								}
 								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO , callID) , callID);

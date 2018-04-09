@@ -2,6 +2,7 @@ package com.isi.thread;
 
 import com.isi.constans.RESULT;
 import com.isi.data.Employees;
+import com.isi.data.ImageMgr;
 import com.isi.exception.ExceptionUtil;
 import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
@@ -47,8 +48,17 @@ public class DeviceCheck extends Thread{
 						logwrite.httpLog(requestID, "run", empVO.getExtension() + " --> Login 실패 3초후 재시도..");
 					} else if(resultVO.getCode() == RESULT.RTN_SUCCESS || resultVO.getCode() == 200){
 						// 성공의 경우
-						Employees.getInstance().loginEmployee(empVO , requestID);
+						EmployeeVO tempVO = Employees.getInstance().loginEmployee(empVO , requestID);
+						if(tempVO != null) {
+							empVO.setOrg_nm(tempVO.getOrg_nm());
+							empVO.setPos_nm(tempVO.getPos_nm());
+						}
+						ImageMgr.getInstance().createImageFiles(empVO, requestID);
 						logwrite.httpLog(requestID, "run", empVO.getExtension() + " --> Login 성공");
+						
+						
+//						JtapiService.getInstance().monitorStart(empVO.getExtension());
+						
 						break;
 					}
 				}

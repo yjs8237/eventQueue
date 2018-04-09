@@ -88,7 +88,7 @@ public class DBQueueMgr {
     	}
     }
     
-    public void addPopUpData(String calling_num , String called_num , String popup_yn , EmployeeVO vo , String description)  {
+    public void addPopUpData(String calling_num , String called_num , String popup_yn , EmployeeVO vo , String targetIP , String description)  {
     	try {
     		
     		//System.out.println("DBQueueMgr addQData  : " + vo.toString());
@@ -96,6 +96,7 @@ public class DBQueueMgr {
     		vo.setCalled_num(called_num);
     		vo.setPopup_yn(popup_yn);
     		vo.setDescription(description);
+    		vo.setTargetIP(targetIP);
         	DBPopUpQueue.getInstance().put(vo);
     	} catch (Exception e) {
     		System.out.println(e.toString());

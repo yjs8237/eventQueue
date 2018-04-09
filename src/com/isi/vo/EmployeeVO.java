@@ -39,7 +39,7 @@ public class EmployeeVO  extends BaseVO implements IPerson {
 	private String description;
 	private String tel_no;
 	private String requestID;
-	
+	private String targetIP;
 	
 	public EmployeeVO (){
 		
@@ -49,6 +49,12 @@ public class EmployeeVO  extends BaseVO implements IPerson {
 	}
 
 
+	public String getTargetIP() {
+		return targetIP;
+	}
+	public void setTargetIP(String targetIP) {
+		this.targetIP = targetIP;
+	}
 	public String getRequestID() {
 		return requestID;
 	}
