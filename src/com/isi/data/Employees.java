@@ -180,17 +180,10 @@ public class Employees {
 		
 		EmployeeVO employee = null;
 		
-		if(list != null) {
-			if(list != null && list.size() > 1){
-				for (int i = 0; i < list.size(); i++) {
-					employee = (EmployeeVO) list.get(i);
-					if(employee.getPopup_svc_yn().equalsIgnoreCase("Y")){
-						break;
-					}
-				}
-			} else {
-				employee = (EmployeeVO) list.get(0);
-			}
+		if(list != null && list.size() > 0) {
+			employee = (EmployeeVO) list.get(0);
+		} else {
+			
 		}
 		
 		if(employee != null){
@@ -212,17 +205,8 @@ public class Employees {
 		
 		EmployeeVO employee = null;
 		
-		if(list != null) {
-			if(list != null && list.size() > 1){
-				for (int i = 0; i < list.size(); i++) {
-					employee = (EmployeeVO) list.get(i);
-					if(employee.getPopup_svc_yn() != null && employee.getPopup_svc_yn().equalsIgnoreCase("Y")) {
-						break;
-					}
-				}
-			} else {
-				employee = (EmployeeVO) list.get(0);
-			}
+		if(list != null && list.size() > 0) {
+			employee = (EmployeeVO) list.get(0);
 		}
 		
 		if(employee != null){

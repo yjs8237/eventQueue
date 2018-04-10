@@ -138,7 +138,55 @@ public class CallEvtHandler {
 		return result;
 	}
 
+	public int callEstablishedEvtForPwc (Evt evt , String callID)  throws Exception{
+		if(evt == null){
+			return RESULT.RTN_EXCEPTION;
+		}
+		
+		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvtForPwc", "## >>>>>>>>>>>>>>>>>>>>>>>> " + evt.toString());
 
+		TermConnEvt event = (TermConnEvt) evt;
+		
+		String callingDN 	= event.getCallingDn(); 	// 전화를 건 사람의 DN
+		String calledDN		= event.getCalledDn();		// 전화를 받은 사람의 DN
+		String terminal 	= event.getTerminal();		// 이벤트 정보에 포함되어 있는 Termina(Mac address)
+		String redirectDN 	= event.getRedirectDn();	// Redirect DN
+		String DN			= event.getDn();			// DN
+		String deviceDN		= event.getDevice();		// Device DN
+		
+		Employees employeeMgr = Employees.getInstance();
+		
+		/* 전화기 현재 상태 업데이트 */
+		CallStateMgr.getInstance().addDeviceState(calledDN , CALLSTATE.ESTABLISHED_ING);
+		CallStateMgr.getInstance().addDeviceState(callingDN , CALLSTATE.ESTABLISHED_ING);
+		
+		/*
+		List employeeList = employeeMgr.getEmployeeListByExtension(calledDN, callID);
+		if(employeeList != null && employeeList.size() > 0){
+			
+			for (int i = 0; i < employeeList.size(); i++) {
+				EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
+				if(employeeVO != null){
+					
+					if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
+//						DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , employeeVO.getDevice_ipaddr(), "cm_user or cm_pwd or device_type is not specified");
+						continue;
+					}
+					xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
+					// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+					xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
+				}
+			}
+		} else {
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvtForPwc", "Employee 정보 없음 !! extension " + calledDN);
+		}
+		*/
+		return RESULT.RTN_SUCCESS;
+		
+	}
+	
+	
+	
 	public int callEstablishedEvt (Evt evt , String callID)  throws Exception{
 		
 		if(evt == null){
@@ -161,11 +209,15 @@ public class CallEvtHandler {
 		
 //		DeviceVO device = deviceMgr.getDevice(callingDN);
 		Employees employeeMgr = Employees.getInstance();
+		
+		
+	
 		EmployeeVO employee = employeeMgr.getEmployeeByExtension(callingDN , callID);
 		if (employee == null){
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvt", "Employee null");
 			return RESULT.RTN_UNDEFINED_ERR;
 		}
+	
 		
 		switch (ctlCause) {
 
@@ -182,11 +234,32 @@ public class CallEvtHandler {
 					CallStateMgr.getInstance().addDeviceState(deviceDN , CALLSTATE.ESTABLISHED_ING);
 					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.ESTABLISHED_ING);
 					
+					List employeeList = employeeMgr.getEmployeeListByExtension(DN, callID);
+					if(employeeList != null && employeeList.size() > 0){
+						
+						for (int i = 0; i < employeeList.size(); i++) {
+							EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
+							if(employeeVO != null){
+								
+								if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
+//									DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , employeeVO.getDevice_ipaddr(), "cm_user or cm_pwd or device_type is not specified");
+									continue;
+								}
+								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
+								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+								xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
+							}
+						}
+						
+					}
+					
+					/*
 					EmployeeVO emp = employeeMgr.getEmployeeByExtension(DN , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(DN);
 					if(emp!=null) {
 //						xmlHandler.evtEstablished(makeEstablishXmlVO(event , emp, callID) , deviceDN , callID);
 					}
+					*/
 					isEastblish = true;
 				} else if(!deviceDN.equals(DN) && deviceDN.equals(redirectDN)){
 					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvt", ">>>>>>>>>>>>>>>>>>>>>>>> " + event.toString());
@@ -195,11 +268,32 @@ public class CallEvtHandler {
 					CallStateMgr.getInstance().addDeviceState(deviceDN , CALLSTATE.ESTABLISHED_ING);
 					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.ESTABLISHED_ING);
 					
+					List employeeList = employeeMgr.getEmployeeListByExtension(DN, callID);
+					if(employeeList != null && employeeList.size() > 0){
+						
+						for (int i = 0; i < employeeList.size(); i++) {
+							EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
+							if(employeeVO != null){
+								
+								if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
+//									DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , employeeVO.getDevice_ipaddr(), "cm_user or cm_pwd or device_type is not specified");
+									continue;
+								}
+								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
+								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+								xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
+							}
+						}
+						
+					}
+					
+					/*
 					EmployeeVO emp = employeeMgr.getEmployeeByExtension(DN , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(DN);
 					if(emp != null){
 //						xmlHandler.evtEstablished(makeEstablishXmlVO(event , emp, callID) , deviceDN , callID);
 					}
+					*/
 					isEastblish = true;
 				}
 				
@@ -215,12 +309,33 @@ public class CallEvtHandler {
 					CallStateMgr.getInstance().addDeviceState(callingDN , CALLSTATE.ESTABLISHED_ING);
 					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.ESTABLISHED_ING);
 					
+					List employeeList = employeeMgr.getEmployeeListByExtension(deviceDN, callID);
+					if(employeeList != null && employeeList.size() > 0){
+						
+						for (int i = 0; i < employeeList.size(); i++) {
+							EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
+							if(employeeVO != null){
+								
+								if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
+//									DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , employeeVO.getDevice_ipaddr(), "cm_user or cm_pwd or device_type is not specified");
+									continue;
+								}
+								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
+								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+								xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
+							}
+						}
+						
+					}
+					
+					/*
 					EmployeeVO emp = employeeMgr.getEmployeeByExtension(deviceDN , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(deviceDN);
 					if(emp != null) {
 						Thread.sleep(100);	// 토글 시 push 가 너무 빠르게 이루어지면 기본화면이 XML 화면을 뒤덮기 때문에.. sleep 0.1 초 살짝 줘볼까
 //						xmlHandler.evtEstablished(makeEstablishXmlVO(event, emp, callID) , callingDN , callID);
 					}
+					*/
 //					isEastblish = true;	// 보류해제시에는 통화이력 정보가 남을 필요가 없다
 				}
 			}
@@ -237,12 +352,33 @@ public class CallEvtHandler {
 					CallStateMgr.getInstance().addDeviceState(callingDN , CALLSTATE.ESTABLISHED_ING);
 					CallStateMgr.getInstance().addDeviceState(event.getDn() , CALLSTATE.ESTABLISHED_ING);
 					
+					List employeeList = employeeMgr.getEmployeeListByExtension(deviceDN, callID);
+					if(employeeList != null && employeeList.size() > 0){
+						
+						for (int i = 0; i < employeeList.size(); i++) {
+							EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
+							if(employeeVO != null){
+								
+								if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
+//									DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , employeeVO.getDevice_ipaddr(), "cm_user or cm_pwd or device_type is not specified");
+									continue;
+								}
+								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
+								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+								xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
+							}
+						}
+						
+					}
+					
+					/*
 					EmployeeVO emp = employeeMgr.getEmployeeByExtension(deviceDN , callID);
 //					DeviceVO dev = DeviceMgr.getInstance().getDevice(deviceDN);
 					if(emp != null){
 //						makeDisconnectXmlVO(event , emp , callID)
 //						xmlHandler.evtEstablished(makeEstablishXmlVO(event, emp, callID) , callingDN , callID);
 					}
+					*/
 					isEastblish = true;
 				}
 			} else {
@@ -318,8 +454,8 @@ public class CallEvtHandler {
 							if(employeeVO != null){
 								
 								if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
-									DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , employeeVO.getDevice_ipaddr(), "cm_user or cm_pwd or device_type is not specified");
-									return RESULT.ERROR;
+//									DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , employeeVO.getDevice_ipaddr(), "cm_user or cm_pwd or device_type is not specified");
+									continue;
 								}
 								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
 								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
@@ -353,7 +489,7 @@ public class CallEvtHandler {
 							if(employeeVO != null){
 								
 								if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
-									return RESULT.ERROR;
+									continue;
 								}
 								
 								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO, callID) , callID);
@@ -391,7 +527,7 @@ public class CallEvtHandler {
 							if(emp != null) {
 								
 								if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
-									return RESULT.ERROR;
+									continue;
 								}
 								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp, callID) , callID);
 								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
@@ -402,7 +538,7 @@ public class CallEvtHandler {
 								if(tempEmp != null) {
 									
 									if(checkVaildPush(tempEmp,callID) != RESULT.RTN_SUCCESS) {
-										return RESULT.ERROR;
+										continue;
 									}
 									xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , tempEmp, callID) , callID);
 									// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
@@ -432,7 +568,7 @@ public class CallEvtHandler {
 							if(emp != null){
 								
 								if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
-									return RESULT.ERROR;
+									continue;
 								}
 								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp,callID) , callID);
 								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
@@ -450,7 +586,7 @@ public class CallEvtHandler {
 					
 					disconType = DISCONNECTTYPE.CONFERENCEFINAL_DISCONNECT;
 					
-					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", ">>>>>>>>>> CONFERENCE FINAL >>>>>>>>>>>>>> " + calledDn);
+					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", ">>>>>>>>>> CONFERENCE FINAL >>>>>>>>>>>>>> " + event.toString());
 					
 					/* 전화기 현재 상태 업데이트 */
 					CallStateMgr.getInstance().addDeviceState(calledDn , CALLSTATE.IDLE);
@@ -463,7 +599,7 @@ public class CallEvtHandler {
 							if(emp != null){
 								
 								if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
-									return RESULT.ERROR;
+									continue;
 								}
 								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp,callID) , callID);
 								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
@@ -476,7 +612,7 @@ public class CallEvtHandler {
 					
 					
 					
-					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", ">>>>>>>>>> CONFERENCE FINAL >>>>>>>>>>>>>> " + callingDn);
+					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", ">>>>>>>>>> CONFERENCE FINAL >>>>>>>>>>>>>> " + event.toString());
 					userList = employees.getEmployeeListByExtension(callingDn , callID);
 					if(userList != null) {
 						for (int i = 0; i < userList.size(); i++) {
@@ -484,7 +620,7 @@ public class CallEvtHandler {
 							if(emp != null) {
 								
 								if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
-									return RESULT.ERROR;
+									continue;
 								}
 								
 								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp, callID) , callID);
@@ -498,12 +634,32 @@ public class CallEvtHandler {
 					
 					isDisconnect = true;
 				} else if(metaCode == CALLSTATE.META_CALL_REMOVING_PARTY && Utils.isNumber(calledDn)) {
-					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", ">>>>>>>>>> 부재중  종료 콜 >>>>>>>>>>>>>> " + calledDn);
+					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", ">>>>>>>>>> 부재중  종료 콜 >>>>>>>>>>>>>> " + event.toString());
 					
 					/* 전화기 현재 상태 업데이트 */
 					CallStateMgr.getInstance().addDeviceState(calledDn , CALLSTATE.IDLE);
 					CallStateMgr.getInstance().addDeviceState(callingDn , CALLSTATE.IDLE);
 					
+					
+					List userList = employees.getEmployeeListByExtension(dn , callID);
+					if(userList != null) {
+						for (int i = 0; i < userList.size(); i++) {
+							EmployeeVO emp = (EmployeeVO) userList.get(i);
+							if(emp != null) {
+								
+								if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
+									continue;
+								}
+								
+								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp, callID) , callID);
+								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+								Thread.sleep(500);
+								xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , emp, callID) , callID);
+							}
+						}
+					}
+					
+					/*
 					EmployeeVO empVO = employees.getEmployeeByMacAddress(macaddress, callID);
 					if(empVO == null) {
 						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", "## 직원정보 없음 ##" + macaddress);
@@ -519,7 +675,7 @@ public class CallEvtHandler {
 						Thread.sleep(500);
 						xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , empVO, callID) , callID);
 					}
-					
+					*/
 					
 				}
 				

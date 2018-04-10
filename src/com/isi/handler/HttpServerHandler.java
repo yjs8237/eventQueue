@@ -251,66 +251,45 @@ public class HttpServerHandler {
 				
 			} else {
 				
-				for (int i = 0; i < userList.size(); i++) {
-					JSONObject obj = new JSONObject();
-					EmployeeVO empVO = (EmployeeVO) userList.get(i);
-					obj.put("emp_lno", empVO.getEmp_lno());
-					obj.put("emp_id", empVO.getEmp_id());
-					obj.put("extension", empVO.getExtension());
-					obj.put("cell_num", empVO.getCell_no());
-					obj.put("mac_address", empVO.getMac_address());
-					obj.put("device_type", empVO.getDevice_type());
-					obj.put("device_ipaddr", empVO.getDevice_ipaddr());
-					obj.put("cm_ip", empVO.getCm_ip());
-					obj.put("cm_user", empVO.getCm_user());
-					obj.put("emp_nm_kor", empVO.getEmp_nm_kor());
-					obj.put("emp_nm_eng", empVO.getEmp_nm_eng());
-					obj.put("org_nm", empVO.getOrg_nm());
-					obj.put("pos_nm", empVO.getPos_nm());
-					obj.put("duty_nm", empVO.getDuty_nm());
-					obj.put("email", empVO.getEmail());
-					obj.put("emp_stat_nm", empVO.getEmp_stat_nm());
-					obj.put("emp_div_cd_nm", empVO.getEmp_div_cd_nm());
-					obj.put("building", empVO.getBuilding());
-					obj.put("floor", empVO.getFloor());
-					obj.put("cm_pwd", empVO.getCm_pwd());
-					obj.put("popup_svc_yn", empVO.getPopup_svc_yn());
-					jsonArr.put(obj);
-				}
-				return jsonArr.toString();
+				return getJsonReturnData (userList);
 			}
 			userList = Employees.getInstance().getEmployeeListByCellNum(cell_no, "");
 			if(userList == null) {
 				
 			} else {
-				
-				for (int i = 0; i < userList.size(); i++) {
-					JSONObject obj = new JSONObject();
-					EmployeeVO empVO = (EmployeeVO) userList.get(i);
-					obj.put("emp_lno", empVO.getEmp_lno());
-					obj.put("emp_id", empVO.getEmp_id());
-					obj.put("extension", empVO.getExtension());
-					obj.put("cell_num", empVO.getCell_no());
-					obj.put("mac_address", empVO.getMac_address());
-					obj.put("device_type", empVO.getDevice_type());
-					obj.put("device_ipaddr", empVO.getDevice_ipaddr());
-					obj.put("cm_ip", empVO.getCm_ip());
-					obj.put("cm_user", empVO.getCm_user());
-					obj.put("emp_nm_kor", empVO.getEmp_nm_kor());
-					obj.put("emp_nm_eng", empVO.getEmp_nm_eng());
-					obj.put("org_nm", empVO.getOrg_nm());
-					obj.put("pos_nm", empVO.getPos_nm());
-					obj.put("duty_nm", empVO.getDuty_nm());
-					obj.put("email", empVO.getEmail());
-					obj.put("emp_stat_nm", empVO.getEmp_stat_nm());
-					obj.put("emp_div_cd_nm", empVO.getEmp_div_cd_nm());
-					obj.put("building", empVO.getBuilding());
-					obj.put("floor", empVO.getFloor());
-					obj.put("cm_pwd", empVO.getCm_pwd());
-					obj.put("popup_svc_yn", empVO.getPopup_svc_yn());
-					jsonArr.put(obj);
-				}
-				return jsonArr.toString();
+				return getJsonReturnData (userList);
+			}
+			return jsonArr.toString();
+		}
+
+		private String getJsonReturnData(List userList) {
+			// TODO Auto-generated method stub
+			JSONArray jsonArr = new JSONArray();
+			for (int i = 0; i < userList.size(); i++) {
+				JSONObject obj = new JSONObject();
+				EmployeeVO empVO = (EmployeeVO) userList.get(i);
+				obj.put("emp_lno", empVO.getEmp_lno() == null ? "" : empVO.getEmp_lno());
+				obj.put("emp_id", empVO.getEmp_id() == null ? "" : empVO.getEmp_id());
+				obj.put("extension", empVO.getExtension() == null ? "" : empVO.getExtension());
+				obj.put("cell_num", empVO.getCell_no() == null ? "" : empVO.getCell_no());
+				obj.put("mac_address", empVO.getMac_address() == null ? "" : empVO.getMac_address());
+				obj.put("device_type", empVO.getDevice_type() == null ? "" : empVO.getDevice_type());
+				obj.put("device_ipaddr", empVO.getDevice_ipaddr() == null ? "" : empVO.getDevice_ipaddr());
+				obj.put("cm_ip", empVO.getCm_ip() == null ? "" : empVO.getCm_ip());
+				obj.put("cm_user", empVO.getCm_user()== null ? "" : empVO.getCm_user());
+				obj.put("emp_nm_kor", empVO.getEmp_nm_kor()== null ? "" : empVO.getEmp_nm_kor());
+				obj.put("emp_nm_eng", empVO.getEmp_nm_eng()== null ? "" : empVO.getEmp_nm_eng());
+				obj.put("org_nm", empVO.getOrg_nm()== null ? "" : empVO.getOrg_nm());
+				obj.put("pos_nm", empVO.getPos_nm()== null ? "" : empVO.getPos_nm());
+				obj.put("duty_nm", empVO.getDuty_nm()== null ? "" : empVO.getDuty_nm());
+				obj.put("email", empVO.getEmail()== null ? "" : empVO.getEmail());
+				obj.put("emp_stat_nm", empVO.getEmp_stat_nm()== null ? "" : empVO.getEmp_stat_nm());
+				obj.put("emp_div_cd_nm", empVO.getEmp_div_cd_nm()== null ? "" : empVO.getEmp_div_cd_nm());
+				obj.put("building", empVO.getBuilding()== null ? "" : empVO.getBuilding());
+				obj.put("floor", empVO.getFloor()== null ? "" : empVO.getFloor());
+				obj.put("cm_pwd", empVO.getCm_pwd()== null ? "" : empVO.getCm_pwd());
+				obj.put("popup_svc_yn", empVO.getPopup_svc_yn()== null ? "" : empVO.getPopup_svc_yn());
+				jsonArr.put(obj);
 			}
 			return jsonArr.toString();
 		}
@@ -488,9 +467,9 @@ public class HttpServerHandler {
 			
 			if(resultVO.getCode() == -900 && resultVO.getMessage().equalsIgnoreCase("Address is out of service")) {
 				// Device 상태가 Out of Service 일 경우 Monitor Stop & Start
-				JtapiService.getInstance().monitorStop(makeCallVO.getMyExtension());
-				JtapiService.getInstance().monitorStart(makeCallVO.getMyExtension());
-				resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(), makeCallVO.getCallingNumber() ,makeCallVO.getMac_address());
+//				JtapiService.getInstance().monitorStop(makeCallVO.getMyExtension());
+//				JtapiService.getInstance().monitorStart(makeCallVO.getMyExtension());
+//				resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(), makeCallVO.getCallingNumber() ,makeCallVO.getMac_address());
 			}
 			
 			//

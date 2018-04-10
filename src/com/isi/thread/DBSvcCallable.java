@@ -106,7 +106,7 @@ public class DBSvcCallable implements Callable<Integer>{
 		sb.append("'").append(popupSvcVO.getCm_user() == null ? "" : popupSvcVO.getCm_user()).append("'").append(",");
 		sb.append("'").append(popupSvcVO.getCm_pwd() == null ? "" : popupSvcVO.getCm_pwd()).append("'").append(",");
 		sb.append("'").append(popupSvcVO.getPopup_svc_yn() == null ? "" : popupSvcVO.getPopup_svc_yn()).append("'").append(",");
-		sb.append("'").append(popupSvcVO.getDevice_ipaddr() == null ? "" : popupSvcVO.getTargetIP()).append("'").append(",");
+		sb.append("'").append(popupSvcVO.getTargetIP() == null ? "" : popupSvcVO.getTargetIP()).append("'").append(",");
 		sb.append("'").append(popupSvcVO.getDescription() == null ? "" : popupSvcVO.getDescription()).append("'").append(")");
 		
 		return sb.toString();
