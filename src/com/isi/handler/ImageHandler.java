@@ -195,21 +195,21 @@ public class ImageHandler {
 			name		= "이 름 : " + employee.getEmp_nm_kor();
 			position	= "직 급 : " + employee.getPos_nm();
 			division 	= "부 서 : " + employee.getOrg_nm();
-			if(employee.getFloor() != null && !employee.getFloor().isEmpty()) {
+			if(employee.getFloor() != null && !employee.getFloor().isEmpty() && employee.getFloor().length() > 0) {
 				floor		= "위 치 : " + employee.getFloor() + "층";
 			} else {
 				floor		= "위 치 : ";
 			}
 			
-		} else if(imageSize.equals("298168")) {
+		} else {
 			aniNum 		= "발  신 : " + callingNum;
 			name		= "이  름 : " + employee.getEmp_nm_kor();
 			position	= "직  급 : " + employee.getPos_nm();
 			division 	= "부  서 : " + employee.getOrg_nm();
-			if(employee.getFloor() != null && !employee.getFloor().isEmpty()) {
+			if(employee.getFloor() != null && !employee.getFloor().isEmpty() && employee.getFloor().length() > 0) {
 				floor		= "위  치 : " + employee.getFloor() + "층";
 			} else {
-				floor		= "위 치 : ";
+				floor		= "위  치 : ";
 			}
 		}
 		
@@ -277,7 +277,10 @@ public class ImageHandler {
             int width = Integer.parseInt(imageVO.getImageSize().substring(0, 3));
             int height = Integer.parseInt(imageVO.getImageSize().substring(3));
             
-			int fontsize = (int) (height / 8);
+            int fontsize = (int) (height / 8);
+            if(imageSize.equals("298168")) {
+            	fontsize = (int) (height / 10);
+            }
 			
 			BufferedImage mergedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 			Graphics2D graphics = (Graphics2D) mergedImage.getGraphics();

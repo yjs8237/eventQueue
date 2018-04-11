@@ -86,7 +86,63 @@ public class MyAddressMgr {
 		return empVO;
 	}
 	
+	public int updateDeviceIpAddr(String mac_address, String device_ipaddr , String callID) {
+		String device_type = "";
+		StringBuffer query = new StringBuffer();
+		
+		query.append(" UPDATE tb_device_info SET device_ipaddr = '").append(device_ipaddr).append("' WHERE mac_address = '").append(mac_address).append("'");
+		
+		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "updateDeviceIpAddr", "updateDeviceIpAddr SQL [" + query.toString() + "]");
+		
+		try {
+			
+			m_stmt = conn.createStatement();
+	        m_stmt.executeUpdate(query.toString());
+	        
+		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID, "updateDeviceIpAddr",  sw.toString());
+		}
+		
+		
+		return 0;
+	}
 	
+	
+	public String getDeviceType (String mac_address , String callID) {
+		String device_type = "";
+		StringBuffer query = new StringBuffer();
+		
+		query.append(" SELECT device_type FROM tb_device_info WHERE mac_address = '").append(mac_address).append("'");
+		
+		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "getDeviceType", "getDeviceType SQL [" + query.toString() + "]");
+		
+	try {
+			
+			m_stmt = conn.createStatement();
+	        m_rs = m_stmt.executeQuery(query.toString());
+			
+			if(m_rs != null) {
+				while(m_rs.next()) {
+					device_type = m_rs.getString("device_type");
+				}
+				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "getDeviceType", "SELECT DEVICE TYPE " + device_type);
+				
+			} else {
+				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "getDeviceType", "## ResultSet is null ##");
+			}
+			
+		} catch (Exception e) {
+			sw = new StringWriter();
+			pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID, "getDeviceType",  sw.toString());
+		}
+		return device_type;
+		
+	}
 
 	public ArrayList<EmployeeVO> getLoginUserList(String emp_id , String callID) {
 		

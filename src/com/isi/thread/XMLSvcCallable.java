@@ -193,14 +193,16 @@ public class XMLSvcCallable implements Callable<Integer> {
 			
 			// Established 전화 받았을 경우
 			case IEvt.CallCtl_TermConn_TalkingEv:
-				// 삼일회계법인은 Established 이벤트에 팝업창을 닫는다..
+				// 삼일회계법인은 Established 이벤트에 팝업창을 닫는다.. ( 1 내선 n 개 Device 직원 때문에)
 //				evtHandler.callEstablishedEvt(evt , callID);
 				evtHandler.callEstablishedEvtForPwc(evt , callID);
 				break;
 
 			// Disconnect 전화 끊었을 경우
 			case IEvt.CallCtl_TermConn_DroppedEv:
-				evtHandler.callDisconnectEvt(evt, callID);
+				// 원복필요 2018-04-11
+				evtHandler.callDisconnectEvtForPwd(evt, callID);
+//				evtHandler.callDisconnectEvt(evt, callID);
 				break;
 		}
 		

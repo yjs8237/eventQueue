@@ -14,6 +14,7 @@ import java.util.Set;
 
 import com.bestez.common.tr.HostWebtIO;
 import com.bestez.common.vo.CustInfoVO;
+import com.cisco.jtapi.extensions.CiscoTerminal;
 import com.isi.constans.*;
 import com.isi.data.*;
 import com.isi.db.DBConnMgr;
@@ -24,6 +25,7 @@ import com.isi.file.LogMgr;
 import com.isi.file.LogWriter;
 import com.isi.file.PropertyRead;
 import com.isi.process.DBQueueMgr;
+import com.isi.service.JtapiService;
 import com.isi.vo.*;
 
 /**
@@ -562,11 +564,28 @@ public class XMLHandler {
 					urlHandler.sendImageUrl();
 				} catch (Exception e) {
 			            e.printStackTrace(ExceptionUtil.getPrintWriter());
-			            m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushImage", ExceptionUtil.getStringWriter().toString());
+			            m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, threadID, "pushImage", ExceptionUtil.getStringWriter().toString());
 				}
 			}
+			
+			// Push
 			pushHandler = new PushHandler(callID);
 			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,  caller_type ,   xmlInfo.getCallingDn()), xmlInfo,false);
+			if(resultVO.getReturnCode() == RESULT.RTN_EXCEPTION) {
+				// Push 가 실패하면 터미널에 직접 XML 데이터 send
+				try {
+					CiscoTerminal terminal = JtapiService.getInstance().getTerminal(xmlInfo.getTerminal());
+					if(terminal != null) {
+						byte[] returnByte = terminal.sendData(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,  caller_type ,   xmlInfo.getCallingDn()).getBytes());
+						m_Log.standLog(callID, "push", "## push response -> " + new String(returnByte).replaceAll("\n", "").replaceAll("\r", ""));
+					}
+				} catch (Exception e) {
+					 e.printStackTrace(ExceptionUtil.getPrintWriter());
+			           m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, threadID, "pushImage", ExceptionUtil.getStringWriter().toString());
+				}
+				
+			}
+			
 			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(),
 					employee, xmlInfo.getTargetIP(),  resultVO.getResultMsg());
 		} else if (returnCode == 0) {

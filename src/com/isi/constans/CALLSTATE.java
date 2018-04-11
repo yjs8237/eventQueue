@@ -15,7 +15,9 @@ public interface CALLSTATE {
 	public static final int CONFERENCE		=		207;	// 전화회의
 	public static final int UNHOLD			=		214;	// 보류해제
 	
+	
 	public static final int META_CALL_STARTING			=	128;	// Meta Call Starting
+	public static final int META_CALL_PROGRESS			=	129;	// Meta Call Progress
 	public static final int META_CALL_MERGING			=	133;	// Meta Call Merging	
 	public static final int META_CALL_REMOVING_PARTY	=	131;	// Meta Call Removing Party
 	public static final int META_CALL_ENDING			=	132;	// Meta Call Ending

@@ -1,5 +1,7 @@
 package com.isi.handler;
 
+import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.cisco.jtapi.extensions.CiscoTermDeviceStateActiveEv;
@@ -11,10 +13,12 @@ import com.cisco.jtapi.extensions.CiscoTermOutOfServiceEv;
 import com.cisco.jtapi.extensions.CiscoTerminal;
 import com.isi.constans.*;
 import com.isi.data.*;
+import com.isi.db.DBConnMgr;
 import com.isi.db.JDatabase;
 import com.isi.event.*;
 import com.isi.file.*;
 import com.isi.process.DBQueueMgr;
+import com.isi.service.JtapiService;
 import com.isi.utils.CodeToString;
 import com.isi.utils.Utils;
 import com.isi.vo.*;
@@ -37,6 +41,7 @@ public class CallEvtHandler {
 	}
 	
 	
+	
 	public int callRingEvt (Evt evt, String callID)  throws Exception {	// Ring 이 울릴 경우
 		
 		if(evt == null){
@@ -47,55 +52,75 @@ public class CallEvtHandler {
 		
 		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "########################## " + event.toString());
 		
+		
 		if(event.getDevice().equals(event.getCalledDn())) { // 전화를 받는 사람 측 이벤트만 push 한다
 			
 			if(event.getMetaCode() != CALLSTATE.META_CALL_STARTING){
 				
-				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", ">>>>>>>>>>>>>>>>>>>>>>>> " + event.toString());
+				m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "Push Event " + event.toString());
 				
 				// 내선 콜 상태 정보 SET
 //				CallStateMgr.getInstance().addDeviceState(event.getCallingDn() , CALLSTATE.ALERTING_ING);
 				CallStateMgr.getInstance().addDeviceState(event.getCalledDn() , CALLSTATE.ALERTING_ING);
 				
-				
-				/*
-				List employeeList = Employees.getInstance().getEmployeeListByExtension(event.getDevice(), callID);
-				
-				int success = 0;
-				if(employeeList != null && employeeList.size() > 0) {
-					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", " >>>> " + event.getDevice() + " list size : " + employeeList.size());
-					for (int i = 0; i < employeeList.size(); i++) {
-						EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
-						if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
-							DBQueueMgr.getInstance().addPopUpData(event.getCallingDn(), event.getCalledDn(), "N", employeeVO , "CM or Device information is not specified");
-//							return RESULT.ERROR;
-							continue;
-						}
-						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", employeeVO.getEmp_id() + " , " + employeeVO.getMac_address() + " , "  + employeeVO.getDevice_ipaddr() + " Push!!");
-						xmlHandler.evtRing(makeAlertingXmlVO(event , employeeVO , callID) , callID);
-						success++;
-					}
-				} else {
-					m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", event.getDevice() + " 사용자 정보 없음" );
-					return RESULT.ERROR;
-				}
-				
-				if(employeeList.size() == success) {
-					return RESULT.RTN_SUCCESS;
-				} else {
-					return RESULT.ERROR;
-				}
-				*/
-				
 				EmployeeVO employeeVO = Employees.getInstance().getEmployeeByMacAddress(event.getTerminal(), callID);
-				if(employeeVO != null) {
+				// 메모리의 타겟 Device 정보가 없다면 Jtapi Provider 를 통해 정보를 획득한다
+				if(employeeVO == null) {
+					employeeVO = new EmployeeVO();
+					employeeVO.setMac_address(event.getTerminal());
+				}
+				if(employeeVO == null || checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
+					getJtapiTerminalInfo(employeeVO , event.getTerminal() , callID);
+					Employees.getInstance().updateEmployeeInfoByMacAddress(employeeVO);
+				}
 					
+				if(employeeVO != null) {
 					if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
 						DBQueueMgr.getInstance().addPopUpData(event.getCallingDn(), event.getCalledDn(), "N", employeeVO , employeeVO.getDevice_ipaddr() ,"CM or Device information is not specified");
 						return RESULT.ERROR;
 					}else {
 						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", employeeVO.getEmp_id() + " , " + employeeVO.getMac_address() + " , "  + employeeVO.getDevice_ipaddr() + " Push!!");
-						xmlHandler.evtRing(makeAlertingXmlVO(event , employeeVO , callID) , callID);
+						
+						
+						/**************************************************************************************/
+						/*
+						 *한 내선번호에 N 개의 Device 를 가진 사용자의 경우 모든 전화기에 팝업 push 를 한다. 
+						 * 그 중 하나의 전화기가 콜을 answer 하게 되면 나머지 전화기는 팝업이 되어 있는 상태로 
+						 * Disconnect 이벤트가 오기전까지 팝업상태를 유지한다.
+						 * 
+						 * 전화를 answer 하지 않은 전화기도 팝업이 닫히도록 하기 위해
+						 * Global CallID 기준 terminal 정보들을 static Map 객체에 put
+						 * 
+						 * Eastablished 이벤트때 해당 터미널들의 팝업을 모두 내린다.
+						 */
+						
+						EmployeeVO tempEmpVO = new EmployeeVO();
+						tempEmpVO.setDevice_ipaddr(employeeVO.getDevice_ipaddr());
+						tempEmpVO.setMac_address(event.getTerminal());
+						tempEmpVO.setCm_user(employeeVO.getCm_user());
+						tempEmpVO.setCm_pwd(employeeVO.getCm_pwd());
+						tempEmpVO.setDevice_type(employeeVO.getDevice_type());
+						CallIDMgr.getInstance().addCallIDObject(event.get_GCallID(), tempEmpVO);
+						
+						/************************************************************************************/
+						
+						int returnCode = xmlHandler.evtRing(makeAlertingXmlVO(event , employeeVO , callID) , callID);
+						if(returnCode == RESULT.RTN_EXCEPTION) {
+							
+						}
+						
+						/*
+						CiscoTerminal terminal = null;
+						terminal =  JtapiService.getInstance().getTerminal(event.getTerminal());
+//						for (int i = 0; i < 100; i++) {
+//							terminal =  JtapiService.getInstance().getTerminal(event.getTerminal());
+//							m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "terminal mac_addree " + terminal.getName() + " , " + terminal.getDeviceState() + " , " + terminal.getState() + " , " + terminal.getIPV4Address().toString());
+//						}
+						String xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><CiscoIPPhoneImageFile><Title>Ringing</Title><Prompt>01032228237</Prompt><LocationX>0</LocationX><LocationY>0</LocationY><URL>http://smartoffice.samil.com/phone/static/images/em/298144/1/1772.png</URL><SoftKeyItem><Name>Close</Name><URL>SoftKey:Exit</URL><Position>1</Position></SoftKeyItem></CiscoIPPhoneImageFile>";
+						byte[] returnbyte = terminal.sendData(xml.getBytes());
+						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", "Return : " + new String(returnbyte));
+						*/
+						
 					}
 					
 				}  else {
@@ -110,40 +135,12 @@ public class CallEvtHandler {
 	}
 	
 
-	private int checkVaildPush(EmployeeVO employeeVO, String callID) {
-		// TODO Auto-generated method stub
-		
-		int result = 0;
-		
-		if(employeeVO.getCm_user() == null || employeeVO.getCm_user().isEmpty() || employeeVO.getCm_user().equalsIgnoreCase("null")) {
-			result = -1;
-		}
-		
-		if(employeeVO.getCm_pwd() == null || employeeVO.getCm_pwd().isEmpty() || employeeVO.getCm_pwd().equalsIgnoreCase("null")) {
-			result = -1;
-		}
-		
-		if(employeeVO.getDevice_type() == null || employeeVO.getDevice_type().isEmpty() || employeeVO.getDevice_type().equalsIgnoreCase("null")) {
-			result = -1;
-		}
-		
-		if(employeeVO.getDevice_ipaddr() == null || employeeVO.getDevice_ipaddr().isEmpty() || employeeVO.getDevice_ipaddr().equalsIgnoreCase("null")) {
-			result = -1;
-		}
-		
-		if(result != RESULT.RTN_SUCCESS) {
-			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID,  "checkVaildPush" , "### Invalid employee information ### " + employeeVO.toString());
-		}
-		
-		return result;
-	}
-
 	public int callEstablishedEvtForPwc (Evt evt , String callID)  throws Exception{
 		if(evt == null){
 			return RESULT.RTN_EXCEPTION;
 		}
 		
-		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvtForPwc", "## >>>>>>>>>>>>>>>>>>>>>>>> " + evt.toString());
+		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callEstablishedEvtForPwc", "## >>>>>>>>>>>>>>>>>>>>>>>> " + evt.toString());
 
 		TermConnEvt event = (TermConnEvt) evt;
 		
@@ -160,27 +157,31 @@ public class CallEvtHandler {
 		CallStateMgr.getInstance().addDeviceState(calledDN , CALLSTATE.ESTABLISHED_ING);
 		CallStateMgr.getInstance().addDeviceState(callingDN , CALLSTATE.ESTABLISHED_ING);
 		
-		/*
-		List employeeList = employeeMgr.getEmployeeListByExtension(calledDN, callID);
-		if(employeeList != null && employeeList.size() > 0){
+		if(event.getMetaCode() == CALLSTATE.META_CALL_PROGRESS) {
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callEstablishedEvtForPwc", "META PROGRESS CALL " + evt.toString());
 			
-			for (int i = 0; i < employeeList.size(); i++) {
-				EmployeeVO employeeVO = (EmployeeVO) employeeList.get(i);
-				if(employeeVO != null){
-					
-					if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
-//						DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , employeeVO.getDevice_ipaddr(), "cm_user or cm_pwd or device_type is not specified");
-						continue;
+			List terminalList = CallIDMgr.getInstance().getCallIdObject(event.get_GCallID());
+			
+			if(terminalList != null) {
+				
+				for (int i = 0; i < terminalList.size(); i++) {
+					EmployeeVO empVO = (EmployeeVO) terminalList.get(i);
+					if(empVO != null && empVO.getDevice_ipaddr() != null) {
+						
+						xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , empVO , callID) , callID);
+						// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+						xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , empVO , callID) , callID);
+						
+					} else {
+						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callEstablishedEvtForPwc", "## EMP 전화기 IP 정보 없음 ## ");
 					}
-					xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
-					// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
-					xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , employeeVO , callID) , callID);
+					
 				}
+				
 			}
-		} else {
-			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "callEstablishedEvtForPwc", "Employee 정보 없음 !! extension " + calledDN);
+			
 		}
-		*/
+		
 		return RESULT.RTN_SUCCESS;
 		
 	}
@@ -406,6 +407,57 @@ public class CallEvtHandler {
 		
 	}
 
+	public int callDisconnectEvtForPwd(Evt evt , String callID)  throws Exception {
+		if(evt == null){
+			return RESULT.RTN_EXCEPTION;
+		}
+		
+		TermConnEvt event = (TermConnEvt) evt;
+
+		String dn 			= event.getDn();
+		String deviceDN 	= event.getDevice();
+		String calledDn 	= event.getCalledDn();
+		String callingDn 	= event.getCallingDn();
+		String redirectDn	= event.getRedirectDn(); 
+		String macaddress	= event.getTerminal();
+		int callType 		= event.getCtlCause();
+		int metaCode		= event.getMetaCode();
+		
+		m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, event.get_GCallID(), "callDisconnectEvtForPwd", "+++++++++++++++++++++++++++ " + event.toString());
+		
+		CallStateMgr.getInstance().addDeviceState(callingDn , CALLSTATE.IDLE);
+		CallStateMgr.getInstance().addDeviceState(dn , CALLSTATE.IDLE);
+		CallStateMgr.getInstance().addDeviceState(calledDn , CALLSTATE.IDLE);
+		
+		EmployeeVO empVO = Employees.getInstance().getEmployeeByMacAddress(event.getTerminal(), callID);
+		
+		// 메모리의 타겟 Device 정보가 없다면 Jtapi Provider 를 통해 정보를 획득한다
+		if(empVO == null) {
+			empVO = new EmployeeVO();
+			empVO.setMac_address(event.getTerminal());
+		}
+		if(empVO == null || checkVaildPush(empVO,callID) != RESULT.RTN_SUCCESS) {
+			getJtapiTerminalInfo(empVO , event.getTerminal() , callID);
+			Employees.getInstance().updateEmployeeInfoByMacAddress(empVO);
+		}
+		
+		if(empVO != null){
+			
+			if(checkVaildPush(empVO,callID) != RESULT.RTN_SUCCESS) {
+//				DBQueueMgr.getInstance().addPopUpData(callingDn, event.getDn(), "N", employeeVO , employeeVO.getDevice_ipaddr(), "cm_user or cm_pwd or device_type is not specified");
+				return RESULT.RTN_EXCEPTION;
+			}
+			xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , empVO , callID) , callID);
+			// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+			xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , empVO , callID) , callID);
+		} 
+		
+		
+		return RESULT.RTN_SUCCESS;
+	}
+	
+	
+	
 	public int callDisconnectEvt(Evt evt , String callID)  throws Exception {
 		
 		if(evt == null){
@@ -513,10 +565,11 @@ public class CallEvtHandler {
 
 					disconType = DISCONNECTTYPE.NORMAL_DISCONNECT;
 					
+					boolean isRightMac = false;
+					
 					/* 전화기 현재 상태 업데이트 */
 					CallStateMgr.getInstance().addDeviceState(calledDn , CALLSTATE.IDLE);
 					CallStateMgr.getInstance().addDeviceState(callingDn , CALLSTATE.IDLE);
-					
 					
 					List employeeList = employees.getEmployeeListByExtension(calledDn, callID);
 					if(employeeList != null && employeeList.size() > 0){
@@ -529,6 +582,13 @@ public class CallEvtHandler {
 								if(checkVaildPush(emp,callID) != RESULT.RTN_SUCCESS) {
 									continue;
 								}
+								
+								if(emp.getMac_address() != null) {
+									if(emp.getMac_address().equals(event.getTerminal())) {
+										isRightMac = true;
+									}
+								}
+								
 								xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , emp, callID) , callID);
 								// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
 								Thread.sleep(500);
@@ -540,6 +600,13 @@ public class CallEvtHandler {
 									if(checkVaildPush(tempEmp,callID) != RESULT.RTN_SUCCESS) {
 										continue;
 									}
+									
+									if(emp.getMac_address() != null) {
+										if(emp.getMac_address().equals(event.getTerminal())) {
+											isRightMac = true;
+										}
+									}
+									
 									xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , tempEmp, callID) , callID);
 									// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
 									Thread.sleep(500);
@@ -550,7 +617,17 @@ public class CallEvtHandler {
 						}
 						
 					}
-				
+					
+					if(!isRightMac) {
+						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callDisconnectEvt", "*** Disconnect 조건이 맞지않는 Terminal , Disconnect Push 시도 ***");
+						EmployeeVO empVO = employees.getEmployeeByMacAddress(event.getTerminal(), callID);
+						xmlHandler.evtDisconnect(makeDisconnectXmlVO(event , empVO, callID) , callID);
+						// XML 팝업 화면이 닫히지 않아 Disconnect XML 을 한번 더 PUSH 한다.
+						Thread.sleep(500);
+						xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , empVO, callID) , callID);
+					}
+					
+					
 					isDisconnect = true;
 				} else if(metaCode == CALLSTATE.META_CALL_REMOVING_PARTY && !Utils.isNumber(calledDn)){	// 전화회의 종료
 					disconType = DISCONNECTTYPE.CONFERENCE_DISCONNECT;
@@ -736,6 +813,85 @@ public class CallEvtHandler {
 		*/
 		return RESULT.RTN_SUCCESS;
 	}
+	
+
+	private void getJtapiTerminalInfo(EmployeeVO employeeVO, String mac_address , String callID) {
+		// TODO Auto-generated method stub
+		try {
+			if(employeeVO == null) {
+				
+			}
+			
+			String device_ipaddr = "";
+			String device_type = "";
+			
+			CiscoTerminal terminal = JtapiService.getInstance().getTerminal(mac_address);
+			if (terminal != null) {
+				device_ipaddr = terminal.getIPV4Address().getHostAddress();
+			}
+			
+			// DB Device Type 정보 가져오고 IP 정보 업데이트
+			Connection conn = DBConnMgr.getInstance().getConnection(callID);
+			MyAddressMgr myAddress=  new MyAddressMgr(conn);
+			device_type = myAddress.getDeviceType(mac_address, callID);
+			if(!device_ipaddr.isEmpty()) {
+				myAddress.updateDeviceIpAddr(mac_address, device_ipaddr , callID);
+			}
+			// 커넥션 반납
+			DBConnMgr.getInstance().returnConnection(conn , callID);
+			
+			
+			if(employeeVO.getCm_user() == null || employeeVO.getCm_user().isEmpty()) {
+				employeeVO.setCm_user("SAC_IPT");
+			}
+			if(employeeVO.getCm_pwd() == null || employeeVO.getCm_pwd().isEmpty()) {
+				employeeVO.setCm_pwd("dkdlvlxl123$");
+			}
+			
+			employeeVO.setDevice_ipaddr(device_ipaddr);
+			employeeVO.setDevice_type(device_type);
+			
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "getJtapiTerminalInfo", "device_ipaddr [" + device_ipaddr + "] device_type [" + device_type + "]");
+			
+		} catch (Exception e) {
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID, "getJtapiTerminalInfo", e.getLocalizedMessage());
+		}
+		
+	}
+
+
+
+
+
+
+	private int checkVaildPush(EmployeeVO employeeVO, String callID) {
+		// TODO Auto-generated method stub
+		
+		int result = 0;
+		
+		if(employeeVO.getCm_user() == null || employeeVO.getCm_user().isEmpty() || employeeVO.getCm_user().equalsIgnoreCase("null")) {
+			result = -1;
+		}
+		
+		if(employeeVO.getCm_pwd() == null || employeeVO.getCm_pwd().isEmpty() || employeeVO.getCm_pwd().equalsIgnoreCase("null")) {
+			result = -1;
+		}
+		
+		if(employeeVO.getDevice_type() == null || employeeVO.getDevice_type().isEmpty() || employeeVO.getDevice_type().equalsIgnoreCase("null")) {
+			result = -1;
+		}
+		
+		if(employeeVO.getDevice_ipaddr() == null || employeeVO.getDevice_ipaddr().isEmpty() || employeeVO.getDevice_ipaddr().equalsIgnoreCase("null")) {
+			result = -1;
+		}
+		
+		if(result != RESULT.RTN_SUCCESS) {
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID,  "checkVaildPush" , "### Invalid employee information ### " + employeeVO.toString());
+		}
+		
+		return result;
+	}
+
 	
 	
 	private XmlVO makeDisconnectXmlVO(TermConnEvt event , EmployeeVO employee, String callID)  throws Exception{

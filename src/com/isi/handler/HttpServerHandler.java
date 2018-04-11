@@ -325,7 +325,7 @@ public class HttpServerHandler {
 			
 			logwrite.httpLog(requestID, "procCreateImage", "Create Login Image Sync Success!!");
 			
-			jsonObj.put("code", "200");
+			jsonObj.put("code", RESULT.HTTP_SUCCESS);
 			jsonObj.put("msg", "success");
 			
 			return jsonObj.toString();
@@ -426,7 +426,7 @@ public class HttpServerHandler {
 			logwrite.httpLog(requestID, "procCallPickup",
 					"DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
 			//
-			jsonObj.put("code", "200");
+			jsonObj.put("code", RESULT.HTTP_SUCCESS);
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 		}
@@ -473,7 +473,7 @@ public class HttpServerHandler {
 			}
 			
 			//
-			jsonObj.put("code", "200");
+			jsonObj.put("code", RESULT.HTTP_SUCCESS);
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 		}
@@ -507,7 +507,7 @@ public class HttpServerHandler {
 			}
 			
 			//
-			jsonObj.put("code", "200");
+			jsonObj.put("code", RESULT.HTTP_SUCCESS);
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 		}
@@ -577,7 +577,7 @@ public class HttpServerHandler {
 			 */
 			// 
 			
-			jsonObj.put("code", "200");
+			jsonObj.put("code", RESULT.HTTP_SUCCESS);
 			jsonObj.put("msg", "success");
 			jsonObj.put("list", resultArr);
 			return jsonObj.toString();
@@ -613,7 +613,7 @@ public class HttpServerHandler {
 			
 			logwrite.httpLog(requestID, "procResetDevice", "DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
 			
-			jsonObj.put("code", "200");
+			jsonObj.put("code", RESULT.HTTP_SUCCESS);
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 		}
@@ -650,7 +650,7 @@ public class HttpServerHandler {
 			logwrite.httpLog(requestID, "procLogout", "EMPLOYEE LOGOUT RESULT CODE [" + loginResult + "]");
 			
 			
-			jsonObj.put("code", "200");
+			jsonObj.put("code", RESULT.HTTP_SUCCESS);
 			jsonObj.put("msg", resultVO.getMessage());
 			return jsonObj.toString();
 			
@@ -723,7 +723,7 @@ public class HttpServerHandler {
 			/*////////////////////////////////////////////////////////*/
 			
 			
-			jsonObj.put("code", "200");
+			jsonObj.put("code", RESULT.HTTP_SUCCESS);
 			jsonObj.put("msg", "success");
 			return jsonObj.toString();
 			

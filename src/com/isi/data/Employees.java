@@ -231,6 +231,10 @@ public class Employees {
 		return employee;
 	}
 	
+	public void updateEmployeeInfoByMacAddress(EmployeeVO empVO) {
+		empMapByMac.put(empVO.getMac_address(), empVO);
+	}
+	
 	public int getEmployeeList(){
 		
 		if(this.empMapByCellNum.size() > 0) {

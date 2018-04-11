@@ -1,5 +1,6 @@
 package com.isi.jtapi;
 
+import com.cisco.jtapi.extensions.CiscoTerminal;
 import com.isi.axl.CiscoPhoneInfo;
 import com.isi.event.IEventObserver;
 import com.isi.event.IEvt;
@@ -16,6 +17,7 @@ public interface IJTAPI  {
 	public JTapiResultVO pickupCall(String myExtension , String pickupExtension);
 	public JTapiResultVO makeCall(String myExtension , String callingNumber , String mac_address);
 	public JTapiResultVO stopCall(String myExtension);
+	public CiscoTerminal getTerminal(String mac_address);
 	
 //	Provider getProvider();
 //	public Log getLog();

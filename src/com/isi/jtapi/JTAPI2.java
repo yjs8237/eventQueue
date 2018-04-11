@@ -116,6 +116,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
 
 			providerString = cmIP + ";login=" + cmID + ";passwd=" + cmPwd;
+			// 원복필요 2018-04-11
+//			providerString = cmIP + ";login=" + "test_user" + ";passwd=" + "dkdlvlxl123$";
 
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.JTAPI, "serviceStart",
 					"[****] start JTAPI provider - " + providerString);
@@ -173,6 +175,16 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 	}
 	
 	
+	
+	public CiscoTerminal getTerminal(String mac_address) {
+		CiscoTerminal terminal = null;
+		try {
+			terminal = (CiscoTerminal) m_Provider.getTerminal(mac_address);
+		} catch (Exception e) {
+			return null;
+		}
+		return terminal;
+	}
 	
 	
 	public int MonitorAllStart(CiscoPhoneInfo address) {
@@ -241,7 +253,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		
 		CiscoAddress addr = null;
 		DevEvt dev = null; // 장이 이벤트 객체
-		// Device device = null; // 장치데이터
+		
 		try {
 
 			addr = (CiscoAddress) m_Provider.getAddress(aDn);
@@ -561,8 +573,76 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				return resultVO;
 			}
 			
+			// 원복필요 2018-04-11
+			/*
 			for (int i = 0; i < terminalArr.length; i++) {
+				
+//				Terminal terminal = terminalArr[i];
+				CiscoTerminal ciscoTerminal = (CiscoTerminal) terminalArr[i];
+				
+				m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "terminal name : " + ciscoTerminal.getName() + " , mac_address : " + mac_address);
+				
+				if(mac_address != null && !mac_address.isEmpty()) {
+					// mac_address 까지 비교해야 한다면 
+					if(!mac_address.equals(ciscoTerminal.getName())){
+						returnCode = RESULT.RTN_EXCEPTION;
+						returnMessage = "mac_address is not same " + mac_address;
+						continue;
+					}	
+				} 
+				
+				CiscoCall ciscoCall = (CiscoCall) ciscoTerminal.getProvider().createCall();
+				Address addresses[] = ciscoTerminal.getAddresses();
+				Address targetAddress = null;
+				
+				
+				// 내선 기준으로 make call ( 같은 내선의 n 개의 Device 일 경우 모든 Device가 makecall 될기야..)
+				
+				for (int j = 0; j < addresses.length; j++) {
+					
+					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "address : " + addresses[j].getName() + " , myExtension : " + myExtension);
+					
+					if (!addresses[j].getName().equals(myExtension)) {
+						continue;
+					}
+					targetAddress = addresses[j];
+					break;
+				}
+				
+				if (targetAddress != null) {
+					if(callingNumber != null && callingNumber.length() > 6) {
+						callingNumber = callingNumber.replaceAll("#", "");
+						callingNumber = callingNumber.replaceAll("-", "");
+						
+						if(callingNumber.startsWith("02709") || callingNumber.startsWith("023781")) {
+							
+							callingNumber = checkInternalNumber(callingNumber);
+							
+						} else {
+							callingNumber = "#" + callingNumber;
+						}
+						
+					}
+					returnMessage = "success";
+					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "call Connect 시도 MyExtension[" + myExtension + "] callingNumber[" + callingNumber + "]");
+					ciscoCall.connect(ciscoTerminal, targetAddress, callingNumber);
+				} else {
+					System.out.println("targetAddress is null "  );
+					returnCode = RESULT.RTN_EXCEPTION;
+					returnMessage = "targetAddress is null " + myExtension;
+					resultVO.setCode(returnCode);
+					resultVO.setMessage(returnMessage);
+					return resultVO;
+				}
+				
+			}
+			*/
+			
+			
+			for (int i = 0; i < terminalArr.length; i++) {
+				
 				Terminal terminal = terminalArr[i];
+
 				
 				m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "terminal name : " + terminal.getName() + " , mac_address : " + mac_address);
 				
@@ -697,6 +777,33 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				resultVO.setMessage(returnMessage);
 				return resultVO;
 			}
+			
+			// 원복필요 2018-04-11
+			/*
+			for (int i = 0; i < terminalArr.length; i++) {
+				CiscoTerminal ciscoTerminal = (CiscoTerminal) terminalArr[i];
+				TerminalConnection tcs[] = ciscoTerminal.getTerminalConnections();
+                if(tcs != null)
+                {
+                    for(int j = 0; j < tcs.length; j++)
+                    {
+                        CiscoCall call = (CiscoCall)tcs[j].getConnection().getCall();
+                        
+                        String callingAddress = call.getCallingAddress().toString();
+                        m_Log.server(LOGTYPE.STAND_LOG, "stopCall", "call Hanhup 시도 MyExtension[" + myExtension + "] callingAddress [" + callingAddress+"]");
+                        
+                        if(callingAddress.equals(myExtension))
+                        {
+                            tcs[j].getConnection().disconnect();
+                            m_Log.server(LOGTYPE.STAND_LOG, "stopCall", "call Hanhup Disconnection");
+                        }
+                    }
+
+                }
+				
+			}
+			*/
+			
 			
 			for (int i = 0; i < terminalArr.length; i++) {
 				Terminal terminal = terminalArr[i];

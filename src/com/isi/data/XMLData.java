@@ -163,6 +163,8 @@ public class XMLData {
     public String getInitMessages(){
     	StringBuffer xmlBuffer = new StringBuffer();
     	
+    	//"<CiscoIPPhoneExecute><ExecuteItem Priority=\"0\" URL=\"Init:Directories\"/><ExecuteItem Priority=\"0\" URL=\"Init:Services\"/></CiscoIPPhoneExecute>";
+    	
     	xmlBuffer.append("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
     	xmlBuffer.append("<CiscoIPPhoneExecute>");
     	xmlBuffer.append("<ExecuteItem URL=\"Init:Messages\"/>");

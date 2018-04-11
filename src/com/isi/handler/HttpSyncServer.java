@@ -222,7 +222,7 @@ public class HttpSyncServer {
 			
 			logwrite.httpLog(requestID, "procImageSync", "Create Image Sync Success!!");
 			
-			jsonObj.put("code", "200");
+			jsonObj.put("code", RESULT.HTTP_SUCCESS);
 			jsonObj.put("msg", "success");
 			
 			
@@ -279,7 +279,7 @@ public class HttpSyncServer {
 			
 			logwrite.httpLog(requestID, "procCreateImage", "Create Login Image Sync Success!!");
 			
-			jsonObj.put("code", "200");
+			jsonObj.put("code", RESULT.HTTP_SUCCESS);
 			jsonObj.put("msg", "success");
 			
 			

@@ -3,6 +3,7 @@ package com.isi.service;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import com.cisco.jtapi.extensions.CiscoTerminal;
 import com.isi.axl.CiscoPhoneInfo;
 import com.isi.constans.LOGLEVEL;
 import com.isi.constans.LOGTYPE;
@@ -200,6 +201,18 @@ public class JtapiService {
 		}
 		
 		return resultVO;
+	}
+	
+	public CiscoTerminal getTerminal(String mac_address) {
+		CiscoTerminal terminal = null;
+		if(mac_address == null || mac_address.isEmpty()) {
+			return null;
+		}
+		
+		for (int i = 0; i < m_jtapi.length; i++) {
+			terminal = m_jtapi[i].getTerminal(mac_address);
+		}
+		return terminal;
 	}
 	
 }
