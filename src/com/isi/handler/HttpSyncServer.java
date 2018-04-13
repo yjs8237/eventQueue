@@ -239,7 +239,6 @@ public class HttpSyncServer {
 			jsonObj.put("code", RESULT.HTTP_SUCCESS);
 			jsonObj.put("msg", "success");
 			
-			
 			return jsonObj.toString();
 		}
 		
