@@ -218,6 +218,20 @@ public class HttpSyncServer {
 			
 			// 로그인 시도할때 이미지 삭제 -> 생성 
 			ImageMgr imageMgr = ImageMgr.getInstance();
+			
+			
+			// DB Device Type 정보 가져오고 IP 정보 업데이트
+			Connection conn = DBConnMgr.getInstance().getConnection(requestID);
+			MyAddressMgr myAddress = new MyAddressMgr(conn);
+			ArrayList<EmployeeVO> empList = myAddress.getLoginUserList(imageSyncVO.getEmp_id(), requestID);
+			// 커넥션 반납
+			DBConnMgr.getInstance().returnConnection(conn, requestID);
+			
+			if(empList != null && empList.size() > 0) {
+				imageSyncVO.setOrg_nm(empList.get(0).getOrg_nm());
+				imageSyncVO.setPos_nm(empList.get(0).getPos_nm());
+			}
+			
 			imageMgr.createImageSyncFiles( imageSyncVO , requestID);
 			
 			logwrite.httpLog(requestID, "procImageSync", "Create Image Sync Success!!");

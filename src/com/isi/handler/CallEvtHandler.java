@@ -452,7 +452,6 @@ public class CallEvtHandler {
 			xmlHandler.evtDisconnectV2(makeDisconnectXmlVO(event , empVO , callID) , callID);
 		} 
 		
-		
 		return RESULT.RTN_SUCCESS;
 	}
 	

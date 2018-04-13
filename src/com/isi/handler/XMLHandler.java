@@ -556,7 +556,7 @@ public class XMLHandler {
 		if (returnCode == 1) {
 			// 생성
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushImage", "이미지 생성 이후 이미지 생성 동기화 URL 호출");
-			// 이중화 환경의 경우 remote 서버에게 로그인 시도 정보 전송 
+			// 이중화 환경의 경우 Push 하기전에 remote 서버에게 로그인 시도 정보 전송 
 			if (XmlInfoMgr.getInstance().getDuplexYN().equalsIgnoreCase("Y")) {
 				HttpUrlHandler urlHandler = new HttpUrlHandler(employee, callID , xmlInfo.getCallingDn() , caller_type );
 				urlHandler.setImageParameter(employee , caller_type, xmlInfo.getCallingDn());
@@ -577,7 +577,16 @@ public class XMLHandler {
 					CiscoTerminal terminal = JtapiService.getInstance().getTerminal(xmlInfo.getTerminal());
 					if(terminal != null) {
 						byte[] returnByte = terminal.sendData(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,  caller_type ,   xmlInfo.getCallingDn()).getBytes());
-						m_Log.standLog(callID, "push", "## push response -> " + new String(returnByte).replaceAll("\n", "").replaceAll("\r", ""));
+						String returnString = new String(returnByte).replaceAll("\n", "").replaceAll("\r", "");
+						m_Log.standLog(callID, "push", "## push response -> " + returnString);
+						resultVO.setResultMsg(returnString);
+						 if(resultVO.getResultMsg().contains("Data=\"Success\"") || resultVO.getResultMsg().contains("Data=\"SUCCESS\"")) {
+					        	resultVO.setPopup_yn("Y");
+					        	resultVO.setReturnCode(RESULT.RTN_SUCCESS);
+					        } else {
+					        	resultVO.setPopup_yn("N");
+					        	resultVO.setReturnCode(RESULT.RTN_EXCEPTION);
+					      }
 					}
 				} catch (Exception e) {
 					 e.printStackTrace(ExceptionUtil.getPrintWriter());

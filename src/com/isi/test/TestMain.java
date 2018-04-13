@@ -44,6 +44,8 @@ import com.test.soap.AxlHandler;
 import com.test.soap.Utils;
 import com.test.vo.CmAxlInfoModel;
 
+import sun.applet.Main;
+
 public class TestMain {
 
 	public static void main(String[] args) {
@@ -113,7 +115,6 @@ public class TestMain {
 		soapHeader.append(xmlBody);
 		
 		
-		String testStr = "adsfgadsfg";
 		
 //		String [] testarr = testStr.split("\n");
 //		System.out.println(testarr.length);
@@ -126,15 +127,10 @@ public class TestMain {
 //		 System.out.println(CommonUtil.convertHex("fbce648</fknumplan><dnorpatter"));
 		 
 //		
-		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
-		String retMsg = axlTest.SendSoapMessageV2(soapHeader.toString(), 10000);
+//		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
+//		String retMsg = axlTest.SendSoapMessageV2(soapHeader.toString(), 10000);
 		
 		
-		
-		int value = 3;
-		String testString = "abc   ";
-		
-		System.out.println(testString.substring(0, value).length());
 		
 
 		
@@ -143,69 +139,35 @@ public class TestMain {
 //		System.out.println(retMsg);
 		
 		
-//		(empVO.getCm_ip(), empVO.getCm_user(), empVO.getCm_pwd(), empVO.getMac_address() , empVO.getRequestID());
-		EmployeeVO empVO = new EmployeeVO();
-		empVO.setCm_ip("10.156.114.111");
-		empVO.setCm_user("SAC_IPT");
-		empVO.setCm_pwd("dkdlvlxl123$");
-		empVO.setMac_address("SEP001AA2660E8A");
-		empVO.setRequestID("");
-		empVO.setExtension("1764");
-		
-		for (int i = 0; i < 16; i++) {
-//			DeviceStatusHandler.getInstance().isRegisteredDevice(empVO);
-		}
-		
-		
-//		String test = "{\"content\":\"8925-Registered,8999-Registered,7099-Registered\",\"xsi:type\":\"xsd:string\"}";
-		String test = "{\"content\":\"8925-Registered\",\"xsi:type\":\"xsd:string\"}";
-		JSONObject tempJson = new JSONObject(test);
-		
-		Object obj = tempJson.get("content");
-		if(obj == null) {
-			
-		} else {
-			String content =tempJson.get("content").toString(); 
-			String []first_arr = content.split(",");
-			for (int i = 0; i < first_arr.length; i++) {
-//				System.out.println(first_arr[i]);
-				String [] arr = first_arr[i].split("-");
-				String currentExtension = "";
-				String deviceStatus = "";
-				if(arr.length>1) {
-					currentExtension = arr[0];
-					deviceStatus = arr[1];
-				}
-//				System.out.println(currentExtension + " , " + deviceStatus);
-			}
-		}
-		
-		
-		
-		
-		
-//		StringBuffer queryBuffer = new StringBuffer();
-//		queryBuffer
-//			.append("SELECT pkid, dnorpattern, cfnaduration, cfnavoicemailenabled, cfnaintdestination, iscallable, cfurintvoicemailenabled, cfurvoicemailenabled, alertingname, description, fkroutepartition ")
-//			.append("FROM NUMPLAN WHERE tkpatternusage = 2 AND fkroutepartition IS NOT NULL ")	//AND iscallable = 't'
-//			.append("AND dnorpattern = '").append("1234").append("'");
-//		
-//		System.out.println(queryBuffer.toString());
-//		System.out.println(queryBuffer.toString().replaceAll("alertingname,", ""));
-		
-		 
-		String extension = "8925";
 
 		
 //		System.out.println(CommonUtil.getPhoneMask(extension));
 		
-		
+		TestMain main = new TestMain();
+		System.out.println(main.testReturn());
 			
 				
 		
 		
 	}
 	
+	public String testReturn() {
+		String str = "1";
+		try {
+			
+			for (int i = 0; i < 10; i++) {
+				str += "1";
+				if(Integer.parseInt(str) == 1111) {
+					str = "3";
+					return str;
+				}
+			}
+		} catch (Exception e) {
+			
+		} finally {
+			return str;
+		}
+	}
 	
 	private String getHexToDec(String hex) {
 		   long v = Long.parseLong(hex, 16);   

@@ -524,6 +524,11 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 	            {
 	                CiscoConnection cc = (CiscoConnection)target.getConnection();
 	                cc.redirect(myExtension);
+	                returnCode = RESULT.RTN_SUCCESS;
+	                returnMessage = "success";
+	                resultVO.setCode(returnCode);
+					resultVO.setMessage(returnMessage);
+					return resultVO;
 	            }
 			}
 		} catch (Exception e) {
@@ -642,9 +647,8 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			for (int i = 0; i < terminalArr.length; i++) {
 				
 				Terminal terminal = terminalArr[i];
-
 				
-				m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "terminal name : " + terminal.getName() + " , mac_address : " + mac_address);
+				m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "myExtension["+myExtension+"] callingNumber["+callingNumber+"] terminal name : " + terminal.getName() + " , mac_address : " + mac_address);
 				
 				if(mac_address != null && !mac_address.isEmpty()) {
 					// mac_address 까지 비교해야 한다면 
@@ -664,7 +668,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				
 				for (int j = 0; j < addresses.length; j++) {
 					
-					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "address : " + addresses[j].getName() + " , myExtension : " + myExtension);
+					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "myExtension["+myExtension+"] callingNumber["+callingNumber+"] address : " + addresses[j].getName() + " , myExtension : " + myExtension);
 					
 					if (!addresses[j].getName().equals(myExtension)) {
 						continue;
@@ -690,6 +694,13 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 					returnMessage = "success";
 					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "call Connect 시도 MyExtension[" + myExtension + "] callingNumber[" + callingNumber + "]");
 					call.connect(terminal, targetAddress, callingNumber);
+					
+					returnCode = RESULT.RTN_SUCCESS;
+					returnMessage = "success";
+					resultVO.setCode(returnCode);
+					resultVO.setMessage(returnMessage);
+					return resultVO;
+					
 				} else {
 					System.out.println("targetAddress is null "  );
 					returnCode = RESULT.RTN_EXCEPTION;
@@ -806,6 +817,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			
 			
 			for (int i = 0; i < terminalArr.length; i++) {
+				
 				Terminal terminal = terminalArr[i];
 				
 				TerminalConnection tcs[] = terminal.getTerminalConnections();
@@ -816,12 +828,17 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
                         CiscoCall call = (CiscoCall)tcs[j].getConnection().getCall();
                         
                         String callingAddress = call.getCallingAddress().toString();
-                        m_Log.server(LOGTYPE.STAND_LOG, "stopCall", "call Hanhup 시도 MyExtension[" + myExtension + "] callingAddress [" + callingAddress+"]");
                         
                         if(callingAddress.equals(myExtension))
                         {
+                        	m_Log.server(LOGTYPE.STAND_LOG, "stopCall", "call Hangup 시도 MyExtension[" + myExtension + "] callingAddress [" + callingAddress+"]");
                             tcs[j].getConnection().disconnect();
-                            m_Log.server(LOGTYPE.STAND_LOG, "stopCall", "call Hanhup Disconnection");
+                            m_Log.server(LOGTYPE.STAND_LOG, "stopCall", "call Hangup Disconnection");
+                            returnCode = RESULT.RTN_SUCCESS;
+                            returnMessage = "success";
+                            resultVO.setCode(returnCode);
+                			resultVO.setMessage(returnMessage);
+                			return resultVO;
                         }
                     }
 

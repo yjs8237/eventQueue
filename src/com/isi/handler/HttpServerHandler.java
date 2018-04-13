@@ -463,7 +463,7 @@ public class HttpServerHandler {
 					makeCallVO.getCallingNumber() , makeCallVO.getMac_address());
 			
 			logwrite.httpLog(requestID, "procMakeCall",
-					"DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
+					"MAKE CALL RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
 			
 			if(resultVO.getCode() == -900 && resultVO.getMessage().equalsIgnoreCase("Address is out of service")) {
 				// Device 상태가 Out of Service 일 경우 Monitor Stop & Start
@@ -496,8 +496,8 @@ public class HttpServerHandler {
 			JTapiResultVO resultVO = JtapiService.getInstance().stopCall(makeCallVO.getMyExtension());
 			
 			
-			logwrite.httpLog(requestID, "procMakeCall",
-					"DEVICE MONITOR RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
+			logwrite.httpLog(requestID, "procStopCall",
+					"HANGUP CALL RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
 
 			if(resultVO.getCode() == -900 && resultVO.getMessage().equalsIgnoreCase("Address is out of service")) {
 				// Device 상태가 Out of Service 일 경우 Monitor Stop & Start
@@ -681,8 +681,6 @@ public class HttpServerHandler {
 			*/
 			EmployeeVO empVO = (EmployeeVO) baseVO;
 			empVO.setCell_no(empVO.getCell_no().replaceAll("-", ""));
-			
-			
 			
 			/*
 			 * 전화기 상태체크 (로그인 시도한 전화기와 내선번호가 정확하게 Regi 되었나 확인)
