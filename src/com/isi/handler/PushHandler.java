@@ -11,6 +11,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import com.cisco.jtapi.extensions.CiscoTerminal;
+import com.isi.constans.LOGLEVEL;
+import com.isi.constans.LOGTYPE;
 import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
 import com.isi.data.*;
@@ -20,6 +23,7 @@ import com.isi.file.LogMgr;
 import com.isi.file.LogWriter;
 import com.isi.file.PropertyRead;
 import com.isi.process.DBQueueMgr;
+import com.isi.service.JtapiService;
 import com.isi.utils.Utils;
 import com.isi.vo.PushResultVO;
 import com.isi.vo.XmlVO;
@@ -129,8 +133,9 @@ public class PushHandler {
 	        if(resultVO.getResultMsg().contains("Data=\"Success\"") || resultVO.getResultMsg().contains("Data=\"SUCCESS\"")) {
 	        	resultVO.setPopup_yn("Y");
 	        } else {
-	        	resultVO.setPopup_yn("N");
 	        	returnCode = RESULT.RTN_EXCEPTION;
+	        	resultVO.setPopup_yn("N");
+//	        	return sendTerminalPush(xml, xmlInfo);
 	        }
 	        
 	        resultVO.setReturnCode(returnCode);
@@ -138,6 +143,57 @@ public class PushHandler {
 	        return resultVO;
 	        
 	    }
+
+	public PushResultVO sendTerminalPush(String xml, XmlVO xmlInfo) {
+		// TODO Auto-generated method stub
+		// Push 가 실패하면 터미널에 직접 XML 데이터 send
+
+		PushResultVO resultVO = new PushResultVO();
+		
+		boolean isSuccess = false;
+		
+		try {
+			CiscoTerminal terminal = JtapiService.getInstance().getTerminal(xmlInfo.getTerminal());
+			if (terminal != null) {
+				m_Log.standLog(threadID, "sendTerminalPush", "## push send -> " + xml);
+
+				byte[] returnByte = terminal.sendData(xml.getBytes());
+				String returnString = new String(returnByte).replaceAll("\n", "").replaceAll("\r", "");
+				m_Log.standLog(threadID, "sendTerminalPush", "## push response -> " + returnString);
+				resultVO.setResultMsg(returnString);
+				if (resultVO.getResultMsg().contains("Data=\"Success\"")
+						|| resultVO.getResultMsg().contains("Data=\"SUCCESS\"")) {
+					resultVO.setPopup_yn("Y");
+					resultVO.setReturnCode(RESULT.RTN_SUCCESS);
+					isSuccess = true;	// Push 성공
+				} else {
+					resultVO.setPopup_yn("N");
+					resultVO.setReturnCode(RESULT.RTN_EXCEPTION);
+				}
+			} else {
+				m_Log.standLog(threadID, "sendTerminalPush", "## Terminal 정보 없음 로그인 여부 확인 필요 ##");
+				resultVO.setPopup_yn("N");
+				resultVO.setReturnCode(RESULT.RTN_EXCEPTION);
+				resultVO.setResultMsg(xmlInfo.getTerminal() + " 정보 없음, 로그인 여부 확인 필요");
+			}
+		} catch (Exception e) {
+			e.printStackTrace(ExceptionUtil.getPrintWriter());
+			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, threadID, "sendTerminalPush",
+					ExceptionUtil.getStringWriter().toString());
+			resultVO.setPopup_yn("N");
+			resultVO.setReturnCode(RESULT.RTN_EXCEPTION);
+			resultVO.setResultMsg(e.getLocalizedMessage());
+		}
+		
+		if(!isSuccess) {
+			// 팝업이 성공하지 못하면
+			m_Log.standLog(threadID, "sendTerminalPush", "## Push 실패 Re-try ## ");
+			resultVO = push(xml, xmlInfo, false);
+		}
+
+		return resultVO;
+
+	}
 
 	
 }

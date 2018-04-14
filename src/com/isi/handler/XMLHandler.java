@@ -434,7 +434,8 @@ public class XMLHandler {
 			case IPPhone.PHONE_7821:
 				pushHandler = new PushHandler(threadID);
 				// 7821 전화기는 Establish 일때 XML 창을 덮어버린다.. 그래서 .. MENUINIT push 한번 해주고
-				pushHandler.push(xmlData.getMenuInit(), xmlInfo, false);
+//				pushHandler.push(xmlData.getMenuInit(), xmlInfo, false);
+				pushHandler.sendTerminalPush(xmlData.getMenuInit(), xmlInfo);
 				returnCode = pushText(person, xmlInfo , callID);
 				break;
 				
@@ -481,7 +482,9 @@ public class XMLHandler {
 			case IPPhone.PHONE_8841: 
 				pushHandler = new PushHandler(callID);
 				// 8841 전화기는 Establish 일때 이미지 팝업을 통화상태 표시창이 덮어버린다.. 그래서 .. MENUINIT push 한번 해주고 이미지 팝업 한다. 
-				pushHandler.push(xmlData.getMenuInit(), xmlInfo, false);
+//				pushHandler.push(xmlData.getMenuInit(), xmlInfo, false);
+				pushHandler.sendTerminalPush(xmlData.getMenuInit(), xmlInfo);
+				
 //				returnCode = pushImage(person, xmlInfo , callID);
 				break;
 				
@@ -520,16 +523,16 @@ public class XMLHandler {
 	public int evtDisconnect(XmlVO xmlInfo , String callID){	// 전화를 끊었을 경우
 		pushHandler = new PushHandler(callID);
 		PushResultVO resultVO = new PushResultVO();
-		resultVO = pushHandler.push(xmlData.getMenuInit(), xmlInfo, false);
-		
+//		resultVO = pushHandler.push(xmlData.getMenuInit(), xmlInfo, false);
+		resultVO = pushHandler.sendTerminalPush(xmlData.getMenuInit(), xmlInfo);
 		return resultVO.getReturnCode();
 	}
 	
 	public int evtDisconnectV2(XmlVO xmlInfo , String callID){	// 전화를 끊었을 경우
 		pushHandler = new PushHandler(callID);
 		PushResultVO resultVO = new PushResultVO();
-		resultVO = pushHandler.push(xmlData.getInitMessages(), xmlInfo, false);
-		
+//		resultVO = pushHandler.push(xmlData.getInitMessages(), xmlInfo, false);
+		resultVO = pushHandler.sendTerminalPush(xmlData.getMenuInit(), xmlInfo);
 		return resultVO.getReturnCode();
 	}
 	
@@ -570,7 +573,10 @@ public class XMLHandler {
 			
 			// Push
 			pushHandler = new PushHandler(callID);
-			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,  caller_type ,   xmlInfo.getCallingDn()), xmlInfo,false);
+//			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,  caller_type ,   xmlInfo.getCallingDn()), xmlInfo,false);
+			resultVO = pushHandler.sendTerminalPush(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,  caller_type ,   xmlInfo.getCallingDn()), xmlInfo);
+			
+			/*
 			if(resultVO.getReturnCode() == RESULT.RTN_EXCEPTION) {
 				// Push 가 실패하면 터미널에 직접 XML 데이터 send
 				try {
@@ -594,13 +600,15 @@ public class XMLHandler {
 				}
 				
 			}
+			*/
 			
 			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(),
 					employee, xmlInfo.getTargetIP(),  resultVO.getResultMsg());
 		} else if (returnCode == 0) {
 			// 이미존재
 			pushHandler = new PushHandler(callID);
-			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,caller_type, xmlInfo.getCallingDn()), xmlInfo,false);
+//			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,caller_type, xmlInfo.getCallingDn()), xmlInfo,false);
+			resultVO = pushHandler.sendTerminalPush(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,  caller_type ,   xmlInfo.getCallingDn()), xmlInfo);
 			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(),
 					employee, xmlInfo.getTargetIP(),resultVO.getResultMsg());
 		} else {
@@ -618,7 +626,8 @@ public class XMLHandler {
 	private int pushText(EmployeeVO employee, XmlVO xmlInfo , String callID ){
 		pushHandler = new PushHandler(callID);
 		PushResultVO resultVO = new PushResultVO();
-		resultVO = pushHandler.push(xmlData.getCiscoIPPhoneText("Calling !!", employee), xmlInfo, false);
+//		resultVO = pushHandler.push(xmlData.getCiscoIPPhoneText("Calling !!", employee), xmlInfo, false);
+		resultVO = pushHandler.sendTerminalPush(xmlData.getCiscoIPPhoneText("Calling !!", employee), xmlInfo);
 		DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(), employee ,xmlInfo.getTargetIP(), resultVO.getResultMsg());
 		return resultVO.getReturnCode();
 	}
