@@ -97,8 +97,6 @@ public class TestMain {
 				"</SOAP-ENV:Envelope>";
 		
 		
-		
-		
 		StringBuffer soapHeader = new StringBuffer();
 		soapHeader.append("POST https://").append(urlIP).append(":").append(urlPort).append("/axl/ HTTP/1.1").append("\n");
 		soapHeader.append("Accept-Encoding: gzip,deflate").append("\n");
@@ -130,43 +128,22 @@ public class TestMain {
 //		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
 //		String retMsg = axlTest.SendSoapMessageV2(soapHeader.toString(), 10000);
 		
-		
-		
-
-		
-		
 //		System.out.println("--- return ---");
 //		System.out.println(retMsg);
 		
-		
-
-		
 //		System.out.println(CommonUtil.getPhoneMask(extension));
 		
-		TestMain main = new TestMain();
-		System.out.println(main.testReturn());
-			
-				
+		String []arr ;
+		
 		
 		
 	}
 	
-	public String testReturn() {
-		String str = "1";
-		try {
-			
-			for (int i = 0; i < 10; i++) {
-				str += "1";
-				if(Integer.parseInt(str) == 1111) {
-					str = "3";
-					return str;
-				}
-			}
-		} catch (Exception e) {
-			
-		} finally {
-			return str;
-		}
+	public void testReturn(EmployeeVO param) {
+		
+		param.setExtension("2");
+		System.out.println(param.getExtension());
+		
 	}
 	
 	private String getHexToDec(String hex) {

@@ -34,6 +34,8 @@ import com.isi.file.PropertyRead;
 import com.isi.service.JtapiService;
 import com.isi.thread.DeviceCheck;
 import com.isi.thread.LoginProcess;
+import com.isi.thread.MakeCall;
+import com.isi.thread.StopCall;
 import com.isi.vo.BaseVO;
 import com.isi.vo.DeviceResetVO;
 import com.isi.vo.DeviceStatusVO;
@@ -446,35 +448,23 @@ public class HttpServerHandler {
 
 			MakeCallVO makeCallVO = getMakeCallInfo(map);
 			
-//			EmployeeVO empVO = Employees.getInstance().getEmployeeByExtension(makeCallVO.getMyExtension(), "");
-//			// JtapiService.getInstance().monitorStop(resetVO.getExtension());
-//			
-//			if(empVO == null) {
-//				logwrite.httpLog(requestID, "procMakeCall",
-//						"Extension " + makeCallVO.getMyExtension() + " not login");
-//				jsonObj.put("code", String.valueOf(RESULT.HTTP_PARAM_ERROR));
-//				jsonObj.put("msg", "Extension " + makeCallVO.getMyExtension() + " not login");
-//				return jsonObj.toString();
-//			}
-			
-			
-			
-			JTapiResultVO resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(),
-					makeCallVO.getCallingNumber() , makeCallVO.getMac_address());
+			MakeCall makeCallProc = new MakeCall(makeCallVO, requestID);
+			makeCallProc.start();
 			
 			logwrite.httpLog(requestID, "procMakeCall",
-					"MAKE CALL RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
+					"MAKE CALL RESULT CODE [" + RESULT.RTN_SUCCESS + "] MESSAGE [" + "success" + "]");
 			
+			/*
 			if(resultVO.getCode() == -900 && resultVO.getMessage().equalsIgnoreCase("Address is out of service")) {
 				// Device 상태가 Out of Service 일 경우 Monitor Stop & Start
 //				JtapiService.getInstance().monitorStop(makeCallVO.getMyExtension());
 //				JtapiService.getInstance().monitorStart(makeCallVO.getMyExtension());
 //				resultVO = JtapiService.getInstance().makeCall(makeCallVO.getMyExtension(), makeCallVO.getCallingNumber() ,makeCallVO.getMac_address());
 			}
-			
+			*/
 			//
 			jsonObj.put("code", RESULT.HTTP_SUCCESS);
-			jsonObj.put("msg", resultVO.getMessage());
+			jsonObj.put("msg", "success");
 			return jsonObj.toString();
 		}
 		
@@ -493,22 +483,24 @@ public class HttpServerHandler {
 
 			MakeCallVO makeCallVO = getStopCallInfo(map);
 			
-			JTapiResultVO resultVO = JtapiService.getInstance().stopCall(makeCallVO.getMyExtension());
-			
+			StopCall stopCallProc = new StopCall(makeCallVO, requestID);
+			stopCallProc.start();
 			
 			logwrite.httpLog(requestID, "procStopCall",
-					"HANGUP CALL RESULT CODE [" + resultVO.getCode() + "] MESSAGE [" + resultVO.getMessage() + "]");
-
+					"HANGUP CALL RESULT CODE [" + 0 + "] MESSAGE [" + "success" + "]");
+			
+			/*
 			if(resultVO.getCode() == -900 && resultVO.getMessage().equalsIgnoreCase("Address is out of service")) {
 				// Device 상태가 Out of Service 일 경우 Monitor Stop & Start
 				JtapiService.getInstance().monitorStop(makeCallVO.getMyExtension());
 				JtapiService.getInstance().monitorStart(makeCallVO.getMyExtension());
-				resultVO = JtapiService.getInstance().stopCall(makeCallVO.getMyExtension() );
+				resultVO = JtapiService.getInstance().stopCall(makeCallVO.getMyExtension()  , requestID);
 			}
+			*/
 			
 			//
 			jsonObj.put("code", RESULT.HTTP_SUCCESS);
-			jsonObj.put("msg", resultVO.getMessage());
+			jsonObj.put("msg", "success");
 			return jsonObj.toString();
 		}
 		

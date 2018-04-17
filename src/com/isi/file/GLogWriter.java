@@ -171,6 +171,12 @@ public class GLogWriter implements ILog {
 	}
 
 	@Override
+	public void server(String callID , String type, String methodName, String msg) {
+		// TODO Auto-generated method stub
+		write(LOGLEVEL.LEVEL_3, type, callID, methodName, msg);
+	}
+	
+	@Override
 	public void server(String type, String methodName, String msg) {
 		// TODO Auto-generated method stub
 		write(LOGLEVEL.LEVEL_3, type, SVCTYPE.GLOBAL, methodName, msg);

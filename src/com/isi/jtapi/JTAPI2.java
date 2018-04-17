@@ -113,6 +113,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 
 		String providerString;
 		try {
+			
 			JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
 
 			providerString = cmIP + ";login=" + cmID + ";passwd=" + cmPwd;
@@ -548,7 +549,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 	}
 
 	@Override
-	public JTapiResultVO makeCall(String myExtension, String callingNumber ,String mac_address) {
+	public JTapiResultVO makeCall(String myExtension, String callingNumber ,String mac_address , String requestID) {
 		// TODO Auto-generated method stub
 		JTapiResultVO resultVO = new JTapiResultVO();
 		
@@ -557,8 +558,85 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 		
 		try {
 			
-//			Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(myExtension);
+			if(myExtension == null || myExtension.isEmpty()) {
+				returnCode = RESULT.RTN_EXCEPTION;
+				returnMessage = "myExtension is null " + myExtension;
+				resultVO.setCode(returnCode);
+				resultVO.setMessage(returnMessage);
+				return resultVO;
+			}
 			
+			if(mac_address == null || mac_address.isEmpty()) {
+				returnCode = RESULT.RTN_EXCEPTION;
+				returnMessage = "mac_address is null " + mac_address;
+				resultVO.setCode(returnCode);
+				resultVO.setMessage(returnMessage);
+				return resultVO;
+			}
+			
+			Terminal terminal = m_Provider.getTerminal(mac_address);
+			
+			if(terminal == null) {
+				returnCode = RESULT.RTN_EXCEPTION;
+				returnMessage = "terminal is null " + mac_address;
+				resultVO.setCode(returnCode);
+				resultVO.setMessage(returnMessage);
+				return resultVO;
+			}
+			
+			
+			Call call = terminal.getProvider().createCall();
+			Address addresses[] = terminal.getAddresses();
+			Address targetAddress = null;
+			
+			// 내선 기준으로 make call ( 같은 내선의 n 개의 Device 일 경우 모든 Device가 makecall 될기야..)
+			
+			for (int j = 0; j < addresses.length; j++) {
+				
+				m_Log.server(requestID ,LOGTYPE.STAND_LOG, "makeCall", "myExtension["+myExtension+"] callingNumber["+callingNumber+"] address : " + addresses[j].getName() + " , myExtension : " + myExtension);
+				
+				if (!addresses[j].getName().equals(myExtension)) {
+					continue;
+				}
+				targetAddress = addresses[j];
+				break;
+			}
+			
+			if (targetAddress != null) {
+				if(callingNumber != null && callingNumber.length() > 6) {
+					callingNumber = callingNumber.replaceAll("#", "");
+					callingNumber = callingNumber.replaceAll("-", "");
+					
+					if(callingNumber.startsWith("02709") || callingNumber.startsWith("023781")) {
+						
+						callingNumber = checkInternalNumber(callingNumber);
+						
+					} else {
+						callingNumber = "#" + callingNumber;
+					}
+					
+				}
+				
+				returnMessage = "success";
+				m_Log.server(requestID,LOGTYPE.STAND_LOG, "makeCall", "call Connect 시도 MyExtension[" + myExtension + "] callingNumber[" + callingNumber + "]");
+				call.connect(terminal, targetAddress, callingNumber);
+				
+				returnCode = RESULT.RTN_SUCCESS;
+				returnMessage = "success";
+				resultVO.setCode(returnCode);
+				resultVO.setMessage(returnMessage);
+				return resultVO;
+				
+			} else {
+				m_Log.server(requestID,LOGTYPE.STAND_LOG, "makeCall", "targetAddress is null ");
+				returnCode = RESULT.RTN_EXCEPTION;
+				returnMessage = "targetAddress is null " + myExtension;
+				resultVO.setCode(returnCode);
+				resultVO.setMessage(returnMessage);
+				return resultVO;
+			}
+			
+			/*
 			CiscoAddress addr = (CiscoAddress) m_Provider.getAddress(myExtension);
 			Terminal[] terminalArr = addr.getTerminals();
 			
@@ -577,71 +655,6 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				resultVO.setMessage(returnMessage);
 				return resultVO;
 			}
-			
-			// 원복필요 2018-04-11
-			/*
-			for (int i = 0; i < terminalArr.length; i++) {
-				
-//				Terminal terminal = terminalArr[i];
-				CiscoTerminal ciscoTerminal = (CiscoTerminal) terminalArr[i];
-				
-				m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "terminal name : " + ciscoTerminal.getName() + " , mac_address : " + mac_address);
-				
-				if(mac_address != null && !mac_address.isEmpty()) {
-					// mac_address 까지 비교해야 한다면 
-					if(!mac_address.equals(ciscoTerminal.getName())){
-						returnCode = RESULT.RTN_EXCEPTION;
-						returnMessage = "mac_address is not same " + mac_address;
-						continue;
-					}	
-				} 
-				
-				CiscoCall ciscoCall = (CiscoCall) ciscoTerminal.getProvider().createCall();
-				Address addresses[] = ciscoTerminal.getAddresses();
-				Address targetAddress = null;
-				
-				
-				// 내선 기준으로 make call ( 같은 내선의 n 개의 Device 일 경우 모든 Device가 makecall 될기야..)
-				
-				for (int j = 0; j < addresses.length; j++) {
-					
-					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "address : " + addresses[j].getName() + " , myExtension : " + myExtension);
-					
-					if (!addresses[j].getName().equals(myExtension)) {
-						continue;
-					}
-					targetAddress = addresses[j];
-					break;
-				}
-				
-				if (targetAddress != null) {
-					if(callingNumber != null && callingNumber.length() > 6) {
-						callingNumber = callingNumber.replaceAll("#", "");
-						callingNumber = callingNumber.replaceAll("-", "");
-						
-						if(callingNumber.startsWith("02709") || callingNumber.startsWith("023781")) {
-							
-							callingNumber = checkInternalNumber(callingNumber);
-							
-						} else {
-							callingNumber = "#" + callingNumber;
-						}
-						
-					}
-					returnMessage = "success";
-					m_Log.server(LOGTYPE.STAND_LOG, "makeCall", "call Connect 시도 MyExtension[" + myExtension + "] callingNumber[" + callingNumber + "]");
-					ciscoCall.connect(ciscoTerminal, targetAddress, callingNumber);
-				} else {
-					System.out.println("targetAddress is null "  );
-					returnCode = RESULT.RTN_EXCEPTION;
-					returnMessage = "targetAddress is null " + myExtension;
-					resultVO.setCode(returnCode);
-					resultVO.setMessage(returnMessage);
-					return resultVO;
-				}
-				
-			}
-			*/
 			
 			
 			for (int i = 0; i < terminalArr.length; i++) {
@@ -711,13 +724,13 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				}
 				
 			}
-			
+			*/
 			
 		} catch (Exception e) {
 			sw = new StringWriter();
 			pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
-			m_Log.server(LOGTYPE.ERR_LOG, "makeCall", sw.toString());
+			m_Log.server(requestID,  LOGTYPE.ERR_LOG, "makeCall", sw.toString());
 			returnCode = RESULT.RTN_EXCEPTION;
 			returnMessage = e.getLocalizedMessage();
 		} finally {
@@ -758,7 +771,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 	}
 
 	@Override
-	public JTapiResultVO stopCall(String myExtension) {
+	public JTapiResultVO stopCall(String myExtension , String requestID) {
 		// TODO Auto-generated method stub
 		JTapiResultVO resultVO = new JTapiResultVO();
 		
@@ -831,9 +844,9 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
                         
                         if(callingAddress.equals(myExtension))
                         {
-                        	m_Log.server(LOGTYPE.STAND_LOG, "stopCall", "call Hangup 시도 MyExtension[" + myExtension + "] callingAddress [" + callingAddress+"]");
+                        	m_Log.server(requestID ,LOGTYPE.STAND_LOG, "stopCall", "call Hangup 시도 MyExtension[" + myExtension + "] callingAddress [" + callingAddress+"]");
                             tcs[j].getConnection().disconnect();
-                            m_Log.server(LOGTYPE.STAND_LOG, "stopCall", "call Hangup Disconnection");
+                            m_Log.server(requestID ,LOGTYPE.STAND_LOG, "stopCall", "call Hangup Disconnection");
                             returnCode = RESULT.RTN_SUCCESS;
                             returnMessage = "success";
                             resultVO.setCode(returnCode);
@@ -852,7 +865,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			sw = new StringWriter();
 			pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
-			m_Log.server(LOGTYPE.ERR_LOG, "stopCall", sw.toString());
+			m_Log.server(requestID ,LOGTYPE.ERR_LOG, "stopCall", sw.toString());
 			returnCode = RESULT.RTN_EXCEPTION;
 			returnMessage = e.getLocalizedMessage();
 		} finally {

@@ -155,11 +155,11 @@ public class PushHandler {
 		try {
 			CiscoTerminal terminal = JtapiService.getInstance().getTerminal(xmlInfo.getTerminal());
 			if (terminal != null) {
-				m_Log.standLog(threadID, "sendTerminalPush", "## push send -> " + xml);
+				m_Log.standLog(threadID, "sendTerminalPush", "## push send ["+xmlInfo.getTerminal()+"] -> " + xml);
 
 				byte[] returnByte = terminal.sendData(xml.getBytes());
 				String returnString = new String(returnByte).replaceAll("\n", "").replaceAll("\r", "");
-				m_Log.standLog(threadID, "sendTerminalPush", "## push response -> " + returnString);
+				m_Log.standLog(threadID, "sendTerminalPush", "## push response ["+xmlInfo.getTerminal()+"] -> " + returnString);
 				resultVO.setResultMsg(returnString);
 				if (resultVO.getResultMsg().contains("Data=\"Success\"")
 						|| resultVO.getResultMsg().contains("Data=\"SUCCESS\"")) {

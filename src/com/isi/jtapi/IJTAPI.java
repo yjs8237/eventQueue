@@ -15,8 +15,8 @@ public interface IJTAPI  {
 	public JTapiResultVO MonitorStart(String aDn);
 	public JTapiResultVO MonitorStop(String aDn);
 	public JTapiResultVO pickupCall(String myExtension , String pickupExtension);
-	public JTapiResultVO makeCall(String myExtension , String callingNumber , String mac_address);
-	public JTapiResultVO stopCall(String myExtension);
+	public JTapiResultVO makeCall(String myExtension , String callingNumber , String mac_address , String requestID);
+	public JTapiResultVO stopCall(String myExtension , String requestID);
 	public CiscoTerminal getTerminal(String mac_address);
 	
 //	Provider getProvider();

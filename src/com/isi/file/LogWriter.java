@@ -259,6 +259,13 @@ public class LogWriter implements ILog {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	@Override
+	public void server(String callID, String type, String methodName, String msg) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 

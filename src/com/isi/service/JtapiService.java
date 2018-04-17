@@ -129,7 +129,7 @@ public class JtapiService {
 		return resultVO;
 	}
 	
-	public JTapiResultVO makeCall(String myExtension , String callingNumber , String mac_address ) {
+	public JTapiResultVO makeCall(String myExtension , String callingNumber , String mac_address , String requestID ) {
 		
 		JTapiResultVO resultVO = null;
 		if(myExtension == null || myExtension.isEmpty()) {
@@ -140,7 +140,7 @@ public class JtapiService {
 			return resultVO;
 		}
 		
-		resultVO = m_jtapi[0].makeCall(myExtension, callingNumber , mac_address );
+		resultVO = m_jtapi[0].makeCall(myExtension, callingNumber , mac_address , requestID );
 		if(resultVO.getCode() != RESULT.RTN_SUCCESS) {
 			return resultVO;
 		}
@@ -148,7 +148,7 @@ public class JtapiService {
 		return resultVO;
 	}
 	
-	public JTapiResultVO stopCall(String myExtension ) {
+	public JTapiResultVO stopCall(String myExtension , String requestID) {
 		
 		JTapiResultVO resultVO = null;
 		if(myExtension == null || myExtension.isEmpty()) {
@@ -156,7 +156,7 @@ public class JtapiService {
 		}
 		
 		
-		resultVO = m_jtapi[0].stopCall(myExtension );
+		resultVO = m_jtapi[0].stopCall(myExtension , requestID );
 		if(resultVO.getCode() != RESULT.RTN_SUCCESS) {
 			return resultVO;
 		}

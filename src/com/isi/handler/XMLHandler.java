@@ -73,14 +73,13 @@ public class XMLHandler {
 		
 		int returnCode = -1;	// Http Push 결과 리턴 코드
 		
-		EmployeeVO employee;
+		EmployeeVO employee = null;
 		
 		if(xmlInfo.getTargetModel() == null || xmlInfo.getTargetModel().isEmpty() || xmlInfo.getTargetModel().equalsIgnoreCase("null")){
 			// 팝업 띄우려는 타겟의 디바이스 타입이 없을 경우
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, callID, "evtRing", "## TARGET MODEL IS NULL ## ----------> 인사정보 DB 확인해주세요.");
 			return RESULT.ERROR;
 		}
-		
 		
 		// 개인 주소록 번호 조회 (개인 주소록 팝업이 우선순위가 높다) 
 		
@@ -93,13 +92,15 @@ public class XMLHandler {
 		xmlInfo.setCallingDn(xmlInfo.getCallingDn().replaceAll("-", ""));
 		
 		
-		// 커넥션 획득
-		Connection conn = DBConnMgr.getInstance().getConnection(callID);
-		MyAddressMgr myAddress=  new MyAddressMgr(conn);
-		employee = myAddress.getMyAddressInfo(myAddressVO.getEmp_id(), xmlInfo.getCallingDn(), callID);
-		
-		// 커넥션 반납
-		DBConnMgr.getInstance().returnConnection(conn , callID);
+		if(myAddressVO != null) {
+			// 커넥션 획득
+			Connection conn = DBConnMgr.getInstance().getConnection(callID);
+			MyAddressMgr myAddress=  new MyAddressMgr(conn);
+			employee = myAddress.getMyAddressInfo(myAddressVO.getEmp_id(), xmlInfo.getCallingDn(), callID);
+			// 커넥션 반납
+			DBConnMgr.getInstance().returnConnection(conn , callID);
+			
+		}
 		
 		String caller_type = "";
 		if(employee != null) {
@@ -519,6 +520,10 @@ public class XMLHandler {
 		return returnCode;
 		
 	}
+	
+	
+	
+	
 	
 	public int evtDisconnect(XmlVO xmlInfo , String callID){	// 전화를 끊었을 경우
 		pushHandler = new PushHandler(callID);

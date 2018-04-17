@@ -6,6 +6,7 @@ package com.isi.file;
 public interface ILog {
 	public void write(String level, String type, String callkey, String methodName,String msg);
 	public void config(String type, String methodName, String msg);
+	public void server(String callID , String type, String methodName, String msg);
 	public void server(String type, String methodName, String msg);
 	public void Jtapi(String type, String callid,String methodName, String msg);
 	public void callLog(String type, String callId, String methodName, String msg);

@@ -108,7 +108,7 @@ public class AxlTest {
 					String str = strArr[i].replaceAll("\r", "");
 					str = str.replaceAll("\n", "");
 					
-					logwrite.server("", "", str);
+					logwrite.server("","", "", str);
 					
 //					System.out.println(str);
 					
@@ -138,8 +138,8 @@ public class AxlTest {
 				}
 			}
 			
-			logwrite.server("", "", "#######################################");
-			logwrite.server("", "", sb.toString().trim());
+			logwrite.server("","", "", "#######################################");
+			logwrite.server("","", "", sb.toString().trim());
 			
 			//logger.debug("StringBuffer [" + sb.toString() + "]");
 			
@@ -153,8 +153,6 @@ public class AxlTest {
 			} else {
 				return "Error Response is Not xml format!!";
 			}
-			logwrite.server("", "", "");
-			logwrite.server("", "", "");
 //			logwrite.server("", "", rcvMsg);
 			
 //			if(WebServerLoadRunner.SOAP_AXL_LOG_YN) {
