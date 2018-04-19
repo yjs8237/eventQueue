@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -112,12 +114,20 @@ public class HttpServerHandler {
 				break;
 			}
 			
-			exchange.sendResponseHeaders(200, responseDATA.length());
+			
+			exchange.getResponseHeaders().set("Content-type", "application/json");
+			
+			
+//			exchange.sendResponseHeaders(200, responseDATA.length()); 오류
+			exchange.sendResponseHeaders(200, responseDATA.getBytes().length);
 			
 			OutputStream responseBody = exchange.getResponseBody();
 			logwrite.httpLog(requestID, "handle", "JSON RETURN DATA #[" + responseDATA + "]#");
 			
+//			Writer out = new OutputStreamWriter(responseBody, "utf-8");
+//			out.write(responseDATA);
 			responseBody.write(responseDATA.getBytes());
+//			out.close();
 			responseBody.close();
 			
 			
@@ -248,19 +258,26 @@ public class HttpServerHandler {
 			String extension = map.get("extension");
 			String mac_address = map.get("mac_address");
 			
-			List userList = Employees.getInstance().getEmployeeListByExtension(extension);
-			if(userList == null) {
-				
-			} else {
-				
-				return getJsonReturnData (userList);
+			List userList;
+			if(extension != null && !extension.isEmpty()) {
+				userList = Employees.getInstance().getEmployeeListByExtension(extension);
+				if(userList == null) {
+					
+				} else {
+					
+					return getJsonReturnData (userList);
+				}
 			}
-			userList = Employees.getInstance().getEmployeeListByCellNum(cell_no, "");
-			if(userList == null) {
 				
-			} else {
-				return getJsonReturnData (userList);
+			if(cell_no != null && !cell_no.isEmpty()) {
+				userList = Employees.getInstance().getEmployeeListByCellNum(cell_no, "");
+				if(userList == null) {
+					
+				} else {
+					return getJsonReturnData (userList);
+				}
 			}
+			
 			return jsonArr.toString();
 		}
 

@@ -102,7 +102,7 @@ public class Employees {
 		// 현재 DB 기준 로그인 유저 메모리에서 삭제하고 다시 put
 		for (int i = 0; i < loginUserlist.size(); i++) {
 			EmployeeVO tempVO = loginUserlist.get(i);
-			logoutEmployee(tempVO , requestID);
+//			logoutEmployee(tempVO , requestID);
 			empMapByMac.put(tempVO.getMac_address() , tempVO);
 		}
 		
@@ -124,10 +124,11 @@ public class Employees {
 			return RESULT.RTN_EXCEPTION;
 		}
 		
+		/*
 		empMapByCellNum.remove(employee.getCell_no());
 		empMapByExtension.remove(employee.getExtension());
 		empMapByMac.remove(employee.getMac_address());
-		
+		*/
 		m_Log.httpLog(requestID , "logoutEmployee", ">> LOGOUT << SUCCESS extension [" + employee.getExtension() + "] cell_no [" + employee.getCell_no() + "] mac_address [" + employee.getMac_address() + "]");
 		
 		return RESULT.RTN_SUCCESS;
@@ -371,8 +372,6 @@ public class Employees {
                 	m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, "", "getMemberInfo" ,"[DB] Select Success");
                 	while(rs.next()){
                 		
-                		if(rs.getString("extension") != null && rs.getString("extension").length() > 0){
-                			
                 			employeeInfo = new EmployeeVO();
                 			
                 			String extension = rs.getString("extension");
@@ -443,7 +442,6 @@ public class Employees {
 //                	    	System.out.println("## SUCCESS getEmployeeList!! ## TOTAL EMPLOYEE COUNT CELLNUM : " + empMapByCellNum.size());
 //                			employeeMap.put(rs.getString("extension"), employeeInfo);
                 		
-                		}
                 			
                 	}
                 	

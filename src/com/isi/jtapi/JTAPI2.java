@@ -501,8 +501,6 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			CiscoAddress addr = (CiscoAddress) m_Provider.getAddress(pickupExtension);
 			Terminal[] terminalArr = addr.getTerminals();
 			
-	//		Terminal[] terminalArr = (Terminal[]) m_TerminalMap.get(pickupExtension);
-			
 			if(terminalArr == null || terminalArr.length == 0) {
 				returnCode = RESULT.RTN_EXCEPTION;
 				returnMessage = "NOT LOGIN " + pickupExtension;
@@ -517,13 +515,16 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				CiscoTerminalConnection target = null;
 	            TerminalConnection tc[] = terminal.getTerminalConnections();
 	            for(int j = 0; j < tc.length; j++) {
+	            	// 터미널 Connection 의 CallControlState가 Ringing 일 경우
 	            	if(((CiscoTerminalConnection)tc[j]).getCallControlState() == 97) {
 	            		target = (CiscoTerminalConnection)tc[j];
 	            	}
 	            }
 	            if(target != null)
 	            {
+	            	
 	                CiscoConnection cc = (CiscoConnection)target.getConnection();
+	                // 해당 콜의 나의 내선번호로 Redirect
 	                cc.redirect(myExtension);
 	                returnCode = RESULT.RTN_SUCCESS;
 	                returnMessage = "success";
