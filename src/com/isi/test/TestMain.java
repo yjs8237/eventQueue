@@ -10,7 +10,10 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -60,29 +63,8 @@ public class TestMain {
 		String m_auth = Text2Base64.getBase64(auth);
 		 
 		StringBuffer queryBuffer = new StringBuffer();
-		queryBuffer
-		.append("select ")
-		.append("	n.pkid fknumplan, n.dnorpattern, n.cfnaduration, n.cfnavoicemailenabled, n.cfnaintdestination, n.cfnaintvoicemailenabled, n.cfnadestination ")
-		.append("	, cfd.cfavoicemailenabled, cfd.cfadestination ")
-		.append("from ")
-		.append("	numplan n, callforwarddynamic cfd ")
-		.append("where ")
-		.append("	n.tkpatternusage IN (1, 2) ")
-		.append("	and n.pkid = cfd.fknumplan ");
-		
-		
-//		queryBuffer
-//		.append("select ")
-//		.append("	d.pkid fkdevice, d.name, d.tkuserlocale, d.tkcountry, d.description ")
-//		.append("	, dnm.busytrigger, dnm.e164mask, n.dnorpattern ")
-//		.append("	, d.fkdevicepool, d.fksoftkeytemplate, n.fkroutepartition, n.fkcallingsearchspace_sharedlineappear ")
-//		.append("	, PICK.pkid as pick_pkid ")
-//		.append("from")
-//		.append("	device d, devicenumplanmap dnm, numplan n , pickupgrouplinemap PM , pickupgroup PICK ")
-//		.append("where ")
-//		.append("	d.pkid = dnm.fkdevice and dnm.fknumplan = n.pkid and n.pkid = PM.fknumplan_line and PM.fkpickupgroup = PICK.pkid ");
-		
-		
+		queryBuffer.append("update numplan set iscallable = 't', cfurintvoicemailenabled = 't', cfurvoicemailenabled = 't' where dnorpattern = '");
+		queryBuffer.append("0100").append("'");
 		
 		
 //		queryBuffer.append("select * from numplan where dnorpattern = '1772'");
@@ -112,28 +94,18 @@ public class TestMain {
 		
 		soapHeader.append(xmlBody);
 		
+		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
+		String retMsg = axlTest.SendSoapMessageV2(soapHeader.toString(), 10000);
 		
-		
-//		String [] testarr = testStr.split("\n");
-//		System.out.println(testarr.length);
-//		
-//		 long v = Long.parseLong("2000", 16);   
-//		 System.out.println(String.valueOf(v));
+		System.out.println("--- return ---");
+		System.out.println(retMsg);
 		
 		 
-		 
-//		 System.out.println(CommonUtil.convertHex("fbce648</fknumplan><dnorpatter"));
 		 
 //		
-//		AxlTest axlTest = new AxlTest(urlIP, urlPort, id, pwd);
-//		String retMsg = axlTest.SendSoapMessageV2(soapHeader.toString(), 10000);
 		
-//		System.out.println("--- return ---");
-//		System.out.println(retMsg);
 		
 //		System.out.println(CommonUtil.getPhoneMask(extension));
-		
-		String []arr ;
 		
 		
 		

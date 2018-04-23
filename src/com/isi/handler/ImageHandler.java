@@ -289,8 +289,9 @@ public class ImageHandler {
 			graphics.drawImage(basic_img, 0, 0, null);
 			
 			Font font = new Font("굴림", Font.BOLD, fontsize);
-			if(callingNum.length() > 6) {
-				font = new Font("GulimChe", Font.BOLD, fontsize);
+			if(imageSize.equals("298168")) {
+				// 컬러폰의 경우 글씨체를 PLAIN 으로
+				font = new Font("GulimChe", Font.PLAIN, fontsize);
 			} else {
 				font = new Font("GulimChe", Font.BOLD, fontsize);
 			}
@@ -326,7 +327,14 @@ public class ImageHandler {
 			if(division != null && !division.isEmpty()) {
 				// 부서
 				if(employee.getOrg_nm().length() > 20) {
-					Font newfont = new Font("맑은고딕", Font.BOLD, fontsize - 2);
+					Font newfont = new Font("GulimChe", Font.BOLD, fontsize - 2);
+					if(imageSize.equals("298168")) {
+						// 컬러폰의 경우 글씨체를 PLAIN 으로
+						newfont = new Font("GulimChe", Font.PLAIN, fontsize-2);
+					} else {
+						newfont = new Font("GulimChe", Font.BOLD, fontsize-2);
+					}
+					
 					graphics.setFont(newfont);
 					graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 					// 사업소
@@ -354,7 +362,6 @@ public class ImageHandler {
 			ImageIO.write(mergedImage, "png", new File(strDest));
 			
 			g_Log.imageLog(callID , "CreateImageFile", "CREATE SUCCESS : " + strDest);
-			
 			
 			
         } catch (Exception ioe) {
