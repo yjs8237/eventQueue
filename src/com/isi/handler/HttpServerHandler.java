@@ -725,7 +725,7 @@ public class HttpServerHandler {
 			// 로그인 요청이 오면 이미지 삭제 -> 생성 작업을 실행하고,
 			// Remote Side 서버에게 로그인 요청 동기화 실시
 			// 비동기 처리를 위해 스레드 처리
-			LoginProcess loginProc = new LoginProcess(empVO , parameter , requestID);
+			LoginProcess loginProc = new LoginProcess(convertJson(empVO) , "LOGINSYNC", requestID);
 			loginProc.start();
 			/*////////////////////////////////////////////////////////*/
 			
@@ -750,6 +750,36 @@ public class HttpServerHandler {
 			*/
 		}
 		
+		private JSONObject convertJson(EmployeeVO empVO) {
+			// TODO Auto-generated method stub
+			JSONObject jsonObj = new JSONObject();
+			
+			jsonObj.put("emp_id", empVO.getEmp_id());
+			jsonObj.put("emp_lno", empVO.getEmp_lno());
+			jsonObj.put("emp_nm_kor", empVO.getEmp_nm_kor());
+			jsonObj.put("emp_nm_eng", empVO.getEmp_nm_eng());
+			jsonObj.put("org_nm", empVO.getOrg_nm());
+			jsonObj.put("pos_nm", empVO.getPos_nm());
+			jsonObj.put("duty_nm", empVO.getDuty_nm());
+			jsonObj.put("extension", empVO.getExtension());
+			jsonObj.put("email", empVO.getEmail());
+			jsonObj.put("cell_no", empVO.getCell_no());
+			jsonObj.put("building", empVO.getBuilding());
+			jsonObj.put("floor", empVO.getFloor());
+			jsonObj.put("emp_stat_nm", empVO.getEmp_stat_nm());
+			jsonObj.put("emp_div_cd_nm", empVO.getEmp_div_cd_nm());
+			jsonObj.put("popup_svc_yn", empVO.getPopup_svc_yn());
+			jsonObj.put("mac_address", empVO.getMac_address());
+			jsonObj.put("device_ipaddr", empVO.getDevice_ipaddr());
+			jsonObj.put("device_type", empVO.getDevice_type());
+			jsonObj.put("cm_ver", empVO.getCm_ver());
+			jsonObj.put("cm_ip", empVO.getCm_ip());
+			jsonObj.put("cm_user", empVO.getCm_user());
+			jsonObj.put("cm_pwd", empVO.getCm_pwd());
+			
+			return jsonObj;
+		}
+
 		private String checkParameter(BaseVO baseVO, int apiType) {
 			String result = "OK";
 			String checkData = "";

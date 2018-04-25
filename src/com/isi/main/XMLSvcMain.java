@@ -21,6 +21,7 @@ import com.isi.file.PropertyRead;
 import com.isi.handler.HttpServerHandler;
 import com.isi.handler.HttpSyncServer;
 import com.isi.handler.HttpUrlHandler;
+import com.isi.handler.ServerSocketHandler;
 import com.isi.process.*;
 import com.isi.process.IQueue;
 import com.isi.process.JQueue;
@@ -72,13 +73,6 @@ public class XMLSvcMain {
 		DBConnMgr.getInstance().setDb_pwd(pr.getValue(PROPERTIES.DB_PASSWORD));
 		DBConnMgr.getInstance().initialConnection();
 		
-//		svcMain.test();
-		
-		/*
-		CMInfo cmInfo = CMInfo.getInstance();
-		cmInfo.setCmUser(pr.getValue(PROPERTIES.CM1_USER));
-		cmInfo.setCmPassword(pr.getValue(PROPERTIES.CM1_PASSWORD));
-		*/
 		
 		/*
 		 * ///////////////////////////////////////////////
@@ -95,8 +89,17 @@ public class XMLSvcMain {
 		}
 		
 		// 로그인시 동기화 상대 서버에게 Http Get Request 받는 서버 (이미지 생성을 위하여)
+		
+		/*
+		 * Socket 수정 원복
+		ServerSocketHandler syncServer = new ServerSocketHandler(XmlInfoMgr.getInstance().getHttp_sync_port());
+		syncServer.startService();
+		*/
 		HttpSyncServer httpSyncServer = new HttpSyncServer();
 		httpSyncServer.startService();
+		//////////////////////////////////////////////////////////////////////////
+		
+		
 		
 		// 구동시 이미지 파일 전체 삭제 & 생성
 		ImageService imgSvrThread = new ImageService();
@@ -154,11 +157,19 @@ public class XMLSvcMain {
 					System.out.println("Active Mode 시작!!!!");
 					logwrite.standLog("", "main", "Start Active Mode !! ");
 					logwrite.duplexLog(duplexMgr.getActiveMode(), "XMLSvcMain main()",  "Start Active Mode !! ");
-//					main.testMode();	// 부하테스트 모드
 					main.singleMode(); // ISPS 없는 싱글모드
+					
+					/*
+					// * Socket 수정 원복
+					ServerSocketHandler serverHandler = new ServerSocketHandler(XmlInfoMgr.getInstance().getHttpPort());
+					serverHandler.startService();
+					serverHandler.start();
+					*/
 					
 					HttpServerHandler httpHandler = new HttpServerHandler();
 					httpHandler.startService();
+					
+					//////////////////////////////////////////////////////////////////////////////////
 					logwrite.standLog("", "main", "Start HTTP Handler success !! ");
 					
 					break;

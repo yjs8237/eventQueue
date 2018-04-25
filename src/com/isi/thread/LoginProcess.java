@@ -5,11 +5,15 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONObject;
+
 import com.isi.constans.PROPERTIES;
+import com.isi.constans.RESULT;
 import com.isi.data.ImageMgr;
 import com.isi.data.XmlInfoMgr;
 import com.isi.file.ILog;
 import com.isi.file.PropertyRead;
+import com.isi.handler.ClientSocketHandler;
 import com.isi.handler.HttpUrlHandler;
 import com.isi.handler.ImageHandler;
 import com.isi.vo.EmployeeVO;
@@ -17,14 +21,20 @@ import com.isi.vo.ImageVO;
 
 public class LoginProcess extends Thread {
 	
-	private EmployeeVO empVO;
-	private String parameter;
 	private String requestID;
+	private JSONObject jsonObj;
+	private String type;
+	private String parameter;
 	
-	public LoginProcess( EmployeeVO empVO, String parameter , String requestID) {
-		this.empVO = empVO;
-		this.parameter = parameter;
+	public LoginProcess( JSONObject jsonObj ,  String type, String requestID) {
+		this.jsonObj = jsonObj;
 		this.requestID = requestID;
+		this.type = type;
+	}
+	
+	public LoginProcess( String parameter, String requestID) {
+		this.requestID = requestID;
+		this.parameter = parameter;
 	}
 	
 	public void run() {
@@ -36,6 +46,18 @@ public class LoginProcess extends Thread {
 			
 			// 이중화 환경의 경우 remote 서버에게 로그인 시도 정보 전송 
 			if(XmlInfoMgr.getInstance().getDuplexYN().equalsIgnoreCase("Y")) {
+				/*
+				 * Socket 수정 원복
+				// $$ IP 변경
+//				ClientSocketHandler clientSock = new ClientSocketHandler(XmlInfoMgr.getInstance().getRemoteIP(), XmlInfoMgr.getInstance().getHttp_sync_port());
+				if(clientSock.connect() == RESULT.RTN_SUCCESS) {
+					jsonObj.put("type", type);
+					clientSock.send(jsonObj.toString());
+					clientSock.disconnect();
+				} else {
+					
+				}
+				*/
 				HttpUrlHandler urlHandler = new HttpUrlHandler(parameter , requestID);
 				urlHandler.sendLoginUrl();
 			}

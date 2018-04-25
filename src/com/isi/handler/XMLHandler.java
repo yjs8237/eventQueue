@@ -12,6 +12,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.json.JSONObject;
+
 import com.bestez.common.tr.HostWebtIO;
 import com.bestez.common.vo.CustInfoVO;
 import com.cisco.jtapi.extensions.CiscoTerminal;
@@ -26,6 +28,7 @@ import com.isi.file.LogWriter;
 import com.isi.file.PropertyRead;
 import com.isi.process.DBQueueMgr;
 import com.isi.service.JtapiService;
+import com.isi.thread.LoginProcess;
 import com.isi.vo.*;
 
 /**
@@ -566,6 +569,12 @@ public class XMLHandler {
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushImage", "이미지 생성 이후 이미지 생성 동기화 URL 호출");
 			// 이중화 환경의 경우 Push 하기전에 remote 서버에게 로그인 시도 정보 전송 
 			if (XmlInfoMgr.getInstance().getDuplexYN().equalsIgnoreCase("Y")) {
+				/*
+				 * Socket 수정 원복
+				LoginProcess loginProc = new LoginProcess(makeJsonData(employee , caller_type, xmlInfo.getCallingDn()) ,  "IMAGESYNC" , threadID);
+				loginProc.start();
+				*/
+				
 				HttpUrlHandler urlHandler = new HttpUrlHandler(employee, callID , xmlInfo.getCallingDn() , caller_type );
 				urlHandler.setImageParameter(employee , caller_type, xmlInfo.getCallingDn());
 				try {
@@ -574,38 +583,13 @@ public class XMLHandler {
 			            e.printStackTrace(ExceptionUtil.getPrintWriter());
 			            m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, threadID, "pushImage", ExceptionUtil.getStringWriter().toString());
 				}
+				
 			}
 			
 			// Push
 			pushHandler = new PushHandler(callID);
 //			resultVO = pushHandler.push(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,  caller_type ,   xmlInfo.getCallingDn()), xmlInfo,false);
 			resultVO = pushHandler.sendTerminalPush(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,  caller_type ,   xmlInfo.getCallingDn()), xmlInfo);
-			
-			/*
-			if(resultVO.getReturnCode() == RESULT.RTN_EXCEPTION) {
-				// Push 가 실패하면 터미널에 직접 XML 데이터 send
-				try {
-					CiscoTerminal terminal = JtapiService.getInstance().getTerminal(xmlInfo.getTerminal());
-					if(terminal != null) {
-						byte[] returnByte = terminal.sendData(xmlData.getCiscoIPPhoneImageFile("Ringing", employee, CALL_RING, xmlInfo.getTargetModel() ,  caller_type ,   xmlInfo.getCallingDn()).getBytes());
-						String returnString = new String(returnByte).replaceAll("\n", "").replaceAll("\r", "");
-						m_Log.standLog(callID, "push", "## push response -> " + returnString);
-						resultVO.setResultMsg(returnString);
-						 if(resultVO.getResultMsg().contains("Data=\"Success\"") || resultVO.getResultMsg().contains("Data=\"SUCCESS\"")) {
-					        	resultVO.setPopup_yn("Y");
-					        	resultVO.setReturnCode(RESULT.RTN_SUCCESS);
-					        } else {
-					        	resultVO.setPopup_yn("N");
-					        	resultVO.setReturnCode(RESULT.RTN_EXCEPTION);
-					      }
-					}
-				} catch (Exception e) {
-					 e.printStackTrace(ExceptionUtil.getPrintWriter());
-			           m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, threadID, "pushImage", ExceptionUtil.getStringWriter().toString());
-				}
-				
-			}
-			*/
 			
 			DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(),
 					employee, xmlInfo.getTargetIP(),  resultVO.getResultMsg());
@@ -628,6 +612,7 @@ public class XMLHandler {
 	}
 	
 	
+	
 	private int pushText(EmployeeVO employee, XmlVO xmlInfo , String callID ){
 		pushHandler = new PushHandler(callID);
 		PushResultVO resultVO = new PushResultVO();
@@ -636,5 +621,35 @@ public class XMLHandler {
 		DBQueueMgr.getInstance().addPopUpData(xmlInfo.getCallingDn(), xmlInfo.getCalledDn(), resultVO.getPopup_yn(), employee ,xmlInfo.getTargetIP(), resultVO.getResultMsg());
 		return resultVO.getReturnCode();
 	}
+	private JSONObject makeJsonData(EmployeeVO employee, String caller_type, String callingDn) {
+		JSONObject jsonObject = new JSONObject();
+		
+		jsonObject.put("caller_type", caller_type);
+		jsonObject.put("callingNumber", callingDn);
+		jsonObject.put("emp_id", employee.getEmp_id());
+		jsonObject.put("emp_lno", employee.getEmp_lno());
+		jsonObject.put("emp_nm_kor", employee.getEmp_nm_kor());
+		jsonObject.put("emp_nm_eng", employee.getEmp_nm_eng());
+		jsonObject.put("org_nm", employee.getOrg_nm());
+		jsonObject.put("pos_nm", employee.getPos_nm());
+		jsonObject.put("duty_nm", employee.getDuty_nm());
+		jsonObject.put("extension", employee.getExtension());
+		jsonObject.put("email", employee.getEmail());
+		jsonObject.put("cell_no", employee.getCell_no());
+		jsonObject.put("building", employee.getBuilding());
+		jsonObject.put("floor", employee.getFloor());
+		jsonObject.put("emp_stat_nm", employee.getEmp_stat_nm());
+		jsonObject.put("emp_div_cd_nm", employee.getEmp_div_cd_nm());
+		jsonObject.put("popup_svc_yn", employee.getPopup_svc_yn());
+		jsonObject.put("mac_address", employee.getMac_address());
+		jsonObject.put("device_ipaddr", employee.getDevice_ipaddr());
+		jsonObject.put("device_type", employee.getDevice_type());
+		jsonObject.put("cm_ver", employee.getCm_ver());
+		jsonObject.put("cm_ip", employee.getCm_ip());
+		jsonObject.put("cm_user", employee.getCm_user());
+		jsonObject.put("cm_pwd", employee.getCm_pwd());
+		return jsonObject;
+	}
+
 	
 }
