@@ -569,12 +569,12 @@ public class XMLHandler {
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, threadID, "pushImage", "이미지 생성 이후 이미지 생성 동기화 URL 호출");
 			// 이중화 환경의 경우 Push 하기전에 remote 서버에게 로그인 시도 정보 전송 
 			if (XmlInfoMgr.getInstance().getDuplexYN().equalsIgnoreCase("Y")) {
-				/*
-				 * Socket 수정 원복
+				
+				 //* Socket 수정 원복
 				LoginProcess loginProc = new LoginProcess(makeJsonData(employee , caller_type, xmlInfo.getCallingDn()) ,  "IMAGESYNC" , threadID);
 				loginProc.start();
-				*/
 				
+				/*
 				HttpUrlHandler urlHandler = new HttpUrlHandler(employee, callID , xmlInfo.getCallingDn() , caller_type );
 				urlHandler.setImageParameter(employee , caller_type, xmlInfo.getCallingDn());
 				try {
@@ -583,6 +583,7 @@ public class XMLHandler {
 			            e.printStackTrace(ExceptionUtil.getPrintWriter());
 			            m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.ERR_LOG, threadID, "pushImage", ExceptionUtil.getStringWriter().toString());
 				}
+				*/
 				
 			}
 			

@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import com.isi.constans.APITYPE;
 import com.isi.constans.CALLSTATE;
+import com.isi.constans.CM_INFO;
 import com.isi.constans.RESULT;
 import com.isi.data.CallStateMgr;
 import com.isi.data.Employees;
@@ -698,17 +699,17 @@ public class HttpServerHandler {
 			
 			if(empVO.getCm_ip() == null || empVO.getCm_ip().isEmpty()) {
 				logwrite.httpLog(requestID, "procLogin", empVO.getEmp_id() + " 교환기 IP 정보가 없습니다!! 교환기 정보 강제 세팅 IP [10.156.214.111]");
-				empVO.setCm_ip("10.156.214.111");
+				empVO.setCm_ip(CM_INFO.CM_IP);
 			}
 			
 			if(empVO.getCm_user() == null || empVO.getCm_user().isEmpty()) {
 				logwrite.httpLog(requestID, "procLogin", empVO.getEmp_id() + " 교환기 USER 정보가 없습니다!! 교환기 정보 강제 세팅 USER [SAC_IPT]");
-				empVO.setCm_user("SAC_IPT");
+				empVO.setCm_user(CM_INFO.CM_USER);
 			}
 			
 			if(empVO.getCm_pwd() == null || empVO.getCm_pwd().isEmpty()) {
 				logwrite.httpLog(requestID, "procLogin", empVO.getEmp_id() + " 교환기 PASSWORD 정보가 없습니다!! 교환기 정보 강제 세팅 PW [dkdlvlxl123$]");
-				empVO.setCm_pwd("dkdlvlxl123$");
+				empVO.setCm_pwd(CM_INFO.CM_USER_PWD);
 			}
 			
 			// 전화기가 깜박거리는 시간동안 백그라운드 스레드에서 일정시간 기다리고 Monitor 시작한다

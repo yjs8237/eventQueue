@@ -63,23 +63,23 @@ public class CallEvtHandler {
 //				CallStateMgr.getInstance().addDeviceState(event.getCallingDn() , CALLSTATE.ALERTING_ING);
 				CallStateMgr.getInstance().addDeviceState(event.getCalledDn() , CALLSTATE.ALERTING_ING);
 				
-				EmployeeVO employeeVO = Employees.getInstance().getEmployeeByMacAddress(event.getTerminal(), callID);
+				EmployeeVO calledEmpVO = Employees.getInstance().getEmployeeByMacAddress(event.getTerminal(), callID);
 				// 메모리의 타겟 Device 정보가 없다면 Jtapi Provider 를 통해 정보를 획득한다
-				if(employeeVO == null) {
-					employeeVO = new EmployeeVO();
-					employeeVO.setMac_address(event.getTerminal());
+				if(calledEmpVO == null) {
+					calledEmpVO = new EmployeeVO();
+					calledEmpVO.setMac_address(event.getTerminal());
 				}
-				if(employeeVO == null || checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
-					getJtapiTerminalInfo(employeeVO , event.getTerminal() , callID);
-					Employees.getInstance().updateEmployeeInfoByMacAddress(employeeVO);
+				if(calledEmpVO == null || checkVaildPush(calledEmpVO,callID) != RESULT.RTN_SUCCESS) {
+					getJtapiTerminalInfo(calledEmpVO , event.getTerminal() , callID);
+					Employees.getInstance().updateEmployeeInfoByMacAddress(calledEmpVO);
 				}
 					
-				if(employeeVO != null) {
-					if(checkVaildPush(employeeVO,callID) != RESULT.RTN_SUCCESS) {
-						DBQueueMgr.getInstance().addPopUpData(event.getCallingDn(), event.getCalledDn(), "N", employeeVO , employeeVO.getDevice_ipaddr() ,"CM or Device information is not specified");
+				if(calledEmpVO != null) {
+					if(checkVaildPush(calledEmpVO,callID) != RESULT.RTN_SUCCESS) {
+						DBQueueMgr.getInstance().addPopUpData(event.getCallingDn(), event.getCalledDn(), "N", calledEmpVO , calledEmpVO.getDevice_ipaddr() ,"CM or Device information is not specified");
 						return RESULT.ERROR;
 					}else {
-						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", employeeVO.getEmp_id() + " , " + employeeVO.getMac_address() + " , "  + employeeVO.getDevice_ipaddr() + " Push!!");
+						m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, callID, "callRingEvt", calledEmpVO.getEmp_id() + " , " + calledEmpVO.getMac_address() + " , "  + calledEmpVO.getDevice_ipaddr() + " Push!!");
 						
 						/**************************************************************************************/
 						/*
@@ -94,11 +94,11 @@ public class CallEvtHandler {
 						 */
 						
 						EmployeeVO tempEmpVO = new EmployeeVO();
-						tempEmpVO.setDevice_ipaddr(employeeVO.getDevice_ipaddr());
+						tempEmpVO.setDevice_ipaddr(calledEmpVO.getDevice_ipaddr());
 						tempEmpVO.setMac_address(event.getTerminal());
-						tempEmpVO.setCm_user(employeeVO.getCm_user());
-						tempEmpVO.setCm_pwd(employeeVO.getCm_pwd());
-						tempEmpVO.setDevice_type(employeeVO.getDevice_type());
+						tempEmpVO.setCm_user(calledEmpVO.getCm_user());
+						tempEmpVO.setCm_pwd(calledEmpVO.getCm_pwd());
+						tempEmpVO.setDevice_type(calledEmpVO.getDevice_type());
 						CallIDMgr.getInstance().addCallIDObject(event.get_GCallID(), tempEmpVO);
 						
 						/************************************************************************************/
@@ -106,8 +106,8 @@ public class CallEvtHandler {
 						
 						// 이벤트 대상 터미널의 1번 라인(DN)이 발신번호와 동일하면 팝업하지 않는다.
 						// 본인이 본인 번호로 전화를 걸었을 경우 
-						if(!employeeVO.getExtension().equals(event.getCallingDn())) {
-							int returnCode = xmlHandler.evtRing(makeAlertingXmlVO(event , employeeVO , callID) , callID);
+						if(!calledEmpVO.getExtension().equals(event.getCallingDn())) {
+							int returnCode = xmlHandler.evtRing(makeAlertingXmlVO(event , calledEmpVO , callID) , callID);
 						}
 						
 						
@@ -871,10 +871,10 @@ public class CallEvtHandler {
 			
 			
 			if(employeeVO.getCm_user() == null || employeeVO.getCm_user().isEmpty()) {
-				employeeVO.setCm_user("SAC_IPT");
+				employeeVO.setCm_user(CM_INFO.CM_USER);
 			}
 			if(employeeVO.getCm_pwd() == null || employeeVO.getCm_pwd().isEmpty()) {
-				employeeVO.setCm_pwd("dkdlvlxl123$");
+				employeeVO.setCm_pwd(CM_INFO.CM_USER_PWD);
 			}
 			
 			employeeVO.setDevice_ipaddr(device_ipaddr);

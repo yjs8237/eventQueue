@@ -46,10 +46,10 @@ public class LoginProcess extends Thread {
 			
 			// 이중화 환경의 경우 remote 서버에게 로그인 시도 정보 전송 
 			if(XmlInfoMgr.getInstance().getDuplexYN().equalsIgnoreCase("Y")) {
-				/*
-				 * Socket 수정 원복
+				
+				// * Socket 수정 원복
 				// $$ IP 변경
-//				ClientSocketHandler clientSock = new ClientSocketHandler(XmlInfoMgr.getInstance().getRemoteIP(), XmlInfoMgr.getInstance().getHttp_sync_port());
+				ClientSocketHandler clientSock = new ClientSocketHandler(XmlInfoMgr.getInstance().getRemoteIP(), XmlInfoMgr.getInstance().getHttp_sync_port());
 				if(clientSock.connect() == RESULT.RTN_SUCCESS) {
 					jsonObj.put("type", type);
 					clientSock.send(jsonObj.toString());
@@ -57,9 +57,10 @@ public class LoginProcess extends Thread {
 				} else {
 					
 				}
-				*/
+				/*
 				HttpUrlHandler urlHandler = new HttpUrlHandler(parameter , requestID);
 				urlHandler.sendLoginUrl();
+				*/
 			}
 			
 			

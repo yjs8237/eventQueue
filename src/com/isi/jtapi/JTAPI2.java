@@ -117,7 +117,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 			JtapiPeer peer = JtapiPeerFactory.getJtapiPeer(null);
 
 			providerString = cmIP + ";login=" + cmID + ";passwd=" + cmPwd;
-			// 원복필요 2018-04-11
+			// 원복
 //			providerString = cmIP + ";login=" + "test_user" + ";passwd=" + "dkdlvlxl123$";
 
 			m_Log.write(LOGLEVEL.LEVEL_3, LOGTYPE.STAND_LOG, SVCTYPE.JTAPI, "serviceStart",
@@ -803,7 +803,7 @@ public class JTAPI2 implements IJTAPI, ProviderObserver {
 				return resultVO;
 			}
 			
-			// 원복필요 2018-04-11
+			// 
 			/*
 			for (int i = 0; i < terminalArr.length; i++) {
 				CiscoTerminal ciscoTerminal = (CiscoTerminal) terminalArr[i];

@@ -90,13 +90,15 @@ public class XMLSvcMain {
 		
 		// 로그인시 동기화 상대 서버에게 Http Get Request 받는 서버 (이미지 생성을 위하여)
 		
-		/*
-		 * Socket 수정 원복
+		
+		 // Socket 수정 원복
 		ServerSocketHandler syncServer = new ServerSocketHandler(XmlInfoMgr.getInstance().getHttp_sync_port());
 		syncServer.startService();
-		*/
+		
+		/*
 		HttpSyncServer httpSyncServer = new HttpSyncServer();
 		httpSyncServer.startService();
+		*/
 		//////////////////////////////////////////////////////////////////////////
 		
 		
@@ -159,16 +161,16 @@ public class XMLSvcMain {
 					logwrite.duplexLog(duplexMgr.getActiveMode(), "XMLSvcMain main()",  "Start Active Mode !! ");
 					main.singleMode(); // ISPS 없는 싱글모드
 					
-					/*
+					
 					// * Socket 수정 원복
 					ServerSocketHandler serverHandler = new ServerSocketHandler(XmlInfoMgr.getInstance().getHttpPort());
 					serverHandler.startService();
 					serverHandler.start();
-					*/
 					
+					/*
 					HttpServerHandler httpHandler = new HttpServerHandler();
 					httpHandler.startService();
-					
+					*/
 					//////////////////////////////////////////////////////////////////////////////////
 					logwrite.standLog("", "main", "Start HTTP Handler success !! ");
 					

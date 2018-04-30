@@ -200,7 +200,7 @@ public class XMLSvcCallable implements Callable<Integer> {
 
 			// Disconnect 전화 끊었을 경우
 			case IEvt.CallCtl_TermConn_DroppedEv:
-				// 원복필요 2018-04-11
+				// 
 				evtHandler.callDisconnectEvtForPwd(evt, callID);
 //				evtHandler.callDisconnectEvt(evt, callID);
 				break;
