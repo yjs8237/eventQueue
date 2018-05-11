@@ -11,6 +11,7 @@ import com.isi.constans.PROPERTIES;
 import com.isi.constans.RESULT;
 import com.isi.data.ImageMgr;
 import com.isi.data.XmlInfoMgr;
+import com.isi.file.GLogWriter;
 import com.isi.file.ILog;
 import com.isi.file.PropertyRead;
 import com.isi.handler.ClientSocketHandler;
@@ -25,16 +26,19 @@ public class LoginProcess extends Thread {
 	private JSONObject jsonObj;
 	private String type;
 	private String parameter;
+	private ILog 			logwrite;
 	
 	public LoginProcess( JSONObject jsonObj ,  String type, String requestID) {
 		this.jsonObj = jsonObj;
 		this.requestID = requestID;
 		this.type = type;
+		this.logwrite = new GLogWriter();
 	}
 	
 	public LoginProcess( String parameter, String requestID) {
 		this.requestID = requestID;
 		this.parameter = parameter;
+		this.logwrite = new GLogWriter();
 	}
 	
 	public void run() {
@@ -52,7 +56,11 @@ public class LoginProcess extends Thread {
 				ClientSocketHandler clientSock = new ClientSocketHandler(XmlInfoMgr.getInstance().getRemoteIP(), XmlInfoMgr.getInstance().getHttp_sync_port());
 				if(clientSock.connect() == RESULT.RTN_SUCCESS) {
 					jsonObj.put("type", type);
-					clientSock.send(jsonObj.toString());
+					if(clientSock.send(jsonObj.toString()) == RESULT.RTN_SUCCESS) {
+						logwrite.httpLog(requestID, "run", "remote Logint Request Success !! " + jsonObj.toString());
+					} else {
+						logwrite.httpLog(requestID, "run", "remote Logint Request Fail !! " + jsonObj.toString());
+					}
 					clientSock.disconnect();
 				} else {
 					

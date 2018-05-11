@@ -55,6 +55,7 @@ public class XMLSvcCallable implements Callable<Integer> {
 				
 				IEvt evt = (IEvt) queue.get();
 //				logwrite.standLog("", "call()", evt.toString());
+				
 				callID = String.valueOf(System.currentTimeMillis()) + "-" + String.valueOf(Thread.currentThread().getName()) + String.valueOf(Thread.currentThread().getId())
 				 + "_" + evt.getDevice();
 				if(evt != null) {
@@ -181,6 +182,9 @@ public class XMLSvcCallable implements Callable<Integer> {
 
 	private void evtTermConnEvt(TermConnEvt evt, String callID) throws Exception {
 		// TODO Auto-generated method stub
+		
+		callID = String.valueOf(System.currentTimeMillis()) + "-" + String.valueOf(Thread.currentThread().getName()) + evt.get_GCallID()
+		 + "_" + evt.getDevice();
 		
 		switch(evt.getEventID()) {
 			// Ring 이 울릴경우

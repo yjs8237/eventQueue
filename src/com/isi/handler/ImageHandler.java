@@ -279,7 +279,7 @@ public class ImageHandler {
             
             int fontsize = (int) (height / 8);
             if(imageSize.equals("298168")) {
-            	fontsize = (int) (height / 10);
+            	fontsize = (int) (height / 9);
             }
 			
 			BufferedImage mergedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -291,7 +291,7 @@ public class ImageHandler {
 			Font font = new Font("굴림", Font.BOLD, fontsize);
 			if(imageSize.equals("298168")) {
 				// 컬러폰의 경우 글씨체를 PLAIN 으로
-				font = new Font("GulimChe", Font.PLAIN, fontsize);
+				font = new Font("GulimChe", Font.BOLD, fontsize);
 			} else {
 				font = new Font("GulimChe", Font.BOLD, fontsize);
 			}
