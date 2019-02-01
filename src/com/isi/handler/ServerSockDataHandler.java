@@ -178,16 +178,18 @@ public class ServerSockDataHandler extends Thread {
 		ImageMgr imageMgr = ImageMgr.getInstance();
 		
 		
-		// DB Device Type 정보 가져오고 IP 정보 업데이트
-		Connection conn = DBConnMgr.getInstance().getConnection(requestID);
-		MyAddressMgr myAddress = new MyAddressMgr(conn);
-		ArrayList<EmployeeVO> empList = myAddress.getLoginUserList(imageSyncVO.getEmp_id(), requestID);
-		// 커넥션 반납
-		DBConnMgr.getInstance().returnConnection(conn, requestID);
-		
-		if(empList != null && empList.size() > 0) {
-			imageSyncVO.setOrg_nm(empList.get(0).getOrg_nm());
-			imageSyncVO.setPos_nm(empList.get(0).getPos_nm());
+		if(imageSyncVO.getEmp_id() != null && !imageSyncVO.getEmp_id().isEmpty()) {
+			// DB Device Type 정보 가져오고 IP 정보 업데이트
+			Connection conn = DBConnMgr.getInstance().getConnection(requestID);
+			MyAddressMgr myAddress = new MyAddressMgr(conn);
+			ArrayList<EmployeeVO> empList = myAddress.getLoginUserList(imageSyncVO.getEmp_id(), requestID);
+			// 커넥션 반납
+			DBConnMgr.getInstance().returnConnection(conn, requestID);
+			
+			if(empList != null && empList.size() > 0) {
+				imageSyncVO.setOrg_nm(empList.get(0).getOrg_nm());
+				imageSyncVO.setPos_nm(empList.get(0).getPos_nm());
+			}
 		}
 		
 		imageMgr.createImageSyncFiles( imageSyncVO , requestID);
@@ -204,30 +206,127 @@ public class ServerSockDataHandler extends Thread {
 	private ImageSyncVO getImageSyncInfo(JSONObject paramObject) {
 		// TODO Auto-generated method stub
 		ImageSyncVO imageSyncVO = new ImageSyncVO();
-		imageSyncVO.setCaller_type(paramObject.get("caller_type").toString());
-		imageSyncVO.setCallingNumber(paramObject.get("callingNumber").toString());
-		imageSyncVO.setEmp_id(paramObject.get("emp_id").toString());
-		imageSyncVO.setEmp_lno(paramObject.get("emp_lno").toString());
-		imageSyncVO.setEmp_nm_kor(paramObject.get("emp_nm_kor").toString());
-		imageSyncVO.setEmp_nm_eng(paramObject.get("emp_nm_eng").toString());
-		imageSyncVO.setOrg_nm(paramObject.get("org_nm").toString());
-		imageSyncVO.setPos_nm(paramObject.get("pos_nm").toString());
-		imageSyncVO.setDuty_nm(paramObject.get("duty_nm").toString());
-		imageSyncVO.setExtension(paramObject.get("extension").toString());
-		imageSyncVO.setEmail(paramObject.get("email").toString());
-		imageSyncVO.setCell_no(paramObject.get("cell_no").toString());
-		imageSyncVO.setBuilding(paramObject.get("building").toString());
-		imageSyncVO.setFloor(paramObject.get("floor").toString());
-		imageSyncVO.setEmp_stat_nm(paramObject.get("emp_stat_nm").toString());
-		imageSyncVO.setEmp_div_cd_nm(paramObject.get("emp_div_cd_nm").toString());
-		imageSyncVO.setPopup_svc_yn(paramObject.get("popup_svc_yn").toString());
-		imageSyncVO.setMac_address(paramObject.get("mac_address").toString());
-		imageSyncVO.setDevice_ipaddr(paramObject.get("device_ipaddr").toString());
-		imageSyncVO.setDevice_type(paramObject.get("device_type").toString());
-		imageSyncVO.setCm_ver(paramObject.get("cm_ver").toString());
-		imageSyncVO.setCm_ip(paramObject.get("cm_ip").toString());
-		imageSyncVO.setCm_user(paramObject.get("cm_user").toString());
-		imageSyncVO.setCm_pwd(paramObject.get("cm_pwd").toString());
+		
+		if(paramObject.has("caller_type")) {
+			imageSyncVO.setCaller_type(paramObject.get("caller_type").toString());
+		} else {
+			imageSyncVO.setCaller_type("");
+		}
+		if(paramObject.has("callingNumber")) {
+			imageSyncVO.setCallingNumber(paramObject.get("callingNumber").toString());
+		} else {
+			imageSyncVO.setCallingNumber("");
+		}
+		if(paramObject.has("emp_id")) {
+			imageSyncVO.setEmp_id(paramObject.get("emp_id").toString());
+		} else {
+			imageSyncVO.setEmp_id("");
+		}
+		if(paramObject.has("emp_lno")) {
+			imageSyncVO.setEmp_lno(paramObject.get("emp_lno").toString());
+		} else {
+			imageSyncVO.setEmp_lno("");
+		}
+		if(paramObject.has("emp_nm_kor")) {
+			imageSyncVO.setEmp_nm_kor(paramObject.get("emp_nm_kor").toString());
+		} else {
+			imageSyncVO.setEmp_nm_kor("");
+		}
+		if(paramObject.has("emp_nm_eng")) {
+			imageSyncVO.setEmp_nm_eng(paramObject.get("emp_nm_eng").toString());
+		} else {
+			imageSyncVO.setEmp_nm_eng("");
+		}
+		if(paramObject.has("org_nm")) {
+			imageSyncVO.setOrg_nm(paramObject.get("org_nm").toString());
+		} else {
+			imageSyncVO.setOrg_nm("");
+		}
+		if(paramObject.has("pos_nm")) {
+			imageSyncVO.setPos_nm(paramObject.get("pos_nm").toString());
+		} else {
+			imageSyncVO.setPos_nm("");
+		}
+		if(paramObject.has("duty_nm")) {
+			imageSyncVO.setDuty_nm(paramObject.get("duty_nm").toString());
+		} else {
+			imageSyncVO.setDuty_nm("");
+		}
+		if(paramObject.has("extension")) {
+			imageSyncVO.setExtension(paramObject.get("extension").toString());
+		} else {
+			imageSyncVO.setExtension("");
+		}
+		if(paramObject.has("email")) {
+			imageSyncVO.setEmail(paramObject.get("email").toString());
+		} else {
+			imageSyncVO.setEmail("");
+		}
+		if(paramObject.has("cell_no")) {
+			imageSyncVO.setCell_no(paramObject.get("cell_no").toString());
+		} else {
+			imageSyncVO.setCell_no("");
+		}
+		if(paramObject.has("building")) {
+			imageSyncVO.setBuilding(paramObject.get("building").toString());
+		} else {
+			imageSyncVO.setBuilding("");
+		}
+		if(paramObject.has("floor")) {
+			imageSyncVO.setFloor(paramObject.get("floor").toString());
+		} else {
+			imageSyncVO.setFloor("");
+		}
+		if(paramObject.has("emp_stat_nm")) {
+			imageSyncVO.setEmp_stat_nm(paramObject.get("emp_stat_nm").toString());
+		} else {
+			imageSyncVO.setEmp_stat_nm("");
+		}
+		if(paramObject.has("emp_div_cd_nm")) {
+			imageSyncVO.setEmp_div_cd_nm(paramObject.get("emp_div_cd_nm").toString());
+		} else {
+			imageSyncVO.setEmp_div_cd_nm("");
+		}
+		if(paramObject.has("popup_svc_yn")) {
+			imageSyncVO.setPopup_svc_yn(paramObject.get("popup_svc_yn").toString());
+		} else {
+			imageSyncVO.setPopup_svc_yn("");
+		}
+		if(paramObject.has("mac_address")) {
+			imageSyncVO.setMac_address(paramObject.get("mac_address").toString());
+		} else {
+			imageSyncVO.setMac_address("");
+		}
+		if(paramObject.has("device_ipaddr")) {
+			imageSyncVO.setDevice_ipaddr(paramObject.get("device_ipaddr").toString());
+		} else {
+			imageSyncVO.setDevice_ipaddr("");
+		}
+		if(paramObject.has("device_type")) {
+			imageSyncVO.setDevice_type(paramObject.get("device_type").toString());
+		} else {
+			imageSyncVO.setDevice_type("");
+		}
+		if(paramObject.has("cm_ver")) {
+			imageSyncVO.setCm_ver(paramObject.get("cm_ver").toString());
+		} else {
+			imageSyncVO.setCm_ver("");
+		}
+		if(paramObject.has("cm_ip")) {
+			imageSyncVO.setCm_ip(paramObject.get("cm_ip").toString());
+		} else {
+			imageSyncVO.setCm_ip("");
+		}
+		if(paramObject.has("cm_user")) {
+			imageSyncVO.setCm_user(paramObject.get("cm_user").toString());
+		} else {
+			imageSyncVO.setCm_user("");
+		}
+		if(paramObject.has("cm_pwd")) {
+			imageSyncVO.setCm_pwd(paramObject.get("cm_pwd").toString());
+		} else {
+			imageSyncVO.setCm_pwd("");
+		}
 		return imageSyncVO;
 	}
 

@@ -205,20 +205,88 @@ public class Employees {
 		ArrayList list = (ArrayList) empMapByExtension.get(stExtension);
 		
 		EmployeeVO employee = null;
+		boolean isPopUpSvcUser = false;
 		
 		if(list != null && list.size() > 0) {
-			employee = (EmployeeVO) list.get(0);
+			
+			for (int i = 0; i < list.size(); i++) {
+				employee = (EmployeeVO) list.get(i);
+				if(employee.getPopup_svc_yn() != null && employee.getPopup_svc_yn().equalsIgnoreCase("Y")) {
+					isPopUpSvcUser = true;
+					break;
+				}
+			}
+			// 동일 내선번호를 두명이 사용하는 경우 발생.. 일단 0848 내선에 대해서만 예외처리 해주자..
+//			employee = checkDupExtension(stExtension , list);
 		}
 		
-		if(employee != null){
+		if(isPopUpSvcUser){
 			logwrite.standLog(callID, "getEmployeeByExtension", "GET Employee Information RESULT [" + employee.toString() + "]");
 		} else {
 			logwrite.standLog(callID, "getEmployeeByExtension", "GET Employee NULL !!! [" + stExtension + "]");
+			employee = null;
 		}
 		
 		return employee;
 	}
 	
+	private EmployeeVO checkDupExtension(String stExtension , ArrayList list) {
+		// TODO Auto-generated method stub
+		EmployeeVO employee = null;
+		if(stExtension.equals("0848")) {
+			for (int i = 0; i < list.size(); i++) {
+				employee = (EmployeeVO) list.get(i);
+				if(!employee.getEmp_lno().equals("100527")) {
+					// 사번이 100527 이 아닌 분의 팝업을 띄워야 한다.
+					return employee;
+				} 
+			}
+		} else if (stExtension.equals("0796")) {
+			for (int i = 0; i < list.size(); i++) {
+				employee = (EmployeeVO) list.get(i);
+				if(!employee.getEmp_lno().equals("140183")) {
+					// 사번이 140183 이 아닌 분의 팝업을 띄워야 한다.
+					return employee;
+				} 
+			}
+		} else if (stExtension.equals("3038")) {
+			for (int i = 0; i < list.size(); i++) {
+				employee = (EmployeeVO) list.get(i);
+				if(!employee.getEmp_lno().equals("170684")) {
+					// 사번이 170684 이 아닌 분의 팝업을 띄워야 한다.
+					return employee;
+				} 
+			}
+		}  else if (stExtension.equals("3095")) {
+			for (int i = 0; i < list.size(); i++) {
+				employee = (EmployeeVO) list.get(i);
+				if(!employee.getEmp_lno().equals("180516")) {
+					// 사번이 180516 이 아닌 분의 팝업을 띄워야 한다.
+					return employee;
+				} 
+			}
+		} else if (stExtension.equals("3147")) {
+			for (int i = 0; i < list.size(); i++) {
+				employee = (EmployeeVO) list.get(i);
+				if(!employee.getEmp_lno().equals("180483")) {
+					// 사번이 180483 이 아닌 분의 팝업을 띄워야 한다.
+					return employee;
+				} 
+			}
+		} else if (stExtension.equals("3219")) {
+			for (int i = 0; i < list.size(); i++) {
+				employee = (EmployeeVO) list.get(i);
+				if(!employee.getEmp_lno().equals("170511")) {
+					// 사번이 170511 이 아닌 분의 팝업을 띄워야 한다.
+					return employee;
+				} 
+			}
+		} else {
+			employee = (EmployeeVO) list.get(0);
+		}
+		return employee;
+	}
+
 	public EmployeeVO getEmployeeByMacAddress (String mac_address , String callID){
 		
 		EmployeeVO employee = (EmployeeVO) empMapByMac.get(mac_address);
@@ -502,7 +570,9 @@ public class Employees {
 			
 			for (int j = 0; j < list.size(); j++) {
 				EmployeeVO empVO = (EmployeeVO) list.get(j);
-				ImageMgr.getInstance().createImageFiles(empVO, "initial");
+				if(empVO.getPopup_svc_yn() != null && empVO.getPopup_svc_yn().equalsIgnoreCase("Y")) {
+					ImageMgr.getInstance().createImageFiles(empVO, "initial");
+				}
 			}
 		}
 		
